@@ -1,1 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Cine Personal</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav>
+        <h1>🎬 Mi Cine</h1>
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Buscar película...">
+            <button id="searchBtn">Buscar</button>
+        </div>
+    </nav>
 
+    <main>
+        <section id="results" class="grid-container"></section>
+        
+        <hr>
+        <h2>🍿 Mi Biblioteca</h2>
+        <section id="myLibrary" class="grid-container"></section>
+
+        <section id="statistics">
+            <h2>📊 Mis Estadísticas</h2>
+            <div id="statsData" class="stats-card">
+                Añade películas para ver tus directores y actores favoritos.
+            </div>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
