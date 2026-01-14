@@ -39,17 +39,66 @@ body {
 .card img { width: 100%; height: 225px; object-fit: cover; }
 
 /* TARJETAS PERSONAS (ACTORES/DIRECTORES) */
+
+/* Tarjeta más grande y con aire interno */
 .person-card {
-    background: var(--card-bg); width: 170px; border-radius: 15px;
-    padding: 12px; border: 1px solid #333; text-align: center;
+    background: #1e1e1e;
+    width: 170px; /* Aumentamos el ancho de 140px a 170px */
+    border-radius: 15px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 12px; /* Añadimos espacio entre el borde y el contenido */
+    border: 1px solid #333;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
 }
+
+/* La foto del actor con bordes redondeados propios */
 .person-photo {
-    width: 100%; height: 190px; object-fit: cover; border-radius: 10px;
+    width: 100%;
+    height: 190px; /* Un poco más alta */
+    object-fit: cover;
+    border-radius: 10px; /* Ahora la foto tiene su propia redondez dentro de la tarjeta */
+    margin-bottom: 10px; /* Separa la foto del nombre */
 }
+
+/* Información del actor */
+.person-info {
+    text-align: center;
+    width: 100%;
+}
+
+.person-info strong {
+    color: white;
+    font-size: 1rem; /* Nombre un poco más grande */
+    display: block;
+    margin-bottom: 12px;
+    height: 2.4em; /* Reserva espacio para nombres largos de 2 líneas */
+    overflow: hidden;
+}
+
+/* El mini póster centrado y con espacio */
+.movie-reference {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding-top: 5px;
+}
+
 .mini-poster {
-    width: 80px !important; height: 120px !important;
-    border-radius: 6px !important; border: 2px solid var(--primary);
-    margin-top: 10px; cursor: pointer; transition: 0.3s;
+    width: 80px !important;   /* Un poco más grande para que se aprecie mejor */
+    height: 120px !important;
+    border-radius: 6px !important;
+    object-fit: cover;
+    border: 2px solid #e50914;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.mini-poster:hover {
+    transform: scale(1.15);
+    z-index: 10;
 }
 
 /* MODAL */
@@ -144,4 +193,13 @@ canvas {
     text-transform: uppercase;
     font-size: 0.8rem;
     letter-spacing: 1px;
+}
+
+/* Contenedor principal para que las tarjetas respiren */
+#directorList, #actorList, #writerList, #producerList {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 25px; /* Más espacio entre tarjetas */
+    padding: 30px;
 }
