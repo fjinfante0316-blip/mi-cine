@@ -35,22 +35,28 @@
 
     <div id="main">
         <section id="searchSection" class="content-section">
-            <div class="search-container">
+            <div class="hero-center">
                 <h1>🎬 MI CINE</h1>
                 <div class="search-box">
                     <input type="text" id="searchInput" placeholder="Busca una película...">
-                    <button id="searchBtn">BUSCAR</button>
+                    <button id="searchBtn">Buscar</button>
                 </div>
             </div>
             <div id="results" class="movie-grid"></div>
         </section>
 
-        <section id="myLibrary" class="content-section" style="display:none;">
-            <h2 class="section-title">🍿 Películas Vistas</h2>
-            <div id="watchedMovies" class="movie-grid"></div>
-            <hr class="separator">
-            <h2 class="section-title" style="color: #aaa;">⏳ Películas Pendientes</h2>
-            <div id="pendingMovies" class="movie-grid"></div>
+        <section id="stats" class="content-section" style="display:none;">
+            <h2 class="section-title">📊 Mis Estadísticas</h2>
+            <div class="stats-center-container">
+                <div class="stat-card-large">
+                <span class="stat-emoji">⏳</span>
+                <div class="stat-value" id="statHours">0h 0m</div>
+                <p class="stat-label">Tiempo total de cine</p>
+                </div>
+            </div>
+            <div class="charts">
+                <canvas id="genreChart"></canvas>
+            </div>
         </section>
 
         <section id="stats" class="content-section" style="display:none;">
