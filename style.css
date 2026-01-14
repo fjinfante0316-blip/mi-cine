@@ -1,105 +1,37 @@
-:root {
-    --primary: #e50914;
-    --bg: #141414;
-    --card: #222;
+:root { --primary: #e50914; --bg: #141414; }
+body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; overflow-x: hidden; }
+
+/* Botón Hamburguesa */
+.menu-btn {
+    position: fixed; top: 20px; left: 20px; font-size: 30px;
+    cursor: pointer; z-index: 1000; background: rgba(0,0,0,0.5);
+    padding: 5px 15px; border-radius: 5px;
 }
 
-body {
-    font-family: 'Segoe UI', sans-serif;
-    background-color: var(--bg);
-    color: white;
-    margin: 0;
+/* Menú Lateral */
+.side-menu {
+    height: 100%; width: 0; position: fixed; z-index: 2000;
+    top: 0; left: 0; background-color: #111;
+    overflow-x: hidden; transition: 0.5s; padding-top: 60px;
 }
+.side-menu a {
+    padding: 15px 30px; text-decoration: none; font-size: 1.2rem;
+    color: #818181; display: block; transition: 0.3s;
+}
+.side-menu a:hover { color: white; background: var(--primary); }
+.close-btn { position: absolute; top: 10px; right: 25px; font-size: 36px; cursor: pointer; }
 
-nav {
-    background: black;
-    padding: 1rem 2rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
+/* Hero / Portada */
+.hero { text-align: center; padding: 100px 20px; min-height: 80vh; }
+.search-box input { padding: 12px; width: 300px; border-radius: 5px 0 0 5px; border: none; }
+.search-box button { padding: 12px 20px; border-radius: 0 5px 5px 0; background: var(--primary); color: white; border: none; cursor: pointer; }
 
-.grid-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    gap: 20px;
-    padding: 20px;
-}
+/* Contenedores */
+.grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; padding: 40px; }
+.flex-container { display: flex; flex-wrap: wrap; gap: 20px; padding: 40px; justify-content: center; }
+.card { background: #222; padding: 10px; border-radius: 8px; text-align: center; }
+.card img { width: 100%; border-radius: 5px; }
+.person-card { text-align: center; width: 120px; }
+.person-card img { width: 90px; height: 90px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); }
 
-.flex-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    padding: 20px;
-    justify-content: center;
-}
-
-.card {
-    background: var(--card);
-    padding: 10px;
-    border-radius: 8px;
-    text-align: center;
-}
-
-.card img {
-    width: 100%;
-    border-radius: 5px;
-}
-
-.person-card {
-    text-align: center;
-    width: 100px;
-}
-
-.person-card img {
-    /* ... lo que ya tenías ... */
-    width: 80px;
-    height: 80px;
-    border-radius: 50%; /* Foto circular */
-    object-fit: cover;
-    border: 2px solid var(--primary);
-    cursor: pointer;
-    transition: transform 0.2s;
-}
-
-.person-card img:hover {
-    transform: scale(1.1); /* Se hace un poco más grande al pasar el ratón */
-    border-color: white;
-}
-
-.person-card p {
-    font-size: 0.8rem;
-    margin-top: 5px;
-}
-
-.stats-card {
-    background: #333;
-    padding: 20px;
-    margin: 20px;
-    border-radius: 10px;
-}
-
-button {
-    background: var(--primary);
-    color: white;
-    border: none;
-    padding: 8px 15px;
-    cursor: pointer;
-    border-radius: 4px;
-}
-
-.scrollable {
-    flex-wrap: nowrap; /* No rompe la línea */
-    overflow-x: auto;  /* Permite deslizar a los lados */
-    padding-bottom: 20px;
-    justify-content: flex-start; /* Empieza desde la izquierda */
-}
-
-/* Estilo para la barra de scroll */
-.scrollable::-webkit-scrollbar {
-    height: 8px;
-}
-.scrollable::-webkit-scrollbar-thumb {
-    background: var(--primary);
-    border-radius: 10px;
-}
+h2 { text-align: center; margin-top: 80px; color: var(--primary); font-size: 2rem; }
