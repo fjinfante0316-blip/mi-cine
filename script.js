@@ -103,10 +103,75 @@ function markAsWatched(id) {
 }
 
 function updateStatistics() {
-    const totalMins = myMovies.reduce((acc, m) => acc + m.runtime, 0);
-    document.getElementById('statHours').innerText = Math.floor(totalMins / 60);
-    document.getElementById('statCountries').innerText = new Set(myMovies.map(m => m.country)).size;
-    // (Aquí iría el código de Chart.js si lo necesitas activar)
+    if (myMovies.length === 0) return;
+
+    // 1. Cálculos básicos
+    const totalMinutes = myMovies.reduce((acc, m) => acc + (m.runtime || 0), 0);
+    const hours = Math.floor(totalMinutes / 60);
+    document.getElementById('statHours').innerText = hours;
+    
+    const countriesSet = new Set(myMovies.map(m => m.country));
+    document.getElementById('statCountries').innerText = countriesSet.size;
+
+    // 2. Preparar datos para Gráfico de Géneros
+    const genreData = {};
+    myMovies.forEach(m => {
+        genreData[m.genre] = (genreData[m.genre] || 0) + 1;
+    });
+
+    // 3. Preparar datos para Gráfico de Países
+    const countryData = {};
+    myMovies.forEach(m => {
+        countryData[m.country] = (countryData[m.country] || 0) + 1;
+    });
+
+    // Destruir gráficos anteriores si existen para evitar errores al recargar
+    if (genreChart) genreChart.destroy();
+    if (countryChart) countryChart.destroy();
+
+    // Crear Gráfico de Géneros (Doughnut)
+    const ctxG = document.getElementById('genreChart').getContext('2d');
+    genreChart = new Chart(ctxG, {
+        type: 'doughnut',
+        data: {
+            labels: Object.keys(genreData),
+            datasets: [{
+                data: Object.values(genreData),
+                backgroundColor: ['#e50914', '#b9090b', '#564d4d', '#f5f5f1', '#ff4d4d'],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            plugins: {
+                legend: { labels: { color: 'white' } },
+                title: { display: true, text: 'TUS GÉNEROS FAVORITOS', color: 'white' }
+            }
+        }
+    });
+
+    // Crear Gráfico de Países (Bar)
+    const ctxC = document.getElementById('countryChart').getContext('2d');
+    countryChart = new Chart(ctxC, {
+        type: 'bar',
+        data: {
+            labels: Object.keys(countryData),
+            datasets: [{
+                label: 'Películas',
+                data: Object.values(countryData),
+                backgroundColor: '#e50914'
+            }]
+        },
+        options: {
+            scales: {
+                y: { beginAtZero: true, ticks: { color: 'white' } },
+                x: { ticks: { color: 'white' } }
+            },
+            plugins: {
+                legend: { display: false },
+                title: { display: true, text: 'PELÍCULAS POR PAÍS', color: 'white' }
+            }
+        }
+    });
 }
 
 renderAll();
