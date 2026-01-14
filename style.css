@@ -150,3 +150,24 @@ h2 {
     margin-top: 100px;
     color: var(--primary);
 }
+
+.menu-stats {
+    padding: 0 30px;
+    margin-bottom: 20px;
+}
+
+.menu-stats p {
+    font-size: 0.9rem;
+    color: #eee;
+    margin: 5px 0;
+    font-weight: bold;
+}
+
+.menu-stats span {
+    color: var(--primary);
+}
+
+/* Ajuste para que el menú no se vea vacío */
+.side-menu hr {
+    opacity: 0.3;
+}
