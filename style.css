@@ -132,17 +132,33 @@ body {
 }
 
 .person-card {
+    background: #222;
+    padding: 10px;
+    border-radius: 10px;
     text-align: center;
-    width: 120px;
+    width: 140px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
 }
 
 .person-card img {
-    width: 90px;
-    height: 90px;
+    width: 100px;
+    height: 100px;
     border-radius: 50%;
     object-fit: cover;
+    margin-bottom: 10px;
     border: 2px solid var(--primary);
-    cursor: pointer;
+}
+
+.person-info strong {
+    display: block;
+    font-size: 0.9rem;
+    color: white;
+}
+
+.person-info p {
+    font-size: 0.75rem;
+    color: #aaa;
+    margin-top: 5px;
 }
 
 h2 {
