@@ -171,3 +171,23 @@ h2 {
 .side-menu hr {
     opacity: 0.3;
 }
+
+.menu-stats {
+    padding: 10px 20px;
+    text-align: center;
+}
+
+.menu-stats p {
+    font-size: 1rem;
+    margin-bottom: 15px;
+    color: #fff;
+}
+
+/* Limitamos el tamaño de los canvas */
+canvas {
+    max-width: 100%;
+    height: auto !important;
+    background: rgba(255,255,255,0.05);
+    border-radius: 10px;
+    padding: 10px;
+}
