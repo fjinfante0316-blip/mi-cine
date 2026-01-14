@@ -131,30 +131,31 @@ body {
     margin-bottom: 10px;
 }
 
-/* 2. Estilo de la tarjeta */
+/* Tarjeta más grande y con aire interno */
 .person-card {
     background: #1e1e1e;
-    width: 140px;
-    border-radius: 12px;
+    width: 170px; /* Aumentamos el ancho de 140px a 170px */
+    border-radius: 15px;
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    align-items: center; /* Centra el contenido interno */
-    padding-bottom: 10px;
+    align-items: center;
+    padding: 12px; /* Añadimos espacio entre el borde y el contenido */
     border: 1px solid #333;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
 }
 
-/* 3. La foto del ACTOR/DIRECTOR (Cuadrada o rectangular, NO círculo) */
+/* La foto del actor con bordes redondeados propios */
 .person-photo {
     width: 100%;
-    height: 160px;
+    height: 190px; /* Un poco más alta */
     object-fit: cover;
-    border-radius: 0; /* Esto elimina el círculo si lo tenías */
+    border-radius: 10px; /* Ahora la foto tiene su propia redondez dentro de la tarjeta */
+    margin-bottom: 10px; /* Separa la foto del nombre */
 }
 
-/* 4. El nombre de la persona */
+/* Información del actor */
 .person-info {
-    padding: 8px;
     text-align: center;
     width: 100%;
 }
@@ -170,9 +171,11 @@ body {
 
 .person-info strong {
     color: white;
-    font-size: 0.9rem;
+    font-size: 1rem; /* Nombre un poco más grande */
     display: block;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
+    height: 2.4em; /* Reserva espacio para nombres largos de 2 líneas */
+    overflow: hidden;
 }
 
 .person-info p {
@@ -273,28 +276,28 @@ canvas {
     color: #ccc;
 }
 
-/* Contenedor de la mini portada */
+/* El mini póster centrado y con espacio */
 .movie-reference {
+    width: 100%;
     display: flex;
     justify-content: center;
-    margin-top: 5px;
+    padding-top: 5px;
 }
 
 /* 5. El MINI PÓSTER de la película (Rectangular y entero) */
 .mini-poster {
-    width: 70px !important;    /* Forzamos el ancho */
-    height: 100px !important;  /* Forzamos el alto */
-    border-radius: 4px !important; /* Bordes apenas redondeados, no círculo */
+    width: 80px !important;   /* Un poco más grande para que se aprecie mejor */
+    height: 120px !important;
+    border-radius: 6px !important;
     object-fit: cover;
     border: 2px solid #e50914;
     cursor: pointer;
-    transition: transform 0.2s;
-    display: block;
-    margin: 0 auto; /* Centra la imagen */
+    transition: transform 0.3s ease;
 }
 
 .mini-poster:hover {
-    transform: scale(1.1);
+    transform: scale(1.15);
+    z-index: 10;
 }
 
 /* --- ESTILOS DEL MODAL (ZOOM) --- */
@@ -338,11 +341,11 @@ canvas {
 .chart-box { background: #1a1a1a; padding: 15px; border-radius: 10px; }
 canvas { width: 100% !important; height: auto !important; }
 
-/* 1. Centrar los contenedores de personas */
+/* Contenedor principal para que las tarjetas respiren */
 #directorList, #actorList, #writerList, #producerList {
     display: flex;
     flex-wrap: wrap;
-    justify-content: center; /* Esto centra las tarjetas */
-    gap: 20px;
-    padding: 20px;
+    justify-content: center;
+    gap: 25px; /* Más espacio entre tarjetas */
+    padding: 30px;
 }
