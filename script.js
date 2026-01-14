@@ -6,11 +6,15 @@ let myMovies = JSON.parse(localStorage.getItem('myCineData')) || [];
 let genreChart = null;
 let countryChart = null;
 
-// Navegación (igual que antes)
+// NAVEGACIÓN
 function toggleMenu() {
     const menu = document.getElementById("sideMenu");
-    menu.style.width = menu.style.width === "250px" ? "0" : "250px";
-    if(menu.style.width === "250px") updateMenuStats(); // Actualizar gráficos al abrir
+    if (menu.style.width === "280px") {
+        menu.style.width = "0";
+    } else {
+        menu.style.width = "280px";
+        setTimeout(updateMenuStats, 300); // Actualiza gráficos al abrir
+    }
 }
 
 function showSection(sectionId) {
@@ -19,14 +23,13 @@ function showSection(sectionId) {
     toggleMenu();
 }
 
-// Búsqueda y Añadir (igual que antes, asegurando que guarde runtime, genres y countries)
+// BÚSQUEDA
 document.getElementById('searchBtn').addEventListener('click', async () => {
     const query = document.getElementById('searchInput').value;
     if (!query) return;
     const res = await fetch(`${BASE_URL}/search/movie?api_key=${API_KEY}&query=${query}&language=es-ES`);
     const data = await res.json();
-    const resultsContainer = document.getElementById('results');
-    resultsContainer.innerHTML = data.results.slice(0, 4).map(movie => `
+    document.getElementById('results').innerHTML = data.results.slice(0, 4).map(movie => `
         <div class="card">
             <img src="${IMG_URL + movie.poster_path}">
             <h4>${movie.title}</h4>
@@ -35,13 +38,16 @@ document.getElementById('searchBtn').addEventListener('click', async () => {
     `).join('');
 });
 
+// AÑADIR CON DATOS COMPLETOS
 async function addMovie(id, title, poster) {
     if (myMovies.find(m => m.id === id)) return alert("Ya guardada");
     const rating = prompt(`Nota (1-10):`);
     if (!rating) return;
 
+    // Obtenemos detalles específicos (duración, géneros, países)
     const dRes = await fetch(`${BASE_URL}/movie/${id}?api_key=${API_KEY}&language=es-ES`);
     const d = await dRes.json();
+    
     const cRes = await fetch(`${BASE_URL}/movie/${id}/credits?api_key=${API_KEY}`);
     const credits = await cRes.json();
     
@@ -60,25 +66,25 @@ async function addMovie(id, title, poster) {
 
     localStorage.setItem('myCineData', JSON.stringify(myMovies));
     renderAll();
+    alert("¡Añadida!");
 }
 
-// NUEVA FUNCIÓN PARA LOS GRÁFICOS
+// GRÁFICOS
 function updateMenuStats() {
     if (myMovies.length === 0) return;
 
-    // Horas totales
-    const totalMinutes = myMovies.reduce((total, m) => total + m.runtime, 0);
+    const totalMinutes = myMovies.reduce((total, m) => total + (m.runtime || 0), 0);
     document.getElementById('statHours').innerText = Math.floor(totalMinutes / 60);
 
-    // Procesar Géneros para el gráfico
+    // Conteo de Géneros
     const genreCounts = {};
-    myMovies.flatMap(m => m.genres).forEach(g => genreCounts[g] = (genreCounts[g] || 0) + 1);
+    myMovies.flatMap(m => m.genres || []).forEach(g => genreCounts[g] = (genreCounts[g] || 0) + 1);
 
-    // Procesar Países para el gráfico
+    // Conteo de Países
     const countryCounts = {};
-    myMovies.flatMap(m => m.countries).forEach(c => countryCounts[c] = (countryCounts[c] || 0) + 1);
+    myMovies.flatMap(m => m.countries || []).forEach(c => countryCounts[c] = (countryCounts[c] || 0) + 1);
 
-    // Dibujar/Actualizar Gráfico de Géneros
+    // Gráfico de Géneros (Doughnut)
     if (genreChart) genreChart.destroy();
     genreChart = new Chart(document.getElementById('genreChart'), {
         type: 'doughnut',
@@ -86,13 +92,19 @@ function updateMenuStats() {
             labels: Object.keys(genreCounts),
             datasets: [{
                 data: Object.values(genreCounts),
-                backgroundColor: ['#e50914', '#564d4d', '#b9090b', '#f5f5f1', '#ff0000']
+                backgroundColor: ['#e50914', '#b9090b', '#564d4d', '#f5f5f1', '#ff0000']
             }]
         },
-        options: { plugins: { legend: { labels: { color: 'white' } }, title: { display: true, text: 'GÉNEROS', color: 'white' } } }
+        options: { 
+            responsive: true,
+            plugins: { 
+                legend: { labels: { color: 'white', font: { size: 10 } } },
+                title: { display: true, text: 'GÉNEROS VISTOS', color: 'white' }
+            } 
+        }
     });
 
-    // Dibujar/Actualizar Gráfico de Países
+    // Gráfico de Países (Bar)
     if (countryChart) countryChart.destroy();
     countryChart = new Chart(document.getElementById('countryChart'), {
         type: 'bar',
@@ -104,16 +116,41 @@ function updateMenuStats() {
                 backgroundColor: '#e50914'
             }]
         },
-        options: { scales: { y: { ticks: { color: 'white' } }, x: { ticks: { color: 'white' } } }, plugins: { legend: { display: false }, title: { display: true, text: 'PAÍSES', color: 'white' } } }
+        options: { 
+            responsive: true,
+            scales: { 
+                y: { ticks: { color: 'white' }, grid: { color: '#333' } },
+                x: { ticks: { color: 'white' }, grid: { display: false } }
+            },
+            plugins: { 
+                legend: { display: false },
+                title: { display: true, text: 'PAÍSES', color: 'white' }
+            }
+        }
     });
 }
 
 function renderAll() {
-    // Render de películas (igual que antes)
     document.getElementById('myLibrary').innerHTML = myMovies.map(m => `
         <div class="card"><img src="${m.poster}"><p><strong>${m.title}</strong></p><p>⭐ ${m.rating}</p></div>
     `).join('');
-    // Render de personas... (directorList, actorList, etc.)
+    
+    renderPeople('directorList', myMovies.map(m => m.director), 'dir');
+    renderPeople('actorList', myMovies.flatMap(m => m.actors), 'act');
+    renderPeople('writerList', myMovies.flatMap(m => m.writers), 'wri');
+    renderPeople('producerList', myMovies.flatMap(m => m.producers), 'pro');
+}
+
+function renderPeople(id, arr, type) {
+    const container = document.getElementById(id);
+    if (!container) return;
+    const unique = Array.from(new Set(arr.map(p => p.name))).map(name => arr.find(p => p.name === name));
+    container.innerHTML = unique.map(p => `
+        <div class="person-card">
+            <img src="${p.photo}">
+            <p>${p.name}</p>
+        </div>
+    `).join('');
 }
 
 renderAll();
