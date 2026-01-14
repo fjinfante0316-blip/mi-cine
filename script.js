@@ -30,11 +30,11 @@ function displayResults(movies) {
 }
 
 async function addMovieWithRating(id, title, poster) {
-    if (myMovies.find(m => m.id === id)) return alert("Ya está en tu lista");
-    const rating = prompt(`¿Qué nota le das a "${title}"? (1-10)`);
+    if (myMovies.find(m => m.id === id)) return alert("Ya guardada");
+    const rating = prompt(`Nota para "${title}" (1-10):`);
     if (!rating) return;
 
-    // Obtener créditos y FOTOS de los artistas
+    // Obtener créditos con fotos de perfiles
     const res = await fetch(`${BASE_URL}/movie/${id}/credits?api_key=${API_KEY}`);
     const credits = await res.json();
     
@@ -55,7 +55,7 @@ async function addMovieWithRating(id, title, poster) {
 }
 
 function renderAll() {
-    // 1. Mostrar Películas
+    // 1. Películas
     document.getElementById('myLibrary').innerHTML = myMovies.map(m => `
         <div class="card">
             <img src="${IMG_URL + m.poster}">
@@ -64,7 +64,7 @@ function renderAll() {
         </div>
     `).join('');
 
-    // 2. Mostrar Directores únicos con foto
+    // 2. Directores únicos
     const uniqueDirs = Array.from(new Set(myMovies.map(m => m.director.name)))
         .map(name => myMovies.find(m => m.director.name === name).director);
     
@@ -75,7 +75,7 @@ function renderAll() {
         </div>
     `).join('');
 
-    // 3. Mostrar Actores únicos con foto
+    // 3. Actores únicos
     const allActors = myMovies.flatMap(m => m.actors);
     const uniqueActors = Array.from(new Set(allActors.map(a => a.name)))
         .map(name => allActors.find(a => a.name === name));
