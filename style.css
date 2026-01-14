@@ -5,201 +5,75 @@
 }
 
 body {
-    font-family: 'Arial', sans-serif;
     background-color: var(--bg);
     color: white;
+    font-family: 'Segoe UI', Arial, sans-serif;
     margin: 0;
 }
 
-/* NAVEGACIÓN */
+/* MENÚ */
 .sidenav {
     height: 100%; width: 0; position: fixed; z-index: 1000;
     top: 0; left: 0; background-color: #111;
     overflow-x: hidden; transition: 0.5s; padding-top: 60px;
 }
 .sidenav a {
-    padding: 8px 32px; text-decoration: none; font-size: 18px;
+    padding: 10px 32px; text-decoration: none; font-size: 18px;
     color: #818181; display: block; transition: 0.3s;
 }
 .sidenav a:hover { color: #f1f1f1; }
 .sidenav .closebtn { position: absolute; top: 0; right: 25px; font-size: 36px; }
+.menu-icon { font-size: 30px; cursor: pointer; padding: 20px; display: inline-block; }
 
-.menu-icon { font-size: 30px; cursor: pointer; padding: 15px; display: block; }
+/* BUSCADOR CENTRADO */
+#searchSection {
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; min-height: 70vh;
+}
+.search-container { width: 90%; max-width: 600px; text-align: center; }
+.search-box { display: flex; gap: 10px; margin-top: 20px; }
+.search-box input { flex: 1; padding: 12px; border-radius: 5px; border: none; background: #333; color: white; }
+.search-box button { padding: 12px 20px; background: var(--primary); border: none; color: white; font-weight: bold; border-radius: 5px; cursor: pointer; }
 
 /* GRIDS */
 .movie-grid, .people-grid {
     display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; padding: 20px;
 }
 
-/* TARJETAS PELÍCULAS */
+/* TARJETAS */
 .card {
-    background: var(--card-bg); width: 150px; border-radius: 8px;
-    overflow: hidden; text-align: center; padding-bottom: 10px;
+    background: var(--card-bg); width: 160px; border-radius: 8px;
+    overflow: hidden; text-align: center; border: 1px solid #333;
 }
-.card img { width: 100%; height: 225px; object-fit: cover; }
+.card img { width: 100%; height: 240px; object-fit: cover; }
 
-/* TARJETAS PERSONAS (ACTORES/DIRECTORES) */
-
-/* Tarjeta más grande y con aire interno */
 .person-card {
-    background: #1e1e1e;
-    width: 170px; /* Aumentamos el ancho de 140px a 170px */
-    border-radius: 15px;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 12px; /* Añadimos espacio entre el borde y el contenido */
-    border: 1px solid #333;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    background: var(--card-bg); width: 180px; border-radius: 15px;
+    padding: 15px; border: 1px solid #333; text-align: center;
 }
-
-/* La foto del actor con bordes redondeados propios */
-.person-photo {
-    width: 100%;
-    height: 190px; /* Un poco más alta */
-    object-fit: cover;
-    border-radius: 10px; /* Ahora la foto tiene su propia redondez dentro de la tarjeta */
-    margin-bottom: 10px; /* Separa la foto del nombre */
-}
-
-/* Información del actor */
-.person-info {
-    text-align: center;
-    width: 100%;
-}
-
-.person-info strong {
-    color: white;
-    font-size: 1rem; /* Nombre un poco más grande */
-    display: block;
-    margin-bottom: 12px;
-    height: 2.4em; /* Reserva espacio para nombres largos de 2 líneas */
-    overflow: hidden;
-}
-
-/* El mini póster centrado y con espacio */
-.movie-reference {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    padding-top: 5px;
-}
-
+.person-photo { width: 100%; height: 210px; object-fit: cover; border-radius: 10px; }
 .mini-poster {
-    width: 80px !important;   /* Un poco más grande para que se aprecie mejor */
-    height: 120px !important;
-    border-radius: 6px !important;
-    object-fit: cover;
-    border: 2px solid #e50914;
-    cursor: pointer;
-    transition: transform 0.3s ease;
+    width: 80px; height: 110px; border: 2px solid var(--primary);
+    margin-top: 10px; border-radius: 4px; cursor: pointer;
 }
 
-.mini-poster:hover {
-    transform: scale(1.15);
-    z-index: 10;
+/* ESTADÍSTICAS */
+.stats-container { display: flex; justify-content: center; gap: 20px; margin: 30px 0; }
+.stat-card {
+    background: var(--card-bg); padding: 20px; border-radius: 15px;
+    width: 140px; text-align: center; border: 1px solid #333;
 }
+.stat-card span { display: block; }
+.stat-card #statHours, .stat-card #statCountries {
+    font-size: 1.5rem; font-weight: bold; color: var(--primary); margin: 10px 0;
+}
+.charts { max-width: 500px; margin: 0 auto; }
 
-/* MODAL */
+/* SEPARADOR Y MODAL */
+.separator { width: 80%; border: 0; border-top: 1px solid #333; margin: 40px auto; }
 .modal {
     display: none; position: fixed; z-index: 2000; left: 0; top: 0;
     width: 100%; height: 100%; background: rgba(0,0,0,0.9);
     justify-content: center; align-items: center;
 }
-.modal-content { max-width: 90%; max-height: 80%; border-radius: 10px; }
-
-.separator { width: 80%; border: 0; border-top: 1px solid #333; margin: 40px auto; }
-
-/* Centrar Buscador */
-#searchSection {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 60vh;
-    text-align: center;
-}
-
-.search-box {
-    display: flex;
-    gap: 10px;
-    width: 90%;
-    max-width: 500px;
-    margin: 20px auto;
-}
-
-.search-box input {
-    flex: 1;
-    padding: 12px;
-    border-radius: 5px;
-    border: 1px solid #333;
-    background: #222;
-    color: white;
-}
-
-.search-box button {
-    padding: 12px 25px;
-    background-color: var(--primary);
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: bold;
-}
-
-/* Estenedor de los gráficos */
-.charts {
-    max-width: 600px;
-    margin: 30px auto;
-}
-
-canvas {
-    max-height: 400px;
-    margin-bottom: 50px;
-}
-
-/* Estadísticas Centradas */
-.stats-container {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    flex-wrap: wrap;
-    margin: 20px 0;
-}
-
-/* La tarjeta individual */
-.stat-card {
-    background: #1e1e1e;
-    padding: 20px;
-    border-radius: 15px;
-    width: 150px;
-    text-align: center;
-    border: 1px solid #333;
-}
-
-/* El número grande dentro de la tarjeta */
-.stat-card span {
-    display: block;
-    font-size: 2rem;
-    font-weight: bold;
-    color: #e50914;
-}
-
-/* El texto debajo del número */
-.stat-card p {
-    margin: 0;
-    color: #aaa;
-    text-transform: uppercase;
-    font-size: 0.8rem;
-    letter-spacing: 1px;
-}
-
-/* Contenedor principal para que las tarjetas respiren */
-#directorList, #actorList, #writerList, #producerList {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 25px; /* Más espacio entre tarjetas */
-    padding: 30px;
-}
+.modal-content { max-width: 80%; max-height: 80%; border-radius: 10px; }
