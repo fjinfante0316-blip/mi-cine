@@ -1,3 +1,5 @@
+
+
 const API_KEY = 'e8b61af0cf42a633e3aa581bb73127f8'; 
 const BASE_URL = 'https://api.themoviedb.org/3';
 const IMG_URL = 'https://image.tmdb.org/t/p/w300';
@@ -17,6 +19,7 @@ function showSection(id) {
     toggleMenu();
 }
 
+// Búsqueda y Añadir (Igual que antes)
 document.getElementById('searchBtn').addEventListener('click', async () => {
     const query = document.getElementById('searchInput').value;
     if (!query) return;
@@ -48,7 +51,6 @@ async function addMovie(id, title, posterPath) {
         id, title, rating, status, poster: posterFull,
         runtime: d.runtime || 0,
         genre: d.genres[0]?.name || "Otros",
-        country: d.production_countries[0]?.name || "Desconocido",
         director: { name: c.crew.find(x => x.job === 'Director')?.name, photo: getP(c.crew.find(x => x.job === 'Director')?.profile_path), movie: title, poster: posterFull },
         actors: c.cast.slice(0, 5).map(a => ({ name: a.name, photo: getP(a.profile_path), movie: title, poster: posterFull })),
         writers: c.crew.filter(x => x.department === 'Writing').slice(0, 2).map(w => ({ name: w.name, photo: getP(w.profile_path), movie: title, poster: posterFull })),
@@ -81,170 +83,60 @@ function renderAll() {
 function renderPeople(id, arr) {
     const container = document.getElementById(id);
     if (!container) return;
-    
-    // Filtramos para asegurar que el objeto existe
-    const valid = arr.filter(p => p && p.name);
-    
-    container.innerHTML = valid.length ? valid.map(p => `
+    container.innerHTML = arr.filter(p => p && p.name).map(p => `
         <div class="person-card">
-            <img class="person-photo" 
-                 src="${p.photo}" 
-                 onclick="editPersonPhoto('${p.name}')" 
-                 title="Haz clic para cambiar la foto"
-                 style="cursor: pointer;">
-            <div class="person-info">
-                <strong>${p.name}</strong>
-                <br>
-                <img class="mini-poster" src="${p.poster}" onclick="openModal('${p.poster}')">
-            </div>
+            <img class="person-photo" src="${p.photo}" onclick="editPersonPhoto('${p.name}')">
+            <strong>${p.name}</strong><br>
+            <img class="mini-poster" src="${p.poster}" onclick="openModal('${p.poster}')">
         </div>
-    `).join('') : '<p style="text-align:center; color:gray; width:100%;">No hay datos.</p>';
+    `).join('');
+}
+
+function updateStatistics() {
+    const mins = myMovies.reduce((acc, m) => acc + (m.runtime || 0), 0);
+    document.getElementById('statHours').innerText = `${Math.floor(mins / 60)}h ${mins % 60}m`;
+    const data = {};
+    myMovies.forEach(m => data[m.genre] = (data[m.genre] || 0) + 1);
+    if (genreChart) genreChart.destroy();
+    genreChart = new Chart(document.getElementById('genreChart'), {
+        type: 'doughnut',
+        data: { labels: Object.keys(data), datasets: [{ data: Object.values(data), backgroundColor: ['#e50914','#444','#888'] }] },
+        options: { plugins: { legend: { labels: { color: 'white' } } } }
+    });
+}
+
+// Backup Functions
+function exportData() {
+    const blob = new Blob([JSON.stringify(myMovies)], {type: "application/json"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = "mi_cine.json"; a.click();
+}
+
+function importData(e) {
+    const reader = new FileReader();
+    reader.onload = (event) => {
+        myMovies = JSON.parse(event.target.result);
+        localStorage.setItem('myCineData', JSON.stringify(myMovies));
+        location.reload();
+    };
+    reader.readAsText(e.target.files[0]);
 }
 
 function editPersonPhoto(name) {
-    const newUrl = prompt(`Introduce la URL de la nueva imagen para ${name}:`);
-    
-    if (newUrl && newUrl.trim() !== "") {
-        let found = false;
-
+    const url = prompt(`Nueva URL de foto para ${name}:`);
+    if (url) {
         myMovies.forEach(m => {
-            // Actualizar Director
-            if (m.director && m.director.name === name) {
-                m.director.photo = newUrl;
-                found = true;
-            }
-            // Actualizar Actores
-            m.actors.forEach(a => {
-                if (a.name === name) {
-                    a.photo = newUrl;
-                    found = true;
-                }
-            });
-            // Actualizar Guionistas
-            m.writers.forEach(w => {
-                if (w.name === name) {
-                    w.photo = newUrl;
-                    found = true;
-                }
-            });
-            // Actualizar Productores
-            m.producers.forEach(p => {
-                if (p.name === name) {
-                    p.photo = newUrl;
-                    found = true;
-                }
-            });
+            if (m.director.name === name) m.director.photo = url;
+            m.actors.forEach(a => { if (a.name === name) a.photo = url; });
         });
-
-        if (found) {
-            localStorage.setItem('myCineData', JSON.stringify(myMovies));
-            renderAll(); // Refresca la vista para ver la nueva foto
-            alert("Foto actualizada correctamente.");
-        }
-    }
-}
-
-function markAsWatched(id) {
-    const m = myMovies.find(x => x.id === id);
-    m.status = 'watched';
-    m.rating = prompt("Nota:");
-    localStorage.setItem('myCineData', JSON.stringify(myMovies));
-    renderAll();
-}
-
-function deleteMovie(id) {
-    if (confirm("¿Borrar?")) {
-        myMovies = myMovies.filter(m => m.id !== id);
         localStorage.setItem('myCineData', JSON.stringify(myMovies));
         renderAll();
     }
 }
 
-function updateStatistics() {
-    if (myMovies.length === 0) {
-        document.getElementById('statHours').innerText = "0h 0m";
-        return;
-    }
-
-    // 1. Cálculo de Tiempo (Horas y Minutos)
-    const totalMinutes = myMovies.reduce((acc, m) => acc + (parseInt(m.runtime) || 0), 0);
-    const hours = Math.floor(totalMinutes / 60);
-    const minutes = totalMinutes % 60;
-    document.getElementById('statHours').innerText = `${hours}h ${minutes}m`;
-
-    // 2. Lógica del Gráfico de Géneros
-    const genreData = {};
-    myMovies.forEach(m => {
-        if (m.genre) {
-            genreData[m.genre] = (genreData[m.genre] || 0) + 1;
-        }
-    });
-
-    if (genreChart) genreChart.destroy();
-    const ctx = document.getElementById('genreChart').getContext('2d');
-    genreChart = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-            labels: Object.keys(genreData),
-            datasets: [{
-                data: Object.values(genreData),
-                backgroundColor: ['#e50914', '#b9090b', '#564d4d', '#f5f5f1', '#333']
-            }]
-        },
-        options: {
-            plugins: {
-                legend: { labels: { color: 'white' } }
-            }
-        }
-    });
-
-    // Hemos eliminado toda la lógica de countryChart para que no dé error
-}
-
+function deleteMovie(id) { if(confirm("¿Borrar?")) { myMovies = myMovies.filter(m => m.id !== id); localStorage.setItem('myCineData', JSON.stringify(myMovies)); renderAll(); } }
+function markAsWatched(id) { const m = myMovies.find(x => x.id === id); m.status = 'watched'; m.rating = prompt("Nota:"); localStorage.setItem('myCineData', JSON.stringify(myMovies)); renderAll(); }
 function openModal(url) { document.getElementById("imageModal").style.display = "flex"; document.getElementById("imgFull").src = url; }
-
-// --- EXPORTAR DATOS ---
-function exportData() {
-    if (myMovies.length === 0) return alert("No hay películas para exportar.");
-    
-    const dataStr = JSON.stringify(myMovies, null, 2);
-    const dataBlob = new Blob([dataStr], { type: "application/json" });
-    const url = URL.createObjectURL(dataBlob);
-    
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `mis_peliculas_${new Date().toISOString().slice(0,10)}.json`;
-    link.click();
-    
-    URL.revokeObjectURL(url);
-}
-
-// --- IMPORTAR DATOS ---
-function importData(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        try {
-            const importedData = JSON.parse(e.target.result);
-            
-            if (Array.isArray(importedData)) {
-                if (confirm(`Se van a importar ${importedData.length} películas. ¿Deseas continuar? (Esto reemplazará tus datos actuales)`)) {
-                    myMovies = importedData;
-                    localStorage.setItem('myCineData', JSON.stringify(myMovies));
-                    renderAll();
-                    alert("¡Datos importados con éxito!");
-                    location.reload(); // Recargamos para actualizar estadísticas y todo el sistema
-                }
-            } else {
-                alert("El archivo no tiene el formato correcto.");
-            }
-        } catch (err) {
-            alert("Error al leer el archivo. Asegúrate de que es un archivo .json válido.");
-        }
-    };
-    reader.readAsText(file);
-}
 
 renderAll();
