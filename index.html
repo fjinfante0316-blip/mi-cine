@@ -11,12 +11,20 @@
 
     <nav id="sideMenu" class="side-menu">
         <div class="close-btn" onclick="toggleMenu()">×</div>
-        <a href="#home" onclick="showSection('home')">🏠 Inicio (Añadir)</a>
-        <a href="#movies" onclick="showSection('movies')">🍿 Mis Películas</a>
-        <a href="#directors" onclick="showSection('directors')">🎥 Directores</a>
-        <a href="#actors" onclick="showSection('actors')">🌟 Reparto</a>
-        <a href="#writers" onclick="showSection('writers')">✍️ Guionistas</a>
-        <a href="#producers" onclick="showSection('producers')">💼 Productores</a>
+        
+        <div id="quickStats" class="menu-stats">
+            <p>⏳ <span id="statHours">0</span>h vistas</p>
+            <p>🌍 <span id="statCountries">0</span> países</p>
+            <p>🎭 <span id="statGenre">-</span></p>
+        </div>
+        <hr style="border: 0.5px solid #333; margin: 10px 20px;">
+
+        <a href="#" onclick="showSection('home')">🏠 Portada (Añadir)</a>
+        <a href="#" onclick="showSection('movies')">🍿 Mis Películas</a>
+        <a href="#" onclick="showSection('directors')">🎥 Directores</a>
+        <a href="#" onclick="showSection('actors')">🌟 Reparto</a>
+        <a href="#" onclick="showSection('writers')">✍️ Guionistas</a>
+        <a href="#" onclick="showSection('producers')">💼 Productores</a>
     </nav>
 
     <main>
