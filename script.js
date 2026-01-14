@@ -34,10 +34,22 @@ async function addMovieWithRating(id, title, poster) {
     const rating = prompt(`Nota para "${title}" (1-10):`);
     if (!rating) return;
 
+    // Obtener créditos con fotos
     const res = await fetch(`${BASE_URL}/movie/${id}/credits?api_key=${API_KEY}`);
     const credits = await res.json();
-    const director = credits.crew.find(p => p.job === 'Director')?.name || 'Desconocido';
-    const actors = credits.cast.slice(0, 3).map(a => a.name);
+    
+    // Buscar director y su foto
+    const dirObj = credits.crew.find(p => p.job === 'Director');
+    const director = {
+        name: dirObj?.name || 'Desconocido',
+        photo: dirObj?.profile_path ? IMG_URL + dirObj.profile_path : 'https://via.placeholder.com/150'
+    };
+
+    // Buscar actores y sus fotos
+    const actors = credits.cast.slice(0, 3).map(a => ({
+        name: a.name,
+        photo: a.profile_path ? IMG_URL + a.profile_path : 'https://via.placeholder.com/150'
+    }));
 
     myMovies.push({ id, title, poster, director, actors, userRating: rating });
     localStorage.setItem('myCineData', JSON.stringify(myMovies));
@@ -45,7 +57,7 @@ async function addMovieWithRating(id, title, poster) {
 }
 
 function renderAll() {
-    // 1. Renderizar Películas
+    // 1. Películas
     document.getElementById('myLibrary').innerHTML = myMovies.map(m => `
         <div class="card">
             <img src="${IMG_URL + m.poster}">
@@ -54,39 +66,28 @@ function renderAll() {
         </div>
     `).join('');
 
-    // 2. Extraer y Renderizar Directores (sin repetir)
-    const directors = [...new Set(myMovies.map(m => m.director))];
-    document.getElementById('directorList').innerHTML = directors.map(d => `
-        <span class="pills">🎬 ${d}</span>
+    // 2. Directores (Unicos)
+    const uniqueDirs = Array.from(new Set(myMovies.map(m => m.director.name)))
+        .map(name => myMovies.find(m => m.director.name === name).director);
+    
+    document.getElementById('directorList').innerHTML = uniqueDirs.map(d => `
+        <div class="person-card">
+            <img src="${d.photo}" alt="${d.name}">
+            <p>${d.name}</p>
+        </div>
     `).join('');
 
-    // 3. Extraer y Renderizar Actores (sin repetir)
-    const actors = [...new Set(myMovies.flatMap(m => m.actors))];
-    document.getElementById('actorList').innerHTML = actors.map(a => `
-        <span class="pills">👤 ${a}</span>
-    `).join('');
-
-    // 4. Estadísticas
-    updateStats();
-}
-
-function updateStats() {
-    if (myMovies.length === 0) return;
-    const statsDiv = document.getElementById('statsData');
-    const allDirs = myMovies.map(m => m.director);
+    // 3. Actores (Unicos)
     const allActors = myMovies.flatMap(m => m.actors);
+    const uniqueActors = Array.from(new Set(allActors.map(a => a.name)))
+        .map(name => allActors.find(a => a.name === name));
 
-    statsDiv.innerHTML = `
-        <p>Total películas: <strong>${myMovies.length}</strong></p>
-        <p>Director favorito: <strong>${getMostFrequent(allDirs)}</strong></p>
-        <p>Actor más visto: <strong>${getMostFrequent(allActors)}</strong></p>
-    `;
-}
-
-function getMostFrequent(arr) {
-    return arr.sort((a,b) =>
-        arr.filter(v => v===a).length - arr.filter(v => v===b).length
-    ).pop();
+    document.getElementById('actorList').innerHTML = uniqueActors.map(a => `
+        <div class="person-card">
+            <img src="${a.photo}" alt="${a.name}">
+            <p>${a.name}</p>
+        </div>
+    `).join('');
 }
 
 renderAll();
