@@ -37,8 +37,14 @@ document.getElementById('searchBtn').addEventListener('click', async () => {
 // --- AÑADIR PELÍCULA ---
 async function addMovie(id, title, posterPath) {
     if (myMovies.find(m => m.id === id)) return alert("Ya guardada");
-    const rating = prompt(`Nota (1-10):`);
-    if (!rating) return;
+    
+    // Nueva pregunta: ¿Vista o Pendiente?
+    const status = confirm(`¿Has visto ya "${title}"? \n(Aceptar = Vista, Cancelar = Pendiente)`) ? 'watched' : 'pending';
+    
+    let rating = "N/A";
+    if (status === 'watched') {
+        rating = prompt(`Nota (1-10):`) || "N/A";
+    }
 
     const dRes = await fetch(`${BASE_URL}/movie/${id}?api_key=${API_KEY}&language=es-ES`);
     const d = await dRes.json();
@@ -49,30 +55,19 @@ async function addMovie(id, title, posterPath) {
     const moviePosterFull = IMG_URL + posterPath;
 
     myMovies.push({
-        id, title, rating, poster: moviePosterFull,
+        id, title, rating, status, // Guardamos el estado aquí
+        poster: moviePosterFull,
         runtime: d.runtime || 0,
         genre: d.genres.length > 0 ? d.genres[0].name : "Desconocido",
         country: d.production_countries.length > 0 ? d.production_countries[0].name : "Desconocido",
-        director: { 
-            name: credits.crew.find(c => c.job === 'Director')?.name || '?', 
-            photo: getPhoto(credits.crew.find(c => c.job === 'Director')?.profile_path),
-            movie: title,
-            poster: moviePosterFull 
-        },
-        actors: credits.cast.slice(0, 5).map(a => ({ 
-            name: a.name, photo: getPhoto(a.profile_path), movie: title, poster: moviePosterFull 
-        })),
-        writers: credits.crew.filter(c => c.department === 'Writing').slice(0, 2).map(w => ({ 
-            name: w.name, photo: getPhoto(w.profile_path), movie: title, poster: moviePosterFull 
-        })),
-        producers: credits.crew.filter(c => c.department === 'Production').slice(0, 2).map(p => ({ 
-            name: p.name, photo: getPhoto(p.profile_path), movie: title, poster: moviePosterFull 
-        }))
+        director: { name: credits.crew.find(c => c.job === 'Director')?.name || '?', photo: getPhoto(credits.crew.find(c => c.job === 'Director')?.profile_path), movie: title, poster: moviePosterFull },
+        actors: credits.cast.slice(0, 5).map(a => ({ name: a.name, photo: getPhoto(a.profile_path), movie: title, poster: moviePosterFull })),
+        writers: credits.crew.filter(c => c.department === 'Writing').slice(0, 2).map(w => ({ name: w.name, photo: getPhoto(w.profile_path), movie: title, poster: moviePosterFull })),
+        producers: credits.crew.filter(c => c.department === 'Production').slice(0, 2).map(p => ({ name: p.name, photo: getPhoto(p.profile_path), movie: title, poster: moviePosterFull }))
     });
 
     localStorage.setItem('myCineData', JSON.stringify(myMovies));
     renderAll();
-    alert("¡Añadida!");
 }
 
 // --- RENDERIZADO DE PERSONAS CON PORTADA DE PELI ---
