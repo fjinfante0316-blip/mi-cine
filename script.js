@@ -81,9 +81,67 @@ function renderAll() {
 function renderPeople(id, arr) {
     const container = document.getElementById(id);
     if (!container) return;
-    container.innerHTML = arr.filter(p => p && p.name).map(p => `
-        <div class="person-card"><img class="person-photo" src="${p.photo}"><strong>${p.name}</strong><br><img class="mini-poster" src="${p.poster}" onclick="openModal('${p.poster}')"></div>
-    `).join('');
+    
+    // Filtramos para asegurar que el objeto existe
+    const valid = arr.filter(p => p && p.name);
+    
+    container.innerHTML = valid.length ? valid.map(p => `
+        <div class="person-card">
+            <img class="person-photo" 
+                 src="${p.photo}" 
+                 onclick="editPersonPhoto('${p.name}')" 
+                 title="Haz clic para cambiar la foto"
+                 style="cursor: pointer;">
+            <div class="person-info">
+                <strong>${p.name}</strong>
+                <br>
+                <img class="mini-poster" src="${p.poster}" onclick="openModal('${p.poster}')">
+            </div>
+        </div>
+    `).join('') : '<p style="text-align:center; color:gray; width:100%;">No hay datos.</p>';
+}
+
+function editPersonPhoto(name) {
+    const newUrl = prompt(`Introduce la URL de la nueva imagen para ${name}:`);
+    
+    if (newUrl && newUrl.trim() !== "") {
+        let found = false;
+
+        myMovies.forEach(m => {
+            // Actualizar Director
+            if (m.director && m.director.name === name) {
+                m.director.photo = newUrl;
+                found = true;
+            }
+            // Actualizar Actores
+            m.actors.forEach(a => {
+                if (a.name === name) {
+                    a.photo = newUrl;
+                    found = true;
+                }
+            });
+            // Actualizar Guionistas
+            m.writers.forEach(w => {
+                if (w.name === name) {
+                    w.photo = newUrl;
+                    found = true;
+                }
+            });
+            // Actualizar Productores
+            m.producers.forEach(p => {
+                if (p.name === name) {
+                    p.photo = newUrl;
+                    found = true;
+                }
+            });
+        });
+
+        if (found) {
+            localStorage.setItem('myCineData', JSON.stringify(myMovies));
+            renderAll(); // Refresca la vista para ver la nueva foto
+            alert("Foto actualizada correctamente.");
+        }
+    }
 }
 
 function markAsWatched(id) {
