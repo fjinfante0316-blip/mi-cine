@@ -349,3 +349,17 @@ canvas { width: 100% !important; height: auto !important; }
     gap: 25px; /* Más espacio entre tarjetas */
     padding: 30px;
 }
+
+.movie-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    padding: 20px 0;
+}
+
+/* Estilo para las pelis pendientes (opcional: ponerlas un poco más oscuras) */
+#pendingMovies .card img {
+    opacity: 0.7;
+    border-bottom: 2px solid #555;
+}
