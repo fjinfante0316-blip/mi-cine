@@ -92,11 +92,24 @@ function renderAll() {
 function renderPeople(id, arr) {
     const container = document.getElementById(id);
     if (!container) return;
-    container.innerHTML = arr.filter(p => p && p.name).map(p => `
+
+    // Filtramos para quitar elementos vacíos o corruptos
+    const validPeople = arr.filter(p => p && p.name);
+
+    if (validPeople.length === 0) {
+        container.innerHTML = '<p style="color:gray;">No hay datos disponibles.</p>';
+        return;
+    }
+
+    container.innerHTML = validPeople.map(p => `
         <div class="person-card">
-            <img class="person-photo" src="${p.photo}">
-            <strong>${p.name}</strong>
-            <img class="mini-poster" src="${p.poster}" onclick="openModal('${p.poster}')">
+            <img class="person-photo" src="${p.photo}" onerror="this.src='https://via.placeholder.com/200x300?text=Sin+Foto'">
+            <div class="person-info">
+                <strong>${p.name}</strong>
+                <div class="movie-reference">
+                    <img class="mini-poster" src="${p.poster}" onclick="openModal('${p.poster}')" title="Película: ${p.movie}">
+                </div>
+            </div>
         </div>
     `).join('');
 }
