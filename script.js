@@ -203,4 +203,48 @@ function updateStatistics() {
 
 function openModal(url) { document.getElementById("imageModal").style.display = "flex"; document.getElementById("imgFull").src = url; }
 
+// --- EXPORTAR DATOS ---
+function exportData() {
+    if (myMovies.length === 0) return alert("No hay películas para exportar.");
+    
+    const dataStr = JSON.stringify(myMovies, null, 2);
+    const dataBlob = new Blob([dataStr], { type: "application/json" });
+    const url = URL.createObjectURL(dataBlob);
+    
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `mis_peliculas_${new Date().toISOString().slice(0,10)}.json`;
+    link.click();
+    
+    URL.revokeObjectURL(url);
+}
+
+// --- IMPORTAR DATOS ---
+function importData(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const importedData = JSON.parse(e.target.result);
+            
+            if (Array.isArray(importedData)) {
+                if (confirm(`Se van a importar ${importedData.length} películas. ¿Deseas continuar? (Esto reemplazará tus datos actuales)`)) {
+                    myMovies = importedData;
+                    localStorage.setItem('myCineData', JSON.stringify(myMovies));
+                    renderAll();
+                    alert("¡Datos importados con éxito!");
+                    location.reload(); // Recargamos para actualizar estadísticas y todo el sistema
+                }
+            } else {
+                alert("El archivo no tiene el formato correcto.");
+            }
+        } catch (err) {
+            alert("Error al leer el archivo. Asegúrate de que es un archivo .json válido.");
+        }
+    };
+    reader.readAsText(file);
+}
+
 renderAll();
