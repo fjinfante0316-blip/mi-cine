@@ -161,16 +161,50 @@ function deleteMovie(id) {
 }
 
 function updateStatistics() {
-    const mins = myMovies.reduce((acc, m) => acc + (m.runtime || 0), 0);
-    document.getElementById('statHours').innerText = Math.floor(mins / 60) + "h";
-    document.getElementById('statCountries').innerText = new Set(myMovies.map(m => m.country)).size;
+    if (myMovies.length === 0) {
+        document.getElementById('statHours').innerText = "0h 0m";
+        document.getElementById('statCountries').innerText = "0";
+        return;
+    }
+
+    // Calculamos el total de minutos de todas las películas
+    const totalMinutes = myMovies.reduce((acc, m) => acc + (parseInt(m.runtime) || 0), 0);
     
-    const data = {};
-    myMovies.forEach(m => data[m.genre] = (data[m.genre] || 0) + 1);
+    // Convertimos a Horas y Minutos
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+
+    // Escribimos el resultado en el HTML
+    document.getElementById('statHours').innerText = `${hours}h ${minutes}m`;
+    
+    // Contador de países únicos
+    const countriesSet = new Set(myMovies.map(m => m.country).filter(c => c && c !== "Desconocido"));
+    document.getElementById('statCountries').innerText = countriesSet.size;
+
+    // --- Lógica del Gráfico de Géneros ---
+    const genreData = {};
+    myMovies.forEach(m => {
+        if (m.genre) {
+            genreData[m.genre] = (genreData[m.genre] || 0) + 1;
+        }
+    });
+
     if (genreChart) genreChart.destroy();
-    genreChart = new Chart(document.getElementById('genreChart'), {
+    const ctx = document.getElementById('genreChart').getContext('2d');
+    genreChart = new Chart(ctx, {
         type: 'doughnut',
-        data: { labels: Object.keys(data), datasets: [{ data: Object.values(data), backgroundColor: ['#e50914','#333','#666'] }] }
+        data: {
+            labels: Object.keys(genreData),
+            datasets: [{
+                data: Object.values(genreData),
+                backgroundColor: ['#e50914', '#b9090b', '#564d4d', '#f5f5f1', '#333']
+            }]
+        },
+        options: {
+            plugins: {
+                legend: { labels: { color: 'white' } }
+            }
+        }
     });
 }
 
