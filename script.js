@@ -35,7 +35,7 @@ document.getElementById('searchBtn').addEventListener('click', async () => {
 });
 
 // --- AÑADIR PELÍCULA ---
-async function addMovie(id, title, poster) {
+async function addMovie(id, title, posterPath) {
     if (myMovies.find(m => m.id === id)) return alert("Ya guardada");
     const rating = prompt(`Nota (1-10):`);
     if (!rating) return;
@@ -46,25 +46,27 @@ async function addMovie(id, title, poster) {
     const credits = await cRes.json();
     
     const getPhoto = (p) => p ? IMG_URL + p : 'https://via.placeholder.com/200x200?text=Sin+Foto';
+    const moviePosterFull = IMG_URL + posterPath;
 
     myMovies.push({
-        id, title, rating, poster: IMG_URL + poster,
+        id, title, rating, poster: moviePosterFull,
         runtime: d.runtime || 0,
         genre: d.genres.length > 0 ? d.genres[0].name : "Desconocido",
         country: d.production_countries.length > 0 ? d.production_countries[0].name : "Desconocido",
         director: { 
             name: credits.crew.find(c => c.job === 'Director')?.name || '?', 
             photo: getPhoto(credits.crew.find(c => c.job === 'Director')?.profile_path),
-            movie: title // Guardamos el nombre de la peli
+            movie: title,
+            poster: moviePosterFull 
         },
         actors: credits.cast.slice(0, 5).map(a => ({ 
-            name: a.name, photo: getPhoto(a.profile_path), movie: title 
+            name: a.name, photo: getPhoto(a.profile_path), movie: title, poster: moviePosterFull 
         })),
         writers: credits.crew.filter(c => c.department === 'Writing').slice(0, 2).map(w => ({ 
-            name: w.name, photo: getPhoto(w.profile_path), movie: title 
+            name: w.name, photo: getPhoto(w.profile_path), movie: title, poster: moviePosterFull 
         })),
         producers: credits.crew.filter(c => c.department === 'Production').slice(0, 2).map(p => ({ 
-            name: p.name, photo: getPhoto(p.profile_path), movie: title 
+            name: p.name, photo: getPhoto(p.profile_path), movie: title, poster: moviePosterFull 
         }))
     });
 
@@ -73,18 +75,20 @@ async function addMovie(id, title, poster) {
     alert("¡Añadida!");
 }
 
-// --- RENDERIZADO DE PERSONAS (NUEVO DISEÑO) ---
+// --- RENDERIZADO DE PERSONAS CON PORTADA DE PELI ---
 function renderPeople(id, arr) {
     const container = document.getElementById(id);
     if (!container) return;
 
-    // Generamos las tarjetas con nombre y película
-    container.innerHTML = arr.map(p => `
+    // Filtramos elementos nulos y generamos las tarjetas
+    container.innerHTML = arr.filter(p => p && p.name).map(p => `
         <div class="person-card">
-            <img src="${p.photo}" onerror="this.src='https://via.placeholder.com/200x200?text=Sin+Foto'">
+            <img class="person-photo" src="${p.photo}" onerror="this.src='https://via.placeholder.com/200x200?text=Sin+Foto'">
             <div class="person-info">
                 <strong>${p.name}</strong>
-                <p>🎬 ${p.movie}</p>
+                <div class="movie-reference">
+                    <img class="mini-poster" src="${p.poster}" title="${p.movie}" onerror="this.style.display='none'">
+                </div>
             </div>
         </div>
     `).join('');
@@ -92,17 +96,20 @@ function renderPeople(id, arr) {
 
 // --- ACTUALIZAR TODA LA WEB ---
 function renderAll() {
-    // Render de Películas
-    document.getElementById('myLibrary').innerHTML = myMovies.map(m => `
-        <div class="card">
-            <img src="${m.poster}">
-            <p><strong>${m.title}</strong></p>
-            <p>⭐ ${m.rating} | 🎭 ${m.genre}</p>
-            <p style="cursor:pointer; color:var(--primary); font-size:0.8rem;" onclick="editCountry(${m.id})">📍 ${m.country} (Editar)</p>
-        </div>
-    `).join('');
+    // Render de Películas en la Librería
+    const libraryCont = document.getElementById('myLibrary');
+    if (libraryCont) {
+        libraryCont.innerHTML = myMovies.map(m => `
+            <div class="card">
+                <img src="${m.poster}">
+                <p><strong>${m.title}</strong></p>
+                <p>⭐ ${m.rating} | 🎭 ${m.genre}</p>
+                <p style="cursor:pointer; color:#e50914; font-size:0.8rem;" onclick="editCountry(${m.id})">📍 ${m.country} (Editar)</p>
+            </div>
+        `).join('');
+    }
     
-    // Render de todas las secciones de personas
+    // Render de todas las secciones de personas (Staff)
     renderPeople('directorList', myMovies.map(m => m.director));
     renderPeople('actorList', myMovies.flatMap(m => m.actors));
     renderPeople('writerList', myMovies.flatMap(m => m.writers));
@@ -149,5 +156,6 @@ function editCountry(movieId) {
     }
 }
 
+// Ejecución inicial
 renderAll();
 
