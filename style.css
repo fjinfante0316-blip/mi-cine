@@ -19,72 +19,11 @@ nav {
     align-items: center;
 }
 
-.search-box input {
-    padding: 8px;
-    border-radius: 4px;
-    border: none;
-}
-
 .grid-container {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
     gap: 20px;
     padding: 20px;
-}
-
-.card {
-    background: var(--card);
-    padding: 10px;
-    border-radius: 8px;
-    text-align: center;
-    transition: 0.3s;
-}
-
-.card:hover { transform: scale(1.05); }
-
-.card img {
-    width: 100%;
-    border-radius: 5px;
-}
-
-.stats-card {
-    background: #333;
-    padding: 20px;
-    margin: 20px;
-    border-radius: 10px;
-    line-height: 1.6;
-}
-
-button {
-    background: var(--primary);
-    color: white;
-    border: none;
-    padding: 8px 15px;
-    cursor: pointer;
-    border-radius: 4px;
-    margin-top: 5px;
-}
-
-/* Añade esto al final de tu style.css */
-.flex-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    padding: 20px;
-}
-
-.pills {
-    background: #444;
-    color: white;
-    padding: 8px 15px;
-    border-radius: 20px;
-    font-size: 0.9rem;
-    border: 1px solid var(--primary);
-}
-
-h2 {
-    margin-left: 20px;
-    color: var(--primary);
 }
 
 .flex-container {
@@ -95,28 +34,48 @@ h2 {
     justify-content: center;
 }
 
+.card {
+    background: var(--card);
+    padding: 10px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.card img {
+    width: 100%;
+    border-radius: 5px;
+}
+
 .person-card {
     text-align: center;
     width: 100px;
-    animation: fadeIn 0.5s ease;
 }
 
 .person-card img {
     width: 80px;
     height: 80px;
-    border-radius: 50%; /* Esto hace la foto circular */
+    border-radius: 50%; /* Foto circular */
     object-fit: cover;
-    border: 2px solid #e50914;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+    border: 2px solid var(--primary);
 }
 
 .person-card p {
     font-size: 0.8rem;
-    margin-top: 8px;
-    color: #ccc;
+    margin-top: 5px;
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+.stats-card {
+    background: #333;
+    padding: 20px;
+    margin: 20px;
+    border-radius: 10px;
+}
+
+button {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    cursor: pointer;
+    border-radius: 4px;
 }
