@@ -34,7 +34,7 @@ document.getElementById('searchBtn').addEventListener('click', async () => {
     `).join('');
 });
 
-// --- AÑADIR ---
+// --- AÑADIR PELÍCULA ---
 async function addMovie(id, title, poster) {
     if (myMovies.find(m => m.id === id)) return alert("Ya guardada");
     const rating = prompt(`Nota (1-10):`);
@@ -54,11 +54,18 @@ async function addMovie(id, title, poster) {
         country: d.production_countries.length > 0 ? d.production_countries[0].name : "Desconocido",
         director: { 
             name: credits.crew.find(c => c.job === 'Director')?.name || '?', 
-            photo: getPhoto(credits.crew.find(c => c.job === 'Director')?.profile_path) 
+            photo: getPhoto(credits.crew.find(c => c.job === 'Director')?.profile_path),
+            movie: title // Guardamos el nombre de la peli
         },
-        actors: credits.cast.slice(0, 5).map(a => ({ name: a.name, photo: getPhoto(a.profile_path) })),
-        writers: credits.crew.filter(c => c.department === 'Writing').slice(0, 2).map(w => ({ name: w.name, photo: getPhoto(w.profile_path) })),
-        producers: credits.crew.filter(c => c.department === 'Production').slice(0, 2).map(p => ({ name: p.name, photo: getPhoto(p.profile_path) }))
+        actors: credits.cast.slice(0, 5).map(a => ({ 
+            name: a.name, photo: getPhoto(a.profile_path), movie: title 
+        })),
+        writers: credits.crew.filter(c => c.department === 'Writing').slice(0, 2).map(w => ({ 
+            name: w.name, photo: getPhoto(w.profile_path), movie: title 
+        })),
+        producers: credits.crew.filter(c => c.department === 'Production').slice(0, 2).map(p => ({ 
+            name: p.name, photo: getPhoto(p.profile_path), movie: title 
+        }))
     });
 
     localStorage.setItem('myCineData', JSON.stringify(myMovies));
@@ -66,64 +73,26 @@ async function addMovie(id, title, poster) {
     alert("¡Añadida!");
 }
 
-// --- CAMBIAR PAÍS MANUALMENTE ---
-function editCountry(movieId) {
-    const movie = myMovies.find(m => m.id === movieId);
-    const newCountry = prompt(`Cambiar país para "${movie.title}":`, movie.country);
-    if (newCountry) {
-        movie.country = newCountry;
-        localStorage.setItem('myCineData', JSON.stringify(myMovies));
-        renderAll();
-        if (document.getElementById('stats').style.display === 'block') updateStatistics();
-    }
+// --- RENDERIZADO DE PERSONAS (NUEVO DISEÑO) ---
+function renderPeople(id, arr) {
+    const container = document.getElementById(id);
+    if (!container) return;
+
+    // Generamos las tarjetas con nombre y película
+    container.innerHTML = arr.map(p => `
+        <div class="person-card">
+            <img src="${p.photo}" onerror="this.src='https://via.placeholder.com/200x200?text=Sin+Foto'">
+            <div class="person-info">
+                <strong>${p.name}</strong>
+                <p>🎬 ${p.movie}</p>
+            </div>
+        </div>
+    `).join('');
 }
 
-// --- ESTADÍSTICAS ---
-function updateStatistics() {
-    if (myMovies.length === 0) return;
-
-    const totalMinutesAll = myMovies.reduce((acc, m) => acc + (m.runtime || 0), 0);
-    const hours = Math.floor(totalMinutesAll / 60);
-    const mins = totalMinutesAll % 60;
-    document.getElementById('statHours').innerText = `${hours}h ${mins}min`;
-
-    const countriesSet = new Set(myMovies.map(m => m.country));
-    document.getElementById('statCountries').innerText = countriesSet.size;
-
-    const genreData = {};
-    myMovies.forEach(m => genreData[m.genre] = (genreData[m.genre] || 0) + 1);
-
-    const countryData = {};
-    myMovies.forEach(m => countryData[m.country] = (countryData[m.country] || 0) + 1);
-
-    if (genreChart) genreChart.destroy();
-    genreChart = new Chart(document.getElementById('genreChart'), {
-        type: 'doughnut',
-        data: {
-            labels: Object.keys(genreData),
-            datasets: [{
-                data: Object.values(genreData),
-                backgroundColor: ['#e50914', '#b9090b', '#564d4d', '#f5f5f1', '#ff0000']
-            }]
-        },
-        options: { plugins: { legend: { labels: { color: 'white' } }, title: { display: true, text: 'GÉNERO PRINCIPAL', color: 'white' } } }
-    });
-
-    if (countryChart) countryChart.destroy();
-    countryChart = new Chart(document.getElementById('countryChart'), {
-        type: 'bar',
-        data: {
-            labels: Object.keys(countryData),
-            datasets: [{ label: 'Películas', data: Object.values(countryData), backgroundColor: '#e50914' }]
-        },
-        options: { 
-            scales: { y: { ticks: { color: 'white' } }, x: { ticks: { color: 'white' } } },
-            plugins: { title: { display: true, text: 'PAÍSES (Haz clic en las pelis para editar)', color: 'white' }, legend: { display: false } }
-        }
-    });
-}
-
+// --- ACTUALIZAR TODA LA WEB ---
 function renderAll() {
+    // Render de Películas
     document.getElementById('myLibrary').innerHTML = myMovies.map(m => `
         <div class="card">
             <img src="${m.poster}">
@@ -133,19 +102,52 @@ function renderAll() {
         </div>
     `).join('');
     
-    renderPeople('directorList', myMovies.map(m => m.director), 'dir');
-    renderPeople('actorList', myMovies.flatMap(m => m.actors), 'act');
-    renderPeople('writerList', myMovies.flatMap(m => m.writers), 'wri');
-    renderPeople('producerList', myMovies.flatMap(m => m.producers), 'pro');
+    // Render de todas las secciones de personas
+    renderPeople('directorList', myMovies.map(m => m.director));
+    renderPeople('actorList', myMovies.flatMap(m => m.actors));
+    renderPeople('writerList', myMovies.flatMap(m => m.writers));
+    renderPeople('producerList', myMovies.flatMap(m => m.producers));
 }
 
-function renderPeople(id, arr, type) {
-    const container = document.getElementById(id);
-    if (!container) return;
-    const unique = Array.from(new Set(arr.map(p => p.name))).map(name => arr.find(p => p.name === name));
-    container.innerHTML = unique.map(p => `
-        <div class="person-card"><img src="${p.photo}"><p>${p.name}</p></div>
-    `).join('');
+// --- ESTADÍSTICAS ---
+function updateStatistics() {
+    if (myMovies.length === 0) return;
+    const totalMinutesAll = myMovies.reduce((acc, m) => acc + (m.runtime || 0), 0);
+    const hours = Math.floor(totalMinutesAll / 60);
+    const mins = totalMinutesAll % 60;
+    document.getElementById('statHours').innerText = `${hours}h ${mins}min`;
+    const countriesSet = new Set(myMovies.map(m => m.country));
+    document.getElementById('statCountries').innerText = countriesSet.size;
+
+    const genreData = {};
+    myMovies.forEach(m => genreData[m.genre] = (genreData[m.genre] || 0) + 1);
+    const countryData = {};
+    myMovies.forEach(m => countryData[m.country] = (countryData[m.country] || 0) + 1);
+
+    if (genreChart) genreChart.destroy();
+    genreChart = new Chart(document.getElementById('genreChart'), {
+        type: 'doughnut',
+        data: { labels: Object.keys(genreData), datasets: [{ data: Object.values(genreData), backgroundColor: ['#e50914', '#b9090b', '#564d4d', '#f5f5f1'] }] },
+        options: { plugins: { legend: { labels: { color: 'white' } }, title: { display: true, text: 'GÉNEROS', color: 'white' } } }
+    });
+
+    if (countryChart) countryChart.destroy();
+    countryChart = new Chart(document.getElementById('countryChart'), {
+        type: 'bar',
+        data: { labels: Object.keys(countryData), datasets: [{ label: 'Películas', data: Object.values(countryData), backgroundColor: '#e50914' }] },
+        options: { scales: { y: { ticks: { color: 'white' } }, x: { ticks: { color: 'white' } } } }
+    });
+}
+
+function editCountry(movieId) {
+    const movie = myMovies.find(m => m.id === movieId);
+    const newCountry = prompt(`Cambiar país para "${movie.title}":`, movie.country);
+    if (newCountry) {
+        movie.country = newCountry;
+        localStorage.setItem('myCineData', JSON.stringify(myMovies));
+        renderAll();
+    }
 }
 
 renderAll();
+
