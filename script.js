@@ -35,23 +35,31 @@ document.getElementById('searchBtn').addEventListener('click', async () => {
 
 // --- AÑADIR PELÍCULA (Máximo 5 actores) ---
 async function addMovie(id, title, poster) {
-    if (myMovies.find(m => m.id === id)) return alert("Ya la tienes guardada");
-    const rating = prompt(`¿Qué nota le das a "${title}"? (1-10)`);
+    if (myMovies.find(m => m.id === id)) return alert("Ya guardada");
+    const rating = prompt(`Nota para "${title}" (1-10):`);
     if (!rating) return;
 
-    const res = await fetch(`${BASE_URL}/movie/${id}/credits?api_key=${API_KEY}`);
-    const credits = await res.json();
+    // Llamada 1: Detalles (Duración, Géneros, Países, Año)
+    const detailsRes = await fetch(`${BASE_URL}/movie/${id}?api_key=${API_KEY}&language=es-ES`);
+    const d = await detailsRes.json();
+
+    // Llamada 2: Créditos (Personas)
+    const creditsRes = await fetch(`${BASE_URL}/movie/${id}/credits?api_key=${API_KEY}`);
+    const credits = await creditsRes.json();
     
     const getPhoto = (p) => p ? IMG_URL + p : 'https://via.placeholder.com/200x200?text=Sin+Foto';
 
     const movieData = {
         id, title, rating,
         poster: IMG_URL + poster,
+        runtime: d.runtime || 0,
+        year: d.release_date ? d.release_date.split('-')[0] : '?',
+        genres: d.genres.map(g => g.name),
+        countries: d.production_countries.map(c => c.name),
         director: { 
             name: credits.crew.find(c => c.job === 'Director')?.name || '?', 
             photo: getPhoto(credits.crew.find(c => c.job === 'Director')?.profile_path) 
         },
-        // AQUÍ EL LÍMITE: .slice(0, 5) para tomar solo los 5 primeros actores
         actors: credits.cast.slice(0, 5).map(a => ({ name: a.name, photo: getPhoto(a.profile_path) })),
         writers: credits.crew.filter(c => c.department === 'Writing').slice(0, 3).map(w => ({ name: w.name, photo: getPhoto(w.profile_path) })),
         producers: credits.crew.filter(c => c.department === 'Production').slice(0, 3).map(p => ({ name: p.name, photo: getPhoto(p.profile_path) }))
@@ -60,7 +68,7 @@ async function addMovie(id, title, poster) {
     myMovies.push(movieData);
     localStorage.setItem('myCineData', JSON.stringify(myMovies));
     renderAll();
-    alert("¡Añadida! Puedes verla en el menú lateral.");
+    alert("¡Añadida!");
 }
 
 // --- RENDERIZADO ---
