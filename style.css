@@ -92,22 +92,31 @@ h2 {
     flex-wrap: wrap;
     gap: 20px;
     padding: 20px;
+    justify-content: center;
 }
 
 .person-card {
     text-align: center;
     width: 100px;
+    animation: fadeIn 0.5s ease;
 }
 
 .person-card img {
     width: 80px;
     height: 80px;
-    border-radius: 50%;
+    border-radius: 50%; /* Esto hace la foto circular */
     object-fit: cover;
-    border: 2px solid var(--primary);
+    border: 2px solid #e50914;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.5);
 }
 
 .person-card p {
     font-size: 0.8rem;
-    margin-top: 5px;
+    margin-top: 8px;
+    color: #ccc;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
