@@ -26,10 +26,12 @@
 
     <div id="main">
         <section id="searchSection" class="content-section">
-            <h1 style="text-align:center;">🎬 Mi Cine</h1>
-            <div class="search-box">
-                <input type="text" id="searchInput" placeholder="Busca una película...">
-                <button id="searchBtn">Buscar</button>
+            <div class="search-container">
+                <h1>🎬 Mi Cine</h1>
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Busca una película...">
+                    <button id="searchBtn">Buscar</button>
+                </div>
             </div>
             <div id="results" class="movie-grid"></div>
         </section>
@@ -37,35 +39,48 @@
         <section id="myLibrary" class="content-section" style="display:none;">
             <h2 class="section-title">🍿 Películas Vistas</h2>
             <div id="watchedMovies" class="movie-grid"></div>
+
             <hr class="separator">
+
             <h2 class="section-title" style="color: #aaa;">⏳ Películas Pendientes</h2>
             <div id="pendingMovies" class="movie-grid"></div>
         </section>
 
         <section id="stats" class="content-section" style="display:none;">
-            <h2 style="text-align:center;">📊 Mis Estadísticas</h2>
+            <h2>📊 Estadísticas</h2>
             <div class="stats-container">
-                <div class="stat-card">⏳ <span id="statHours">0</span> <p>Horas Totales</p></div>
-                <div class="stat-card">🌍 <span id="statCountries">0</span> <p>Países</p></div>
+                <div class="stat-card">
+                    <span class="emoji">⏳</span>
+                    <span id="statHours">0</span>
+                    <p>Tiempo Total</p>
+                </div>
+                <div class="stat-card">
+                    <span class="emoji">🌍</span>
+                    <span id="statCountries">0</span>
+                    <p>Países</p>
+                </div>
             </div>
             <div class="charts">
                 <canvas id="genreChart"></canvas>
                 <canvas id="countryChart"></canvas>
             </div>
-<        /section>
+        </section>
 
         <section id="directors" class="content-section" style="display:none;">
             <h2>🎥 Directores</h2>
             <div id="directorList" class="people-grid"></div>
         </section>
+
         <section id="actors" class="content-section" style="display:none;">
             <h2>🌟 Reparto</h2>
             <div id="actorList" class="people-grid"></div>
         </section>
+
         <section id="writers" class="content-section" style="display:none;">
             <h2>✍️ Guionistas</h2>
             <div id="writerList" class="people-grid"></div>
         </section>
+
         <section id="producers" class="content-section" style="display:none;">
             <h2>💼 Productores</h2>
             <div id="producerList" class="people-grid"></div>
@@ -73,7 +88,6 @@
     </div>
 
     <div id="imageModal" class="modal" onclick="this.style.display='none'">
-        <span class="close">&times;</span>
         <img class="modal-content" id="imgFull">
     </div>
 
