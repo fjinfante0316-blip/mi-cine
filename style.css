@@ -87,3 +87,19 @@ button {
     cursor: pointer;
     border-radius: 4px;
 }
+
+.scrollable {
+    flex-wrap: nowrap; /* No rompe la línea */
+    overflow-x: auto;  /* Permite deslizar a los lados */
+    padding-bottom: 20px;
+    justify-content: flex-start; /* Empieza desde la izquierda */
+}
+
+/* Estilo para la barra de scroll */
+.scrollable::-webkit-scrollbar {
+    height: 8px;
+}
+.scrollable::-webkit-scrollbar-thumb {
+    background: var(--primary);
+    border-radius: 10px;
+}
