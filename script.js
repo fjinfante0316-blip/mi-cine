@@ -4,22 +4,19 @@ const IMG_URL = 'https://image.tmdb.org/t/p/w300';
 
 let myMovies = JSON.parse(localStorage.getItem('myCineData')) || [];
 
-// --- LÓGICA DEL MENÚ Y NAVEGACIÓN ---
+// --- NAVEGACIÓN ---
 function toggleMenu() {
     const menu = document.getElementById("sideMenu");
     menu.style.width = menu.style.width === "250px" ? "0" : "250px";
 }
 
 function showSection(sectionId) {
-    // Ocultar todas las secciones
     document.querySelectorAll('.content-section').forEach(s => s.style.display = 'none');
-    // Mostrar la elegida
     document.getElementById(sectionId).style.display = 'block';
-    // Cerrar menú
     toggleMenu();
 }
 
-// --- BÚSQUEDA Y RESULTADOS ---
+// --- BÚSQUEDA ---
 document.getElementById('searchBtn').addEventListener('click', async () => {
     const query = document.getElementById('searchInput').value;
     if (!query) return;
@@ -36,7 +33,7 @@ document.getElementById('searchBtn').addEventListener('click', async () => {
     `).join('');
 });
 
-// --- AÑADIR PELÍCULA Y TODO EL REPARTO/EQUIPO ---
+// --- AÑADIR PELÍCULA (Máximo 5 actores) ---
 async function addMovie(id, title, poster) {
     if (myMovies.find(m => m.id === id)) return alert("Ya la tienes guardada");
     const rating = prompt(`¿Qué nota le das a "${title}"? (1-10)`);
@@ -54,20 +51,20 @@ async function addMovie(id, title, poster) {
             name: credits.crew.find(c => c.job === 'Director')?.name || '?', 
             photo: getPhoto(credits.crew.find(c => c.job === 'Director')?.profile_path) 
         },
-        actors: credits.cast.map(a => ({ name: a.name, photo: getPhoto(a.profile_path) })),
-        writers: credits.crew.filter(c => c.department === 'Writing').map(w => ({ name: w.name, photo: getPhoto(w.profile_path) })),
-        producers: credits.crew.filter(c => c.department === 'Production').map(p => ({ name: p.name, photo: getPhoto(p.profile_path) }))
+        // AQUÍ EL LÍMITE: .slice(0, 5) para tomar solo los 5 primeros actores
+        actors: credits.cast.slice(0, 5).map(a => ({ name: a.name, photo: getPhoto(a.profile_path) })),
+        writers: credits.crew.filter(c => c.department === 'Writing').slice(0, 3).map(w => ({ name: w.name, photo: getPhoto(w.profile_path) })),
+        producers: credits.crew.filter(c => c.department === 'Production').slice(0, 3).map(p => ({ name: p.name, photo: getPhoto(p.profile_path) }))
     };
 
     myMovies.push(movieData);
     localStorage.setItem('myCineData', JSON.stringify(myMovies));
     renderAll();
-    alert("¡Película añadida! Revisa el menú lateral.");
+    alert("¡Añadida! Puedes verla en el menú lateral.");
 }
 
-// --- RENDERIZADO DE BIBLIOTECA ---
+// --- RENDERIZADO ---
 function renderAll() {
-    // 1. Películas
     document.getElementById('myLibrary').innerHTML = myMovies.map(m => `
         <div class="card">
             <img src="${m.poster}">
@@ -76,7 +73,6 @@ function renderAll() {
         </div>
     `).join('');
 
-    // 2. Directores, Actores, Guionistas y Productores
     renderPeople('directorList', myMovies.map(m => m.director), 'dir');
     renderPeople('actorList', myMovies.flatMap(m => m.actors), 'act');
     renderPeople('writerList', myMovies.flatMap(m => m.writers), 'wri');
@@ -87,7 +83,6 @@ function renderPeople(containerId, peopleArray, type) {
     const container = document.getElementById(containerId);
     if (!container) return;
 
-    // Quitar duplicados por nombre
     const uniquePeople = Array.from(new Set(peopleArray.map(p => p.name)))
         .map(name => peopleArray.find(p => p.name === name));
 
@@ -99,7 +94,6 @@ function renderPeople(containerId, peopleArray, type) {
     `).join('');
 }
 
-// EDITAR FOTO MEDIANTE CLIC
 function editImg(name, type) {
     const newUrl = prompt(`URL de la nueva foto para ${name}:`);
     if (!newUrl) return;
