@@ -4,82 +4,87 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mi Cine Personal</title>
-    <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="menu-btn" onclick="toggleMenu()">☰</div>
 
-    <nav id="sideMenu" class="side-menu">
-        <div class="close-btn" onclick="toggleMenu()">×</div>
-        <a href="#" onclick="showSection('home')">🏠 Portada (Añadir)</a>
-        <a href="#" onclick="showSection('movies')">🍿 Mis Películas</a>
+    <div id="sideMenu" class="sidenav">
+        <a href="javascript:void(0)" class="closebtn" onclick="toggleMenu()">&times;</a>
+        <a href="#" onclick="showSection('searchSection')">🏠 Portada (Añadir)</a>
+        <a href="#" onclick="showSection('myLibrary')">🍿 Mis Películas</a>
         <a href="#" onclick="showSection('stats')">📊 Estadísticas</a>
         <a href="#" onclick="showSection('directors')">🎥 Directores</a>
         <a href="#" onclick="showSection('actors')">🌟 Reparto</a>
         <a href="#" onclick="showSection('writers')">✍️ Guionistas</a>
         <a href="#" onclick="showSection('producers')">💼 Productores</a>
-    </nav>
+    </div>
 
-    <main>
-        <section id="home" class="content-section">
-            <div class="hero">
-                <h1>🎬 Mi Cine</h1>
-                <div class="search-box">
-                    <input type="text" id="searchInput" placeholder="Busca para añadir...">
-                    <button id="searchBtn">Buscar</button>
-                </div>
-                <div id="results" class="grid-container"></div>
+    <span style="font-size:30px;cursor:pointer;color:white;padding:15px;display:block;" onclick="toggleMenu()">&#9776; Menú</span>
+
+    <div id="main">
+        
+        <section id="searchSection" class="content-section">
+            <h1 style="text-align:center;">🎬 Mi Cine</h1>
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Busca una película...">
+                <button id="searchBtn">Buscar</button>
             </div>
+            <div id="results" class="movie-grid"></div>
         </section>
 
         <section id="myLibrary" class="content-section" style="display:none;">
             <div class="container">
-                <h2 style="color: #e50914; margin-top: 30px;">🍿 Películas Vistas</h2>
-                <div id="watchedMovies" class="movie-grid">
-            </div>
+                <h2 class="section-title">🍿 Películas Vistas</h2>
+                <div id="watchedMovies" class="movie-grid"></div>
 
-            <hr style="margin: 50px 0; border: 0; border-top: 1px solid #333;">
+                <hr class="separator">
 
-            <h2 style="color: #aaa;">⏳ Películas Pendientes</h2>
-            <div id="pendingMovies" class="movie-grid"></div>
+                <h2 class="section-title" style="color: #aaa;">⏳ Películas Pendientes</h2>
+                <div id="pendingMovies" class="movie-grid"></div>
             </div>
         </section>
 
-        <section id="stats" class="content-section" style="display:none">
+        <section id="stats" class="content-section" style="display:none;">
             <h2>📊 Mis Estadísticas</h2>
             <div class="stats-container">
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <span class="stat-icon">⏳</span>
-                        <div class="stat-val" id="statHours">0</div>
-                        <div class="stat-label">Horas Totales</div>
-                    </div>
-                    <div class="stat-card">
-                        <span class="stat-icon">🌍</span>
-                        <div class="stat-val" id="statCountries">0</div>
-                        <div class="stat-label">Países</div>
-                    </div>
-                </div>
-                <div class="charts-row">
-                    <div class="chart-box"><canvas id="genreChart"></canvas></div>
-                    <div class="chart-box"><canvas id="countryChart"></canvas></div>
-                </div>
+                <div class="stat-card">⏳ <span id="statHours">0</span> <p>Horas Totales</p></div>
+                <div class="stat-card">🌍 <span id="statCountries">0</span> <p>Países</p></div>
+            </div>
+            <div class="charts">
+                <canvas id="genreChart"></canvas>
+                <canvas id="countryChart"></canvas>
             </div>
         </section>
 
-        <section id="directors" class="content-section" style="display:none"><h2>🎥 Directores</h2><div id="directorList" class="flex-container"></div></section>
-        <section id="actors" class="content-section" style="display:none"><h2>🌟 Reparto</h2><div id="actorList" class="flex-container"></div></section>
-        <section id="writers" class="content-section" style="display:none"><h2>✍️ Guionistas</h2><div id="writerList" class="flex-container"></div></section>
-        <section id="producers" class="content-section" style="display:none"><h2>💼 Productores</h2><div id="producerList" class="flex-container"></div></section>
-    </main>
+        <section id="directors" class="content-section" style="display:none;">
+            <h2>🎥 Directores</h2>
+            <div id="directorList" class="people-grid"></div>
+        </section>
+
+        <section id="actors" class="content-section" style="display:none;">
+            <h2>🌟 Reparto</h2>
+            <div id="actorList" class="people-grid"></div>
+        </section>
+
+        <section id="writers" class="content-section" style="display:none;">
+            <h2>✍️ Guionistas</h2>
+            <div id="writerList" class="people-grid"></div>
+        </section>
+
+        <section id="producers" class="content-section" style="display:none;">
+            <h2>💼 Productores</h2>
+            <div id="producerList" class="people-grid"></div>
+        </section>
+
+    </div>
 
     <div id="imageModal" class="modal" onclick="this.style.display='none'">
         <span class="close">&times;</span>
         <img class="modal-content" id="imgFull">
+        <div id="caption"></div>
     </div>
-    
+
     <script src="script.js"></script>
-    
 </body>
 </html>
