@@ -17,6 +17,7 @@ function showSection(id) {
     toggleMenu();
 }
 
+// BÚSQUEDA
 document.getElementById('searchBtn').addEventListener('click', async () => {
     const query = document.getElementById('searchInput').value;
     if (!query) return;
@@ -24,67 +25,70 @@ document.getElementById('searchBtn').addEventListener('click', async () => {
     const data = await res.json();
     document.getElementById('results').innerHTML = data.results.slice(0, 4).map(m => `
         <div class="card">
-            <img src="${m.poster_path ? IMG_URL + m.poster_path : ''}">
+            <img src="${m.poster_path ? IMG_URL + m.poster_path : 'https://via.placeholder.com/300x450'}">
             <h4>${m.title}</h4>
             <button onclick="addMovie(${m.id}, '${m.title.replace(/'/g, "")}', '${m.poster_path}')">Añadir</button>
         </div>
     `).join('');
 });
 
+// AÑADIR PELÍCULA (CORREGIDO PARA GUARDAR STAFF)
 async function addMovie(id, title, posterPath) {
-    if (myMovies.find(m => m.id === id)) return alert("Ya existe");
+    if (myMovies.find(m => m.id === id)) return alert("Ya guardada");
+    
     const status = confirm(`¿Has visto "${title}"?`) ? 'watched' : 'pending';
     const rating = status === 'watched' ? prompt("Nota (1-10):") : "N/A";
 
     const dRes = await fetch(`${BASE_URL}/movie/${id}?api_key=${API_KEY}&language=es-ES`);
     const d = await dRes.json();
     const cRes = await fetch(`${BASE_URL}/movie/${id}/credits?api_key=${API_KEY}`);
-    const c = await cRes.json();
+    const credits = await cRes.json();
     
-    const getP = (p) => p ? IMG_URL + p : 'https://via.placeholder.com/200';
+    const getPhoto = (p) => p ? IMG_URL + p : 'https://via.placeholder.com/200x300?text=Sin+Foto';
     const posterFull = IMG_URL + posterPath;
 
     myMovies.push({
         id, title, rating, status, poster: posterFull,
-        runtime: d.runtime || 0, genre: d.genres[0]?.name || "?",
-        country: d.production_countries[0]?.name || "?",
-        director: { name: c.crew.find(x => x.job==='Director')?.name, photo: getP(c.crew.find(x => x.job==='Director')?.profile_path), movie: title, poster: posterFull },
-        actors: c.cast.slice(0, 5).map(a => ({ name: a.name, photo: getP(a.profile_path), movie: title, poster: posterFull })),
-        writers: c.crew.filter(x => x.department==='Writing').slice(0,2).map(w => ({ name: w.name, photo: getP(w.profile_path), movie: title, poster: posterFull })),
-        producers: c.crew.filter(x => x.department==='Production').slice(0,2).map(p => ({ name: p.name, photo: getP(p.profile_path), movie: title, poster: posterFull }))
+        runtime: d.runtime || 0,
+        genre: d.genres[0]?.name || "Desconocido",
+        country: d.production_countries[0]?.name || "Desconocido",
+        director: { 
+            name: credits.crew.find(c => c.job === 'Director')?.name || '?', 
+            photo: getPhoto(credits.crew.find(c => c.job === 'Director')?.profile_path),
+            movie: title, poster: posterFull 
+        },
+        actors: credits.cast.slice(0, 5).map(a => ({ 
+            name: a.name, photo: getPhoto(a.profile_path), movie: title, poster: posterFull 
+        })),
+        writers: credits.crew.filter(c => c.department === 'Writing').slice(0, 2).map(w => ({ 
+            name: w.name, photo: getPhoto(w.profile_path), movie: title, poster: posterFull 
+        })),
+        producers: credits.crew.filter(c => c.department === 'Production').slice(0, 2).map(p => ({ 
+            name: p.name, photo: getPhoto(p.profile_path), movie: title, poster: posterFull 
+        }))
     });
 
     localStorage.setItem('myCineData', JSON.stringify(myMovies));
     renderAll();
+    alert("¡Añadida!");
 }
 
+// RENDERIZAR TODO (CORREGIDO)
 function renderAll() {
     const wCont = document.getElementById('watchedMovies');
     const pCont = document.getElementById('pendingMovies');
-    
-    // 1. Renderizar Películas (Vistas y Pendientes)
-    if (wCont && pCont) {
-        wCont.innerHTML = myMovies.filter(m => m.status === 'watched').map(m => `
-            <div class="card">
-                <img src="${m.poster}">
-                <p><strong>${m.title}</strong></p>
-                <p>⭐ ${m.rating}</p>
-            </div>
-        `).join('');
+    if (!wCont || !pCont) return;
 
-        pCont.innerHTML = myMovies.filter(m => m.status === 'pending').map(m => `
-            <div class="card">
-                <img src="${m.poster}" style="filter:grayscale(1)">
-                <p><strong>${m.title}</strong></p>
-                <button onclick="markAsWatched(${m.id})" style="background:#28a745; color:white; border:none; padding:5px; border-radius:5px; cursor:pointer;">¡Ya la he visto!</button>
-            </div>
-        `).join('');
-    }
+    wCont.innerHTML = myMovies.filter(m => m.status === 'watched').map(m => `
+        <div class="card"><img src="${m.poster}"><p><strong>${m.title}</strong></p><p>⭐ ${m.rating}</p></div>
+    `).join('');
 
-    // 2. Renderizar Staff (Asegurándonos de que aplanamos las listas de todas las películas)
-    // Usamos flatMap para los actores porque cada película tiene un array de 5 actores
+    pCont.innerHTML = myMovies.filter(m => m.status === 'pending').map(m => `
+        <div class="card"><img src="${m.poster}" style="filter:grayscale(1)"><p>${m.title}</p><button onclick="markAsWatched(${m.id})">Visto</button></div>
+    `).join('');
+
     renderPeople('directorList', myMovies.map(m => m.director));
-    renderPeople('actorList', myMovies.flatMap(m => m.actors)); 
+    renderPeople('actorList', myMovies.flatMap(m => m.actors));
     renderPeople('writerList', myMovies.flatMap(m => m.writers));
     renderPeople('producerList', myMovies.flatMap(m => m.producers));
 }
@@ -92,26 +96,14 @@ function renderAll() {
 function renderPeople(id, arr) {
     const container = document.getElementById(id);
     if (!container) return;
-
-    // Filtramos para quitar elementos vacíos o corruptos
-    const validPeople = arr.filter(p => p && p.name);
-
-    if (validPeople.length === 0) {
-        container.innerHTML = '<p style="color:gray;">No hay datos disponibles.</p>';
-        return;
-    }
-
-    container.innerHTML = validPeople.map(p => `
+    const valid = arr.filter(p => p && p.name);
+    container.innerHTML = valid.length ? valid.map(p => `
         <div class="person-card">
-            <img class="person-photo" src="${p.photo}" onerror="this.src='https://via.placeholder.com/200x300?text=Sin+Foto'">
-            <div class="person-info">
-                <strong>${p.name}</strong>
-                <div class="movie-reference">
-                    <img class="mini-poster" src="${p.poster}" onclick="openModal('${p.poster}')" title="Película: ${p.movie}">
-                </div>
-            </div>
+            <img class="person-photo" src="${p.photo}">
+            <strong>${p.name}</strong>
+            <img class="mini-poster" src="${p.poster}" onclick="openModal('${p.poster}')">
         </div>
-    `).join('');
+    `).join('') : '<p>No hay datos.</p>';
 }
 
 function openModal(url) {
@@ -127,77 +119,25 @@ function markAsWatched(id) {
     renderAll();
 }
 
+// ESTADÍSTICAS (CORREGIDO)
 function updateStatistics() {
-    if (myMovies.length === 0) return;
+    const totalMins = myMovies.reduce((acc, m) => acc + (m.runtime || 0), 0);
+    document.getElementById('statHours').innerText = Math.floor(totalMins / 60);
+    document.getElementById('statCountries').innerText = new Set(myMovies.map(m => m.country)).size;
 
-    // 1. Cálculos básicos
-    const totalMinutes = myMovies.reduce((acc, m) => acc + (m.runtime || 0), 0);
-    const hours = Math.floor(totalMinutes / 60);
-    document.getElementById('statHours').innerText = hours;
-    
-    const countriesSet = new Set(myMovies.map(m => m.country));
-    document.getElementById('statCountries').innerText = countriesSet.size;
-
-    // 2. Preparar datos para Gráfico de Géneros
     const genreData = {};
-    myMovies.forEach(m => {
-        genreData[m.genre] = (genreData[m.genre] || 0) + 1;
-    });
+    myMovies.forEach(m => genreData[m.genre] = (genreData[m.genre] || 0) + 1);
 
-    // 3. Preparar datos para Gráfico de Países
-    const countryData = {};
-    myMovies.forEach(m => {
-        countryData[m.country] = (countryData[m.country] || 0) + 1;
-    });
-
-    // Destruir gráficos anteriores si existen para evitar errores al recargar
     if (genreChart) genreChart.destroy();
-    if (countryChart) countryChart.destroy();
-
-    // Crear Gráfico de Géneros (Doughnut)
-    const ctxG = document.getElementById('genreChart').getContext('2d');
-    genreChart = new Chart(ctxG, {
+    const ctx = document.getElementById('genreChart').getContext('2d');
+    genreChart = new Chart(ctx, {
         type: 'doughnut',
         data: {
             labels: Object.keys(genreData),
-            datasets: [{
-                data: Object.values(genreData),
-                backgroundColor: ['#e50914', '#b9090b', '#564d4d', '#f5f5f1', '#ff4d4d'],
-                borderWidth: 0
-            }]
+            datasets: [{ data: Object.values(genreData), backgroundColor: ['#e50914', '#564d4d', '#b9090b', '#f5f5f1'] }]
         },
-        options: {
-            plugins: {
-                legend: { labels: { color: 'white' } },
-                title: { display: true, text: 'TUS GÉNEROS FAVORITOS', color: 'white' }
-            }
-        }
-    });
-
-    // Crear Gráfico de Países (Bar)
-    const ctxC = document.getElementById('countryChart').getContext('2d');
-    countryChart = new Chart(ctxC, {
-        type: 'bar',
-        data: {
-            labels: Object.keys(countryData),
-            datasets: [{
-                label: 'Películas',
-                data: Object.values(countryData),
-                backgroundColor: '#e50914'
-            }]
-        },
-        options: {
-            scales: {
-                y: { beginAtZero: true, ticks: { color: 'white' } },
-                x: { ticks: { color: 'white' } }
-            },
-            plugins: {
-                legend: { display: false },
-                title: { display: true, text: 'PELÍCULAS POR PAÍS', color: 'white' }
-            }
-        }
+        options: { plugins: { legend: { labels: { color: 'white' } } } }
     });
 }
 
 renderAll();
-
