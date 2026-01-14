@@ -86,3 +86,28 @@ h2 {
     margin-left: 20px;
     color: var(--primary);
 }
+
+.flex-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding: 20px;
+}
+
+.person-card {
+    text-align: center;
+    width: 100px;
+}
+
+.person-card img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--primary);
+}
+
+.person-card p {
+    font-size: 0.8rem;
+    margin-top: 5px;
+}
