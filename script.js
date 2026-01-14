@@ -102,24 +102,45 @@ function openModal(url) {
 
 // --- ACTUALIZAR TODA LA WEB ---
 function renderAll() {
-    // Render de Películas en la Librería
-    const libraryCont = document.getElementById('myLibrary');
-    if (libraryCont) {
-        libraryCont.innerHTML = myMovies.map(m => `
+    const watchedCont = document.getElementById('watchedMovies');
+    const pendingCont = document.getElementById('pendingMovies');
+
+    if (watchedCont && pendingCont) {
+        // Películas Vistas
+        watchedCont.innerHTML = myMovies.filter(m => m.status === 'watched').map(m => `
             <div class="card">
                 <img src="${m.poster}">
                 <p><strong>${m.title}</strong></p>
                 <p>⭐ ${m.rating} | 🎭 ${m.genre}</p>
-                <p style="cursor:pointer; color:#e50914; font-size:0.8rem;" onclick="editCountry(${m.id})">📍 ${m.country} (Editar)</p>
+            </div>
+        `).join('');
+
+        // Películas Pendientes
+        pendingCont.innerHTML = myMovies.filter(m => m.status === 'pending').map(m => `
+            <div class="card">
+                <img src="${m.poster}" style="filter: grayscale(0.8);">
+                <p><strong>${m.title}</strong></p>
+                <button onclick="markAsWatched(${m.id})" style="background: #28a745; margin-top:5px;">¡Ya la he visto!</button>
             </div>
         `).join('');
     }
     
-    // Render de todas las secciones de personas (Staff)
+    // Render de personas (se mantiene igual)
     renderPeople('directorList', myMovies.map(m => m.director));
     renderPeople('actorList', myMovies.flatMap(m => m.actors));
     renderPeople('writerList', myMovies.flatMap(m => m.writers));
     renderPeople('producerList', myMovies.flatMap(m => m.producers));
+}
+
+// Nueva función para cambiar el estado
+function markAsWatched(id) {
+    const movie = myMovies.find(m => m.id === id);
+    if (movie) {
+        movie.status = 'watched';
+        movie.rating = prompt(`¿Qué nota le das a "${movie.title}" (1-10)?`) || "N/A";
+        localStorage.setItem('myCineData', JSON.stringify(myMovies));
+        renderAll();
+    }
 }
 
 // --- ESTADÍSTICAS ---
