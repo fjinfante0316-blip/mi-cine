@@ -110,45 +110,45 @@ function renderAll() {
     const watchedCont = document.getElementById('watchedMovies');
     const pendingCont = document.getElementById('pendingMovies');
 
-    if (watchedCont && pendingCont) {
-        // Render de Vistas
-        watchedCont.innerHTML = myMovies.filter(m => m.status === 'watched').map(m => `
-            <div class="card">
-                <button class="delete-btn" onclick="deleteMovie(${m.id})">×</button>
-                <img src="${m.poster}">
-                <p><strong>${m.title}</strong></p>
-                <p>⭐ ${m.rating}</p>
-            </div>
-        `).join('');
+    // Si no encuentra los contenedores, detiene la función para no dar error
+    if (!watchedCont || !pendingCont) return;
 
-        // Render de Pendientes
-        pendingCont.innerHTML = myMovies.filter(m => m.status === 'pending').map(m => `
-            <div class="card">
-                <button class="delete-btn" onclick="deleteMovie(${m.id})">×</button>
-                <img src="${m.poster}" style="filter: grayscale(0.8);">
-                <p><strong>${m.title}</strong></p>
-                <button onclick="markAsWatched(${m.id})" style="background:#28a745; color:white; border:none; padding:5px; border-radius:5px; cursor:pointer;">¡Vista!</button>
-            </div>
-        `).join('');
-    }
-    
-    // El resto de los renderPeople se quedan igual...
+    // 1. Render de Películas Vistas
+    const watchedList = myMovies.filter(m => m.status === 'watched');
+    watchedCont.innerHTML = watchedList.length > 0 ? watchedList.map(m => `
+        <div class="card">
+            <button class="delete-btn" onclick="deleteMovie(${m.id})">×</button>
+            <img src="${m.poster}">
+            <p><strong>${m.title}</strong></p>
+            <p>⭐ ${m.rating}</p>
+        </div>
+    `).join('') : '<p style="color:gray;">No has visto ninguna película aún.</p>';
+
+    // 2. Render de Películas Pendientes
+    const pendingList = myMovies.filter(m => m.status === 'pending');
+    pendingCont.innerHTML = pendingList.length > 0 ? pendingList.map(m => `
+        <div class="card">
+            <button class="delete-btn" onclick="deleteMovie(${m.id})">×</button>
+            <img src="${m.poster}" style="filter: grayscale(0.8);">
+            <p><strong>${m.title}</strong></p>
+            <button onclick="markAsWatched(${m.id})" style="background:#28a745; color:white; border:none; padding:5px; border-radius:5px; cursor:pointer; margin-top:5px;">¡Ya la vi!</button>
+        </div>
+    `).join('') : '<p style="color:gray;">No tienes películas pendientes.</p>';
+
+    // 3. Render de Staff (Actores, Directores, etc.)
     renderPeople('directorList', myMovies.map(m => m.director));
     renderPeople('actorList', myMovies.flatMap(m => m.actors));
     renderPeople('writerList', myMovies.flatMap(m => m.writers));
     renderPeople('producerList', myMovies.flatMap(m => m.producers));
 }
 
+// Función para BORRAR películas
 function deleteMovie(id) {
-    if (confirm("¿Seguro que quieres eliminar esta película de tu lista?")) {
-        // Filtramos: nos quedamos con todas las pelis EXCEPTO la que tiene ese ID
+    if (confirm("¿Eliminar esta película de tu lista?")) {
         myMovies = myMovies.filter(movie => movie.id !== id);
-        
-        // Guardamos la nueva lista en el navegador
         localStorage.setItem('myCineData', JSON.stringify(myMovies));
-        
-        // Actualizamos la pantalla inmediatamente
-        renderAll();
+        renderAll(); // Refresca la pantalla
+        if (document.getElementById('stats').style.display === 'block') updateStatistics();
     }
 }
 
