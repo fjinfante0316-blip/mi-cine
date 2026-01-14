@@ -90,7 +90,6 @@ function renderPeople(id, arr) {
                     <img class="mini-poster" 
                          src="${p.poster}" 
                          onclick="openModal('${p.poster}')"
-                         title="Clic para ampliar"
                          onerror="this.style.display='none'">
                 </div>
             </div>
