@@ -1,168 +1,38 @@
 :root { --primary: #e50914; --bg: #141414; --card: #1e1e1e; }
-body { background: var(--bg); color: white; font-family: 'Arial', sans-serif; margin: 0; }
+body { background: var(--bg); color: white; font-family: Arial, sans-serif; margin: 0; overflow-x: hidden; }
 
-/* CENTRADO DE PORTADA */
-#searchSection {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 80vh; /* Ocupa gran parte de la pantalla */
-    width: 100%;      /* Asegura que ocupe todo el ancho */
-    text-align: center;
-    box-sizing: border-box;
-}
-.hero-center {
-    width: 100%;
-    max-width: 600px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-.search-box { display: flex; width: 100%; max-width: 500px; gap: 10px; }
+/* MENÚ */
+.sidenav { height: 100%; width: 0; position: fixed; z-index: 1000; top: 0; left: 0; background: #111; overflow-x: hidden; transition: 0.5s; padding-top: 20px; }
+.sidenav a { padding: 10px 32px; text-decoration: none; font-size: 18px; color: #818181; display: block; }
+.menu-icon { font-size: 30px; cursor: pointer; padding: 20px; display: inline-block; }
+
+/* PORTADA CENTRADA */
+#searchSection { display: flex; flex-direction: column; align-items: center; padding-top: 10vh; width: 100%; }
+.hero-center { text-align: center; margin-bottom: 30px; width: 100%; max-width: 600px; }
+.hero-center h1 { font-size: 3.5rem; color: var(--primary); margin-bottom: 20px; }
+.search-box { display: flex; gap: 10px; padding: 0 20px; }
 .search-box input { flex: 1; padding: 15px; border-radius: 5px; border: none; background: #222; color: white; }
 .search-box button { padding: 15px 25px; background: var(--primary); border: none; color: white; font-weight: bold; border-radius: 5px; cursor: pointer; }
 
-/* TÍTULOS DE SECCIÓN */
-.section-title {
-    text-align: center;
-    margin: 40px auto 20px auto;
-    font-size: 2.2rem;
-    color: white;
-    display: block; /* Cambiado de inline-block a block para centrar mejor */
-    width: 100%;
+/* GRIDS (PELIS Y STAFF) */
+.movie-grid, .people-grid { 
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; 
+    width: 100%; max-width: 1200px; margin: 0 auto; padding: 20px;
 }
 
-/* NAVEGACIÓN Y BACKUP */
-.sidenav { height: 100%; width: 0; position: fixed; z-index: 1000; top: 0; left: 0; background: #111; overflow-x: hidden; transition: 0.5s; padding-top: 20px; }
-.sidenav a { padding: 10px 32px; text-decoration: none; font-size: 18px; color: #818181; display: block; }
-.backup-zone { padding: 20px 32px; display: flex; flex-direction: column; gap: 10px; }
-.btn-export { background: #28a745; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; }
-.btn-import { background: #007bff; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; }
+/* TARJETAS STAFF */
+.person-card { background: var(--card); width: 160px; padding: 15px; border-radius: 15px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+.person-photo { width: 110px; height: 110px; border-radius: 50%; object-fit: cover; border: 3px solid #333; cursor: pointer; }
+.mini-poster { width: 70px; height: 100px; border: 2px solid var(--primary); margin-top: 10px; border-radius: 4px; cursor: pointer; }
 
-/* GRIDS Y TARJETAS */
-.movie-grid, 
-.people-grid {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center; /* Centra las tarjetas en la pantalla */
-    gap: 30px; /* Espacio entre personas */
-    padding: 20px;
-}
-.card { background: var(--card); width: 160px; border-radius: 8px; position: relative; overflow: hidden; }
+/* ESTADÍSTICAS */
+.stats-center-container { display: flex; justify-content: center; width: 100%; margin: 30px 0; }
+.stat-card-large { background: #1e1e1e; border: 2px solid #333; border-radius: 20px; padding: 30px; width: 250px; text-align: center; }
+.stat-value { font-size: 2.5rem; color: var(--primary); font-weight: bold; }
+.charts { max-width: 400px; margin: 0 auto; }
+
+/* TITULOS */
+.section-title { text-align: center; width: 100%; font-size: 2.2rem; margin: 40px 0 20px; }
+.card { background: var(--card); width: 160px; border-radius: 8px; position: relative; overflow: hidden; text-align: center; }
 .card img { width: 100%; height: 240px; object-fit: cover; }
 .delete-btn { position: absolute; top: 5px; right: 5px; background: var(--primary); color: white; border: none; border-radius: 50%; width: 25px; height: 25px; cursor: pointer; z-index: 10; }
-
-.person-card {
-    background: var(--card);
-    width: 160px; /* Ancho fijo para que todas sean iguales */
-    padding: 15px;
-    border-radius: 15px;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center; /* Centra todo el contenido internamente */
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-}
-
-.person-photo {
-    width: 110px;
-    height: 110px;
-    border-radius: 50%; /* Círculo perfecto */
-    object-fit: cover;
-    border: 3px solid #333;
-    margin-bottom: 12px;
-    cursor: pointer;
-    transition: transform 0.2s;
-}
-
-.person-photo:hover {
-    transform: scale(1.1);
-    border-color: var(--primary);
-}
-
-.person-card strong {
-    font-size: 0.95rem;
-    line-height: 1.2;
-    margin-bottom: 10px;
-    display: block;
-    min-height: 2.4em; /* Reserva espacio para 2 líneas de nombre */
-}
-
-.mini-poster {
-    width: 70px;
-    height: 100px;
-    border-radius: 4px;
-    border: 2px solid var(--primary);
-    object-fit: cover;
-    cursor: pointer;
-    margin-top: auto; /* Empuja la foto al final de la tarjeta */
-}
-.modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; }
-.modal-content { max-width: 80%; max-height: 80%; }
-
-/* Contenedor de la gráfica */
-/* Contenedor para centrar la tarjeta en la pantalla */
-.stats-center-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 20px 0;
-    width: 100%;
-}
-
-/* La tarjeta grande de tiempo */
-
-.stats-center-container {
-    display: flex;
-    justify-content: center; /* Centrado horizontal */
-    align-items: center;
-    width: 100%;            /* Ocupa todo el ancho disponible */
-    margin: 40px 0;
-}
-
-.stat-card-large {
-    background: linear-gradient(145deg, #1e1e1e, #252525);
-    border: 2px solid #333;
-    border-radius: 20px;
-    padding: 30px;
-    width: 280px;            /* Tamaño fijo de la tarjeta */
-    text-align: center;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-}
-
-.stat-card-large:hover {
-    transform: translateY(-5px);
-    border-color: var(--primary);
-}
-
-.stat-emoji {
-    font-size: 3rem;
-    display: block;
-    margin-bottom: 10px;
-}
-
-.stat-value {
-    font-size: 2.5rem;
-    font-weight: bold;
-    color: var(--primary);
-    text-shadow: 0 0 15px rgba(229, 9, 20, 0.3);
-    margin: 10px 0;
-}
-
-.stat-label {
-    color: #aaa;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    font-size: 0.8rem;
-    margin: 0;
-}
-
-/* Ajuste de la gráfica para que no se pegue a la tarjeta */
-.charts {
-    margin-top: 40px;
-}
-#genreChart {
-    max-width: 100% !important;
-    max-height: 400px !important;
-}
