@@ -54,24 +54,29 @@
         </section>
 
         <section id="stats" class="content-section" style="display:none;">
-            <h2 style="text-align:center;">📊 Mis Estadísticas</h2>
+            <h2 class="section-title">📊 Estadísticas de Tiempo</h2>
             <div class="stats-container">
-               <div class="stat-card">
-                <span style="font-size: 2rem;">⏳</span>
-                <span id="statHours">0h 0m</span>
-                <p>Tiempo Total</p>
+                <div class="stat-card"><span>⏳</span><span id="statHours">0h 0m</span></div>
             </div>
-            </div>
-            <div class="charts">
-                <canvas id="genreChart"></canvas>
-                </div>
+            <div class="charts"><canvas id="genreChart"></canvas></div>
         </section>
-
-        <section id="directors" class="content-section" style="display:none;"><div id="directorList" class="people-grid"></div></section>
-        <section id="actors" class="content-section" style="display:none;"><div id="actorList" class="people-grid"></div></section>
-        <section id="writers" class="content-section" style="display:none;"><div id="writerList" class="people-grid"></div></section>
-        <section id="producers" class="content-section" style="display:none;"><div id="producerList" class="people-grid"></div></section>
-    </div>
+        
+        <section id="directors" class="content-section" style="display:none;">
+            <h2 class="section-title">🎥 Directores</h2>
+            <div id="directorList" class="people-grid"></div>
+        </section>
+        <section id="actors" class="content-section" style="display:none;">
+            <h2 class="section-title">🌟 Reparto</h2>
+            <div id="actorList" class="people-grid"></div>
+        </section>
+        <section id="writers" class="content-section" style="display:none;">
+            <h2 class="section-title">✍️ Guionistas</h2>
+            <div id="writerList" class="people-grid"></div>
+        </section>
+        <section id="producers" class="content-section" style="display:none;">
+            <h2 class="section-title">💼 Productores</h2>
+            <div id="producerList" class="people-grid"></div>
+        </section>
 
     <div id="imageModal" class="modal" onclick="this.style.display='none'"><img id="imgFull" class="modal-content"></div>
 
