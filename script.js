@@ -107,24 +107,49 @@ function openModal(url) {
 }
 // --- ACTUALIZAR TODA LA WEB ---
 function renderAll() {
-    // Render de Películas en la Librería
-    const libraryCont = document.getElementById('myLibrary');
-    if (libraryCont) {
-        libraryCont.innerHTML = myMovies.map(m => `
+    const watchedCont = document.getElementById('watchedMovies');
+    const pendingCont = document.getElementById('pendingMovies');
+
+    if (watchedCont && pendingCont) {
+        // Render de Vistas
+        watchedCont.innerHTML = myMovies.filter(m => m.status === 'watched').map(m => `
             <div class="card">
+                <button class="delete-btn" onclick="deleteMovie(${m.id})">×</button>
                 <img src="${m.poster}">
                 <p><strong>${m.title}</strong></p>
-                <p>⭐ ${m.rating} | 🎭 ${m.genre}</p>
-                <p style="cursor:pointer; color:#e50914; font-size:0.8rem;" onclick="editCountry(${m.id})">📍 ${m.country} (Editar)</p>
+                <p>⭐ ${m.rating}</p>
+            </div>
+        `).join('');
+
+        // Render de Pendientes
+        pendingCont.innerHTML = myMovies.filter(m => m.status === 'pending').map(m => `
+            <div class="card">
+                <button class="delete-btn" onclick="deleteMovie(${m.id})">×</button>
+                <img src="${m.poster}" style="filter: grayscale(0.8);">
+                <p><strong>${m.title}</strong></p>
+                <button onclick="markAsWatched(${m.id})" style="background:#28a745; color:white; border:none; padding:5px; border-radius:5px; cursor:pointer;">¡Vista!</button>
             </div>
         `).join('');
     }
     
-    // Render de todas las secciones de personas (Staff)
+    // El resto de los renderPeople se quedan igual...
     renderPeople('directorList', myMovies.map(m => m.director));
     renderPeople('actorList', myMovies.flatMap(m => m.actors));
     renderPeople('writerList', myMovies.flatMap(m => m.writers));
     renderPeople('producerList', myMovies.flatMap(m => m.producers));
+}
+
+function deleteMovie(id) {
+    if (confirm("¿Seguro que quieres eliminar esta película de tu lista?")) {
+        // Filtramos: nos quedamos con todas las pelis EXCEPTO la que tiene ese ID
+        myMovies = myMovies.filter(movie => movie.id !== id);
+        
+        // Guardamos la nueva lista en el navegador
+        localStorage.setItem('myCineData', JSON.stringify(myMovies));
+        
+        // Actualizamos la pantalla inmediatamente
+        renderAll();
+    }
 }
 
 // --- ESTADÍSTICAS ---
