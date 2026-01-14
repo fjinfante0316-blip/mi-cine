@@ -56,7 +56,7 @@
         <section id="producers" class="content-section" style="display:none"><h2>💼 Productores</h2><div id="producerList" class="flex-container"></div></section>
     </main>
 
-    <a href="#" onclick="showSection('stats')">📊 Ver Estadísticas</a>
+    <a href="#" onclick="showSection('stats')">📊 Estadísticas</a>
 
     <section id="stats" class="content-section" style="display:none">
         <h2>📊 Mi Análisis de Cine</h2>
@@ -70,17 +70,14 @@
                 <div class="stat-card">
                     <span class="stat-icon">🌍</span>
                     <div class="stat-val" id="statCountries">0</div>
-                    <div class="stat-label">Países Visitados</div>
+                    <div class="stat-label">Países</div>
                 </div>
             </div>
-
             <div class="charts-row">
                 <div class="chart-box">
-                    <h3>🎭 Géneros Favoritos</h3>
                     <canvas id="genreChart"></canvas>
                 </div>
                 <div class="chart-box">
-                    <h3>🗺️ Producción por País</h3>
                     <canvas id="countryChart"></canvas>
                 </div>
             </div>
