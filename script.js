@@ -76,22 +76,34 @@ async function addMovie(id, title, posterPath) {
 }
 
 // --- RENDERIZADO DE PERSONAS CON PORTADA DE PELI ---
+// --- RENDERIZADO DE PERSONAS CON PORTADA RECTANGULAR ---
 function renderPeople(id, arr) {
     const container = document.getElementById(id);
     if (!container) return;
 
-    // Filtramos elementos nulos y generamos las tarjetas
     container.innerHTML = arr.filter(p => p && p.name).map(p => `
         <div class="person-card">
             <img class="person-photo" src="${p.photo}" onerror="this.src='https://via.placeholder.com/200x200?text=Sin+Foto'">
             <div class="person-info">
                 <strong>${p.name}</strong>
                 <div class="movie-reference">
-                    <img class="mini-poster" src="${p.poster}" title="${p.movie}" onerror="this.style.display='none'">
+                    <img class="mini-poster" 
+                         src="${p.poster}" 
+                         onclick="openModal('${p.poster}')"
+                         title="Clic para ampliar"
+                         onerror="this.style.display='none'">
                 </div>
             </div>
         </div>
     `).join('');
+}
+
+// --- FUNCIÓN PARA EL ZOOM ---
+function openModal(url) {
+    const modal = document.getElementById("imageModal");
+    const modalImg = document.getElementById("imgFull");
+    modal.style.display = "flex";
+    modalImg.src = url;
 }
 
 // --- ACTUALIZAR TODA LA WEB ---
