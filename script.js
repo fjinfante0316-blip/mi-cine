@@ -11,14 +11,10 @@ function toggleMenu() {
     menu.style.width = (menu.style.width === "250px") ? "0" : "250px";
 }
 
-// CAMBIO CLAVE: Cargar estadísticas al mostrar la sección
 function showSection(sectionId) {
     document.querySelectorAll('.content-section').forEach(s => s.style.display = 'none');
     document.getElementById(sectionId).style.display = 'block';
-    
-    if (sectionId === 'stats') {
-        updateStatistics();
-    }
+    if (sectionId === 'stats') updateStatistics();
     toggleMenu();
 }
 
@@ -66,42 +62,28 @@ async function addMovie(id, title, poster) {
 
 function updateStatistics() {
     if (myMovies.length === 0) return;
-
     const totalMinutes = myMovies.reduce((acc, m) => acc + (m.runtime || 0), 0);
     document.getElementById('statHours').innerText = Math.floor(totalMinutes / 60);
-    
     const countriesSet = new Set(myMovies.flatMap(m => m.countries || []));
     document.getElementById('statCountries').innerText = countriesSet.size;
 
     const genreData = {};
     myMovies.flatMap(m => m.genres || []).forEach(g => genreData[g] = (genreData[g] || 0) + 1);
-
     const countryData = {};
     myMovies.flatMap(m => m.countries || []).forEach(c => countryData[c] = (countryData[c] || 0) + 1);
 
-    // Gráfico de Géneros
     if (genreChart) genreChart.destroy();
     genreChart = new Chart(document.getElementById('genreChart'), {
         type: 'doughnut',
-        data: {
-            labels: Object.keys(genreData),
-            datasets: [{ data: Object.values(genreData), backgroundColor: ['#e50914', '#b9090b', '#564d4d', '#f5f5f1', '#ff0000'] }]
-        },
+        data: { labels: Object.keys(genreData), datasets: [{ data: Object.values(genreData), backgroundColor: ['#e50914', '#b9090b', '#564d4d', '#f5f5f1'] }] },
         options: { plugins: { legend: { labels: { color: 'white' } }, title: { display: true, text: 'GÉNEROS', color: 'white' } } }
     });
 
-    // Gráfico de Países
     if (countryChart) countryChart.destroy();
     countryChart = new Chart(document.getElementById('countryChart'), {
         type: 'bar',
-        data: {
-            labels: Object.keys(countryData),
-            datasets: [{ label: 'Películas', data: Object.values(countryData), backgroundColor: '#e50914' }]
-        },
-        options: { 
-            scales: { y: { ticks: { color: 'white' } }, x: { ticks: { color: 'white' } } },
-            plugins: { legend: { display: false }, title: { display: true, text: 'PAÍSES', color: 'white' } }
-        }
+        data: { labels: Object.keys(countryData), datasets: [{ label: 'Películas', data: Object.values(countryData), backgroundColor: '#e50914' }] },
+        options: { scales: { y: { ticks: { color: 'white' } }, x: { ticks: { color: 'white' } } } }
     });
 }
 
@@ -109,7 +91,6 @@ function renderAll() {
     document.getElementById('myLibrary').innerHTML = myMovies.map(m => `
         <div class="card"><img src="${m.poster}"><p><strong>${m.title}</strong></p><p>⭐ ${m.rating}</p></div>
     `).join('');
-    
     renderPeople('directorList', myMovies.map(m => m.director), 'dir');
     renderPeople('actorList', myMovies.flatMap(m => m.actors), 'act');
     renderPeople('writerList', myMovies.flatMap(m => m.writers), 'wri');
@@ -121,10 +102,7 @@ function renderPeople(id, arr, type) {
     if (!container) return;
     const unique = Array.from(new Set(arr.map(p => p.name))).map(name => arr.find(p => p.name === name));
     container.innerHTML = unique.map(p => `
-        <div class="person-card">
-            <img src="${p.photo}">
-            <p>${p.name}</p>
-        </div>
+        <div class="person-card"><img src="${p.photo}"><p>${p.name}</p></div>
     `).join('');
 }
 
