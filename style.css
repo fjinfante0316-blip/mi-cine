@@ -22,8 +22,21 @@ body { background: var(--bg); color: white; font-family: Arial; margin: 0; }
 .mini-poster { width: 60px; height: 90px; border: 2px solid var(--primary); margin-top: 10px; cursor: pointer; }
 
 .stats-container { display: flex; justify-content: center; gap: 20px; margin-top: 20px; }
-.stat-card { background: var(--card); padding: 15px; border-radius: 10px; width: 120px; text-align: center; border: 1px solid #333; }
-.stat-card span { display: block; font-size: 1.2rem; font-weight: bold; color: var(--primary); }
+.stat-card {
+    background: var(--card);
+    padding: 15px;
+    border-radius: 10px;
+    min-width: 140px; /* Un poco más ancho para que quepa bien el texto */
+    text-align: center;
+    border: 1px solid #333;
+}
+
+.stat-card span {
+    display: block;
+    font-size: 1.4rem; /* Tamaño de fuente equilibrado */
+    font-weight: bold;
+    color: var(--primary);
+}
 .charts { max-width: 400px; margin: 20px auto; }
 .separator { width: 80%; border: 0; border-top: 1px solid #333; margin: 30px auto; }
 .modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; }
