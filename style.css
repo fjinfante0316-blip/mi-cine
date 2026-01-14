@@ -1,37 +1,152 @@
-:root { --primary: #e50914; --bg: #141414; }
-body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; overflow-x: hidden; }
+:root {
+    --primary: #e50914;
+    --bg: #141414;
+    --card: #222;
+}
 
-/* Botón Hamburguesa */
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: var(--bg);
+    color: white;
+    margin: 0;
+    overflow-x: hidden;
+}
+
+/* --- BOTÓN HAMBURGUESA --- */
 .menu-btn {
-    position: fixed; top: 20px; left: 20px; font-size: 30px;
-    cursor: pointer; z-index: 1000; background: rgba(0,0,0,0.5);
-    padding: 5px 15px; border-radius: 5px;
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    font-size: 30px;
+    cursor: pointer;
+    z-index: 2000; /* Por encima de todo */
+    background: rgba(0, 0, 0, 0.7);
+    padding: 5px 15px;
+    border-radius: 5px;
+    color: white;
 }
 
-/* Menú Lateral */
+/* --- MENÚ LATERAL --- */
 .side-menu {
-    height: 100%; width: 0; position: fixed; z-index: 2000;
-    top: 0; left: 0; background-color: #111;
-    overflow-x: hidden; transition: 0.5s; padding-top: 60px;
+    height: 100%;
+    width: 0; /* Empieza cerrado */
+    position: fixed;
+    z-index: 3000; /* Por encima del botón */
+    top: 0;
+    left: 0;
+    background-color: #111;
+    overflow-x: hidden;
+    transition: 0.5s;
+    padding-top: 60px;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.5);
 }
+
 .side-menu a {
-    padding: 15px 30px; text-decoration: none; font-size: 1.2rem;
-    color: #818181; display: block; transition: 0.3s;
+    padding: 15px 30px;
+    text-decoration: none;
+    font-size: 1.2rem;
+    color: #818181;
+    display: block;
+    transition: 0.3s;
+    white-space: nowrap;
 }
-.side-menu a:hover { color: white; background: var(--primary); }
-.close-btn { position: absolute; top: 10px; right: 25px; font-size: 36px; cursor: pointer; }
 
-/* Hero / Portada */
-.hero { text-align: center; padding: 100px 20px; min-height: 80vh; }
-.search-box input { padding: 12px; width: 300px; border-radius: 5px 0 0 5px; border: none; }
-.search-box button { padding: 12px 20px; border-radius: 0 5px 5px 0; background: var(--primary); color: white; border: none; cursor: pointer; }
+.side-menu a:hover {
+    color: white;
+    background: var(--primary);
+}
 
-/* Contenedores */
-.grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; padding: 40px; }
-.flex-container { display: flex; flex-wrap: wrap; gap: 20px; padding: 40px; justify-content: center; }
-.card { background: #222; padding: 10px; border-radius: 8px; text-align: center; }
-.card img { width: 100%; border-radius: 5px; }
-.person-card { text-align: center; width: 120px; }
-.person-card img { width: 90px; height: 90px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); }
+.close-btn {
+    position: absolute;
+    top: 10px;
+    right: 25px;
+    font-size: 36px;
+    cursor: pointer;
+}
 
-h2 { text-align: center; margin-top: 80px; color: var(--primary); font-size: 2rem; }
+/* --- SECCIÓN PORTADA (BUSCADOR) --- */
+.hero {
+    text-align: center;
+    padding: 120px 20px;
+    min-height: 100vh;
+    position: relative;
+    z-index: 1; /* Capa baja para que no tape el menú */
+}
+
+.search-box {
+    margin: 30px auto;
+    display: flex;
+    justify-content: center;
+    max-width: 500px;
+    position: relative;
+    z-index: 100; /* Asegura que el input sea clicable */
+}
+
+.search-box input {
+    padding: 15px;
+    width: 70%;
+    border-radius: 5px 0 0 5px;
+    border: none;
+    font-size: 1rem;
+    outline: none;
+}
+
+.search-box button {
+    padding: 15px 25px;
+    border-radius: 0 5px 5px 0;
+    background: var(--primary);
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+/* --- DISEÑO DE TARJETAS Y PERSONAS --- */
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 20px;
+    padding: 20px;
+}
+
+.flex-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding: 40px;
+    justify-content: center;
+}
+
+.card {
+    background: var(--card);
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+
+.card img {
+    width: 100%;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.person-card {
+    text-align: center;
+    width: 120px;
+}
+
+.person-card img {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--primary);
+    cursor: pointer;
+}
+
+h2 {
+    text-align: center;
+    margin-top: 100px;
+    color: var(--primary);
+}
