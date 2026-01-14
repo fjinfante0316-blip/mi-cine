@@ -131,25 +131,34 @@ body {
     margin-bottom: 10px;
 }
 
-/* Tarjeta y Foto de persona */
+/* 2. Estilo de la tarjeta */
 .person-card {
     background: #1e1e1e;
-    width: 130px;
-    border-radius: 8px;
+    width: 140px;
+    border-radius: 12px;
     overflow: hidden;
-    margin: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centra el contenido interno */
+    padding-bottom: 10px;
     border: 1px solid #333;
 }
 
+/* 3. La foto del ACTOR/DIRECTOR (Cuadrada o rectangular, NO círculo) */
 .person-photo {
     width: 100%;
-    height: 150px;
-    object-fit: cover; /* La foto del actor sí se recorta para llenar el cuadro */
+    height: 160px;
+    object-fit: cover;
+    border-radius: 0; /* Esto elimina el círculo si lo tenías */
 }
 
+/* 4. El nombre de la persona */
 .person-info {
     padding: 8px;
+    text-align: center;
+    width: 100%;
 }
+
 .person-card img {
     width: 100px;
     height: 100px;
@@ -160,10 +169,10 @@ body {
 }
 
 .person-info strong {
-    font-size: 0.85rem;
     color: white;
+    font-size: 0.9rem;
     display: block;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
 }
 
 .person-info p {
@@ -271,15 +280,17 @@ canvas {
     margin-top: 5px;
 }
 
-/* La Mini Portada (Entera y Rectangular) */
+/* 5. El MINI PÓSTER de la película (Rectangular y entero) */
 .mini-poster {
-    width: 60px;   /* Un poco más ancha para que se vea mejor */
-    height: 90px;  /* Proporción 2:3 típica de cine */
-    object-fit: contain; /* IMPORTANTE: Asegura que se vea la peli ENTERA sin recortes */
-    background: #000;
+    width: 70px !important;    /* Forzamos el ancho */
+    height: 100px !important;  /* Forzamos el alto */
+    border-radius: 4px !important; /* Bordes apenas redondeados, no círculo */
+    object-fit: cover;
     border: 2px solid #e50914;
     cursor: pointer;
     transition: transform 0.2s;
+    display: block;
+    margin: 0 auto; /* Centra la imagen */
 }
 
 .mini-poster:hover {
@@ -326,3 +337,12 @@ canvas {
 .charts-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
 .chart-box { background: #1a1a1a; padding: 15px; border-radius: 10px; }
 canvas { width: 100% !important; height: auto !important; }
+
+/* 1. Centrar los contenedores de personas */
+#directorList, #actorList, #writerList, #producerList {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center; /* Esto centra las tarjetas */
+    gap: 20px;
+    padding: 20px;
+}
