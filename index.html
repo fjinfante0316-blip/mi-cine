@@ -14,13 +14,17 @@
         <div class="close-btn" onclick="toggleMenu()">×</div>
         
         <div class="menu-stats">
-            <p>⏳ <span id="statHours">0</span>h de cine</p>
-            <canvas id="genreChart" width="200" height="200"></canvas>
-            <canvas id="countryChart" width="200" height="200" style="margin-top:20px;"></canvas>
+            <h3>📊 Tus Estadísticas</h3>
+            <p>⏳ <span id="statHours">0</span> horas vistas</p>
+            <div class="chart-container">
+                <canvas id="genreChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <canvas id="countryChart"></canvas>
+            </div>
         </div>
 
-        <hr style="opacity:0.2; margin: 20px;">
-
+        <hr>
         <a href="#" onclick="showSection('home')">🏠 Portada</a>
         <a href="#" onclick="showSection('movies')">🍿 Mis Películas</a>
         <a href="#" onclick="showSection('directors')">🎥 Directores</a>
@@ -45,11 +49,11 @@
             <h2>🍿 Mis Películas</h2>
             <div id="myLibrary" class="grid-container"></div>
         </section>
-        
-        <section id="directors" class="content-section" style="display:none"><div id="directorList" class="flex-container"></div></section>
-        <section id="actors" class="content-section" style="display:none"><div id="actorList" class="flex-container"></div></section>
-        <section id="writers" class="content-section" style="display:none"><div id="writerList" class="flex-container"></div></section>
-        <section id="producers" class="content-section" style="display:none"><div id="producerList" class="flex-container"></div></section>
+
+        <section id="directors" class="content-section" style="display:none"><h2>🎥 Directores</h2><div id="directorList" class="flex-container"></div></section>
+        <section id="actors" class="content-section" style="display:none"><h2>🌟 Reparto</h2><div id="actorList" class="flex-container"></div></section>
+        <section id="writers" class="content-section" style="display:none"><h2>✍️ Guionistas</h2><div id="writerList" class="flex-container"></div></section>
+        <section id="producers" class="content-section" style="display:none"><h2>💼 Productores</h2><div id="producerList" class="flex-container"></div></section>
     </main>
 
     <script src="script.js"></script>
