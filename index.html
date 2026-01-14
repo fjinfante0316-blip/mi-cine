@@ -10,7 +10,16 @@
 <body>
 
     <div id="sideMenu" class="sidenav">
-        <a href="javascript:void(0)" class="closebtn" onclick="toggleMenu()">&times;</a>
+         <a href="javascript:void(0)" class="closebtn" onclick="toggleMenu()">&times;</a>
+    
+        <div class="backup-zone">
+             <button class="btn-export" onclick="exportData()">📥 Exportar Copia</button>
+            <button class="btn-import" onclick="document.getElementById('importInput').click()">📤 Importar Copia</button>
+            <input type="file" id="importInput" style="display: none;" onchange="importData(event)">
+        </div>
+    
+        <hr class="menu-divider">
+
         <a href="#" onclick="showSection('searchSection')">🏠 Portada</a>
         <a href="#" onclick="showSection('myLibrary')">🍿 Mis Películas</a>
         <a href="#" onclick="showSection('stats')">📊 Estadísticas</a>
