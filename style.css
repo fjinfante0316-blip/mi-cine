@@ -21,10 +21,58 @@ body { background: var(--bg); color: white; font-family: Arial, sans-serif; marg
 }
 
 /* TARJETAS STAFF */
-.person-card { background: var(--card); width: 160px; padding: 15px; border-radius: 15px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-.person-photo { width: 110px; height: 110px; border-radius: 50%; object-fit: cover; border: 3px solid #333; cursor: pointer; }
-.mini-poster { width: 70px; height: 100px; border: 2px solid var(--primary); margin-top: 10px; border-radius: 4px; cursor: pointer; }
+/* Contenedor de la tarjeta de staff */
+.person-card {
+    background: var(--card);
+    width: 170px;             /* Ancho fijo para consistencia */
+    padding: 20px 10px;       /* Espaciado interno */
+    border-radius: 15px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;   /* Alinea elementos uno debajo de otro */
+    align-items: center;      /* Centra horizontalmente todo el contenido */
+    justify-content: space-between; /* Mantiene la peli abajo y la foto arriba */
+    box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+    transition: transform 0.3s ease;
+}
 
+.person-card:hover {
+    transform: translateY(-5px);
+}
+
+/* Foto circular centrada */
+.person-photo {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #333;
+    margin-bottom: 15px;      /* Espacio con el nombre */
+    cursor: pointer;
+}
+
+/* Nombre del artista centrado */
+.person-card strong {
+    font-size: 0.95rem;
+    color: #fff;
+    display: block;
+    width: 100%;              /* Ocupa todo el ancho para poder centrar texto */
+    text-align: center;       /* Fuerza el centrado del texto */
+    line-height: 1.3;
+    min-height: 2.6em;        /* Reserva espacio para 2 líneas siempre */
+    margin-bottom: 10px;
+}
+
+/* El poster de la película debajo del nombre */
+.mini-poster {
+    width: 75px;
+    height: 110px;
+    border: 2px solid var(--primary);
+    border-radius: 5px;
+    object-fit: cover;
+    cursor: pointer;
+    margin-top: auto;         /* Lo empuja al fondo de la tarjeta si el nombre es corto */
+}
 /* ESTADÍSTICAS */
 .stats-center-container { display: flex; justify-content: center; width: 100%; margin: 30px 0; }
 .stat-card-large { background: #1e1e1e; border: 2px solid #333; border-radius: 20px; padding: 30px; width: 250px; text-align: center; }
