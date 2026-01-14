@@ -62,22 +62,22 @@ body {
 
 .separator { width: 80%; border: 0; border-top: 1px solid #333; margin: 40px auto; }
 
-/* Centrar la sección de búsqueda */
+/* Centrar Buscador */
 #searchSection {
     display: flex;
     flex-direction: column;
-    align-items: center; /* Centra horizontalmente */
-    justify-content: center; /* Centra verticalmente si hay espacio */
-    min-height: 70vh; /* Para que ocupe gran parte de la pantalla */
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
     text-align: center;
 }
 
 .search-box {
     display: flex;
     gap: 10px;
-    width: 100%;
-    max-width: 500px; /* Ancho máximo del buscador */
-    margin-top: 20px;
+    width: 90%;
+    max-width: 500px;
+    margin: 20px auto;
 }
 
 .search-box input {
@@ -87,7 +87,6 @@ body {
     border: 1px solid #333;
     background: #222;
     color: white;
-    font-size: 1rem;
 }
 
 .search-box button {
@@ -102,9 +101,8 @@ body {
 
 /* Estenedor de los gráficos */
 .charts {
-    width: 100%;
-    max-width: 800px;
-    margin: 20px auto;
+    max-width: 600px;
+    margin: 30px auto;
 }
 
 canvas {
@@ -112,13 +110,13 @@ canvas {
     margin-bottom: 50px;
 }
 
-/* Contenedor que guarda las dos tarjetas (Horas y Países) */
+/* Estadísticas Centradas */
 .stats-container {
     display: flex;
-    justify-content: center; /* Centra las tarjetas horizontalmente */
-    gap: 30px; /* Espacio entre las dos tarjetas */
-    margin-bottom: 40px;
-    flex-wrap: wrap; /* Para que en móviles se pongan una debajo de otra */
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin: 20px 0;
 }
 
 /* La tarjeta individual */
@@ -126,19 +124,17 @@ canvas {
     background: #1e1e1e;
     padding: 20px;
     border-radius: 15px;
-    min-width: 150px;
-    text-align: center; /* Centra el texto y los emojis internamente */
+    width: 150px;
+    text-align: center;
     border: 1px solid #333;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
 }
 
 /* El número grande dentro de la tarjeta */
 .stat-card span {
     display: block;
-    font-size: 2.5rem;
+    font-size: 2rem;
     font-weight: bold;
-    color: #e50914; /* Rojo Netflix */
-    margin: 10px 0;
+    color: #e50914;
 }
 
 /* El texto debajo del número */
