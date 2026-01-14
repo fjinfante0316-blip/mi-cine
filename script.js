@@ -1,11 +1,12 @@
 const API_KEY = 'e8b61af0cf42a633e3aa581bb73127f8'; // <--- PEGA TU CLAVE DE TMDB AQUÍ
 const BASE_URL = 'https://api.themoviedb.org/3';
-const IMG_URL = 'https://image.tmdb.org/t/p/w500';
+const IMG_URL = 'https://image.tmdb.org/t/p/w200'; 
 
 let myMovies = JSON.parse(localStorage.getItem('myCineData')) || [];
 
 document.getElementById('searchBtn').addEventListener('click', searchMovies);
 
+// 1. BUSCAR PELÍCULAS
 async function searchMovies() {
     const query = document.getElementById('searchInput').value;
     if (!query) return;
@@ -29,6 +30,7 @@ function displayResults(movies) {
     });
 }
 
+// 2. AÑADIR PELÍCULA Y EXTRAER EQUIPO AUTOMÁTICAMENTE
 async function addMovie(id, title, poster) {
     if (myMovies.find(m => m.id === id)) return alert("Ya guardada");
     const rating = prompt(`Nota para "${title}" (1-10):`);
@@ -37,76 +39,110 @@ async function addMovie(id, title, poster) {
     const res = await fetch(`${BASE_URL}/movie/${id}/credits?api_key=${API_KEY}`);
     const credits = await res.json();
     
+    const getPhoto = (path) => path ? IMG_URL + path : 'https://via.placeholder.com/200x200?text=Sin+Foto';
+
+    // Director
     const dirObj = credits.crew.find(p => p.job === 'Director');
-    const director = {
-        name: dirObj?.name || 'Desconocido',
-        photo: dirObj?.profile_path ? IMG_URL + dirObj.profile_path : 'https://via.placeholder.com/150'
-    };
+    const director = { name: dirObj?.name || 'Desconocido', photo: getPhoto(dirObj?.profile_path) };
 
-    const actors = credits.cast.slice(0, 3).map(a => ({
-        name: a.name,
-        photo: a.profile_path ? IMG_URL + a.profile_path : 'https://via.placeholder.com/150'
-    }));
+    // Reparto Completo
+    const actors = credits.cast.map(a => ({ name: a.name, photo: getPhoto(a.profile_path) }));
 
-    myMovies.push({ id, title, poster, director, actors, userRating: rating });
+    // Guionistas (Department: Writing)
+    const writers = credits.crew
+        .filter(p => p.department === 'Writing')
+        .map(w => ({ name: w.name, photo: getPhoto(w.profile_path) }));
+
+    // Productores (Department: Production)
+    const producers = credits.crew
+        .filter(p => p.department === 'Production')
+        .map(p => ({ name: p.name, photo: getPhoto(p.profile_path) }));
+
+    myMovies.push({ id, title, poster: IMG_URL + poster, director, actors, writers, producers, userRating: rating });
     localStorage.setItem('myCineData', JSON.stringify(myMovies));
     renderAll();
 }
 
-// NUEVA FUNCIÓN: Cambiar foto al hacer clic
-function changePhoto(name, type) {
-    const newUrl = prompt(`Introduce la URL de la nueva foto para: ${name}`);
+// 3. EDITAR FOTOS HACIENDO CLIC
+function editImg(name, type) {
+    const newUrl = prompt(`Nueva URL de imagen para ${name}:`);
     if (!newUrl) return;
 
-    myMovies.forEach(movie => {
-        // Si es director y coincide el nombre, actualizamos
-        if (type === 'dir' && movie.director.name === name) {
-            movie.director.photo = newUrl;
-        }
-        // Si es actor, buscamos en su lista de actores
-        if (type === 'act') {
-            movie.actors.forEach(actor => {
-                if (actor.name === name) actor.photo = newUrl;
-            });
-        }
+    myMovies.forEach(m => {
+        if (type === 'dir' && m.director.name === name) m.director.photo = newUrl;
+        if (type === 'act') m.actors.forEach(a => { if(a.name === name) a.photo = newUrl; });
+        if (type === 'wri') m.writers.forEach(w => { if(w.name === name) w.photo = newUrl; });
+        if (type === 'pro') m.producers.forEach(p => { if(p.name === name) p.photo = newUrl; });
     });
 
     localStorage.setItem('myCineData', JSON.stringify(myMovies));
     renderAll();
 }
 
+// 4. RENDERIZAR TODO
 function renderAll() {
-    // Renderizado de Películas
+    // Películas
     document.getElementById('myLibrary').innerHTML = myMovies.map(m => `
         <div class="card">
-            <img src="${IMG_URL + m.poster}">
+            <img src="${m.poster}">
             <p><strong>${m.title}</strong></p>
             <p>⭐ ${m.userRating}/10</p>
         </div>
     `).join('');
 
-    // Renderizado de Directores (con click para editar)
-    const uniqueDirs = Array.from(new Set(myMovies.map(m => m.director.name)))
-        .map(name => myMovies.find(m => m.director.name === name).director);
-    
-    document.getElementById('directorList').innerHTML = uniqueDirs.map(d => `
-        <div class="person-card" onclick="changePhoto('${d.name}', 'dir')" style="cursor:pointer">
-            <img src="${d.photo}" onerror="this.src='https://via.placeholder.com/150'" title="Haz clic para cambiar foto">
-            <p>${d.name}</p>
+    // Secciones de Personas (Usamos función genérica para no repetir código)
+    renderPeople('directorList', myMovies.map(m => m.director), 'dir');
+    renderPeople('actorList', myMovies.flatMap(m => m.actors), 'act');
+    renderPeople('writerList', myMovies.flatMap(m => m.writers), 'wri');
+    renderPeople('producerList', myMovies.flatMap(m => m.producers), 'pro');
+
+    updateStats();
+}
+
+function renderPeople(containerId, peopleArray, type) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    // Eliminar duplicados por nombre
+    const uniquePeople = Array.from(new Set(peopleArray.map(p => p.name)))
+        .map(name => peopleArray.find(p => p.name === name));
+
+    container.innerHTML = uniquePeople.map(p => `
+        <div class="person-card" onclick="editImg('${p.name}', '${type}')" style="cursor:pointer">
+            <img src="${p.photo}" onerror="this.src='https://via.placeholder.com/200x200?text=Sin+Foto'">
+            <p>${p.name}</p>
         </div>
     `).join('');
+}
 
-    // Renderizado de Actores (con click para editar)
-    const allActors = myMovies.flatMap(m => m.actors);
-    const uniqueActors = Array.from(new Set(allActors.map(a => a.name)))
-        .map(name => allActors.find(a => a.name === name));
+function updateStats() {
+    const statsDiv = document.getElementById('statsData');
+    if (myMovies.length === 0) return;
 
-    document.getElementById('actorList').innerHTML = uniqueActors.map(a => `
-        <div class="person-card" onclick="changePhoto('${a.name}', 'act')" style="cursor:pointer">
-            <img src="${a.photo}" onerror="this.src='https://via.placeholder.com/150'" title="Haz clic para cambiar foto">
-            <p>${a.name}</p>
-        </div>
-    `).join('');
+    const allDirs = myMovies.map(m => m.director.name);
+    const allActors = myMovies.flatMap(m => m.actors.map(a => a.name));
+
+    statsDiv.innerHTML = `
+        <p>Total películas: <strong>${myMovies.length}</strong></p>
+        <p>Director favorito: <strong>${getMostFrequent(allDirs)}</strong></p>
+        <p>Actor más visto: <strong>${getMostFrequent(allActors)}</strong></p>
+        <button onclick="clearAll()" style="margin-top:10px; background:#444; font-size:10px">Borrar Biblioteca</button>
+    `;
+}
+
+function getMostFrequent(arr) {
+    if (arr.length === 0) return "-";
+    return arr.sort((a,b) =>
+        arr.filter(v => v===a).length - arr.filter(v => v===b).length
+    ).pop();
+}
+
+function clearAll() {
+    if(confirm("¿Borrar todo?")) {
+        myMovies = [];
+        localStorage.removeItem('myCineData');
+        renderAll();
+    }
 }
 
 renderAll();
