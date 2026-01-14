@@ -64,3 +64,25 @@ button {
     border-radius: 4px;
     margin-top: 5px;
 }
+
+/* Añade esto al final de tu style.css */
+.flex-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 20px;
+}
+
+.pills {
+    background: #444;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    border: 1px solid var(--primary);
+}
+
+h2 {
+    margin-left: 20px;
+    color: var(--primary);
+}
