@@ -34,7 +34,7 @@ document.getElementById('searchBtn').addEventListener('click', async () => {
     `).join('');
 });
 
-// --- AÑADIR (1 Género, 1 País y Duración) ---
+// --- AÑADIR ---
 async function addMovie(id, title, poster) {
     if (myMovies.find(m => m.id === id)) return alert("Ya guardada");
     const rating = prompt(`Nota (1-10):`);
@@ -66,23 +66,30 @@ async function addMovie(id, title, poster) {
     alert("¡Añadida!");
 }
 
-// --- ESTADÍSTICAS (HORAS Y MINUTOS) ---
+// --- CAMBIAR PAÍS MANUALMENTE ---
+function editCountry(movieId) {
+    const movie = myMovies.find(m => m.id === movieId);
+    const newCountry = prompt(`Cambiar país para "${movie.title}":`, movie.country);
+    if (newCountry) {
+        movie.country = newCountry;
+        localStorage.setItem('myCineData', JSON.stringify(myMovies));
+        renderAll();
+        if (document.getElementById('stats').style.display === 'block') updateStatistics();
+    }
+}
+
+// --- ESTADÍSTICAS ---
 function updateStatistics() {
     if (myMovies.length === 0) return;
 
     const totalMinutesAll = myMovies.reduce((acc, m) => acc + (m.runtime || 0), 0);
-    
-    // Cálculo de horas y minutos
     const hours = Math.floor(totalMinutesAll / 60);
     const mins = totalMinutesAll % 60;
-    
-    // Mostramos el formato "Xh Ymin"
     document.getElementById('statHours').innerText = `${hours}h ${mins}min`;
 
     const countriesSet = new Set(myMovies.map(m => m.country));
     document.getElementById('statCountries').innerText = countriesSet.size;
 
-    // Conteos para gráficos
     const genreData = {};
     myMovies.forEach(m => genreData[m.genre] = (genreData[m.genre] || 0) + 1);
 
@@ -111,7 +118,7 @@ function updateStatistics() {
         },
         options: { 
             scales: { y: { ticks: { color: 'white' } }, x: { ticks: { color: 'white' } } },
-            plugins: { title: { display: true, text: 'PAÍS DE ORIGEN', color: 'white' }, legend: { display: false } }
+            plugins: { title: { display: true, text: 'PAÍSES (Haz clic en las pelis para editar)', color: 'white' }, legend: { display: false } }
         }
     });
 }
@@ -122,6 +129,7 @@ function renderAll() {
             <img src="${m.poster}">
             <p><strong>${m.title}</strong></p>
             <p>⭐ ${m.rating} | 🎭 ${m.genre}</p>
+            <p style="cursor:pointer; color:var(--primary); font-size:0.8rem;" onclick="editCountry(${m.id})">📍 ${m.country} (Editar)</p>
         </div>
     `).join('');
     
