@@ -11,11 +11,28 @@ function toggleMenu() {
 }
 
 function showSection(id) {
-    document.querySelectorAll('.content-section').forEach(s => s.style.display = 'none');
+    // Ocultamos todas
+    document.querySelectorAll('.content-section').forEach(s => {
+        s.style.display = 'none';
+    });
+
     const target = document.getElementById(id);
-    if(target) target.style.display = 'block';
+    if (target) {
+        // Si es la sección de búsqueda, usamos flex para que el CSS de centrado funcione
+        if (id === 'searchSection') {
+            target.style.display = 'flex';
+        } else {
+            target.style.display = 'block';
+        }
+    }
+
     if (id === 'stats') updateStatistics();
-    if (menuVisible()) toggleMenu();
+    
+    // Si el menú está abierto, lo cerramos
+    const menu = document.getElementById("sideMenu");
+    if (menu.style.width === "250px") {
+        toggleMenu();
+    }
 }
 
 function menuVisible() { return document.getElementById("sideMenu").style.width === "250px"; }
