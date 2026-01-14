@@ -163,25 +163,16 @@ function deleteMovie(id) {
 function updateStatistics() {
     if (myMovies.length === 0) {
         document.getElementById('statHours').innerText = "0h 0m";
-        document.getElementById('statCountries').innerText = "0";
         return;
     }
 
-    // Calculamos el total de minutos de todas las películas
+    // 1. Cálculo de Tiempo (Horas y Minutos)
     const totalMinutes = myMovies.reduce((acc, m) => acc + (parseInt(m.runtime) || 0), 0);
-    
-    // Convertimos a Horas y Minutos
     const hours = Math.floor(totalMinutes / 60);
     const minutes = totalMinutes % 60;
-
-    // Escribimos el resultado en el HTML
     document.getElementById('statHours').innerText = `${hours}h ${minutes}m`;
-    
-    // Contador de países únicos
-    const countriesSet = new Set(myMovies.map(m => m.country).filter(c => c && c !== "Desconocido"));
-    document.getElementById('statCountries').innerText = countriesSet.size;
 
-    // --- Lógica del Gráfico de Géneros ---
+    // 2. Lógica del Gráfico de Géneros
     const genreData = {};
     myMovies.forEach(m => {
         if (m.genre) {
@@ -206,6 +197,8 @@ function updateStatistics() {
             }
         }
     });
+
+    // Hemos eliminado toda la lógica de countryChart para que no dé error
 }
 
 function openModal(url) { document.getElementById("imageModal").style.display = "flex"; document.getElementById("imgFull").src = url; }
