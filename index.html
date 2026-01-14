@@ -7,40 +7,53 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <nav>
-        <h1>🎬 Mi Cine</h1>
-        <div class="search-box">
-            <input type="text" id="searchInput" placeholder="Buscar película...">
-            <button id="searchBtn">Buscar</button>
-        </div>
+    <div class="menu-btn" onclick="toggleMenu()">☰</div>
+
+    <nav id="sideMenu" class="side-menu">
+        <div class="close-btn" onclick="toggleMenu()">×</div>
+        <a href="#home" onclick="showSection('home')">🏠 Inicio (Añadir)</a>
+        <a href="#movies" onclick="showSection('movies')">🍿 Mis Películas</a>
+        <a href="#directors" onclick="showSection('directors')">🎥 Directores</a>
+        <a href="#actors" onclick="showSection('actors')">🌟 Reparto</a>
+        <a href="#writers" onclick="showSection('writers')">✍️ Guionistas</a>
+        <a href="#producers" onclick="showSection('producers')">💼 Productores</a>
     </nav>
 
     <main>
-        <section id="results" class="grid-container"></section>
-        
-        <hr>
-        <h2>🍿 Mis Películas</h2>
-        <section id="myLibrary" class="grid-container"></section>
+        <section id="home" class="content-section">
+            <div class="hero">
+                <h1>🎬 Mi Cine</h1>
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Busca una película para añadir...">
+                    <button id="searchBtn">Buscar</button>
+                </div>
+                <div id="results" class="grid-container"></div>
+            </div>
+        </section>
 
-        <hr>
-        <h2>🎥 Mis Directores</h2>
-        <section id="directorList" class="flex-container"></section>
+        <section id="movies" class="content-section" style="display:none">
+            <h2>🍿 Mis Películas</h2>
+            <div id="myLibrary" class="grid-container"></div>
+        </section>
 
-        <hr>
-        <h2>🌟 Mis Actores</h2>
-        <section id="actorList" class="flex-container"></section>
+        <section id="directors" class="content-section" style="display:none">
+            <h2>🎥 Directores</h2>
+            <div id="directorList" class="flex-container"></div>
+        </section>
 
-        <hr>
-        <h2>✍️ Guionistas</h2>
-        <section id="writerList" class="flex-container scrollable"></section>
+        <section id="actors" class="content-section" style="display:none">
+            <h2>🌟 Reparto Completo</h2>
+            <div id="actorList" class="flex-container"></div>
+        </section>
 
-        <hr>
-        <h2>💼 Productores</h2>
-        <section id="producerList" class="flex-container scrollable"></section>
+        <section id="writers" class="content-section" style="display:none">
+            <h2>✍️ Guionistas</h2>
+            <div id="writerList" class="flex-container"></div>
+        </section>
 
-        <section id="statistics">
-            <h2>📊 Estadísticas</h2>
-            <div id="statsData" class="stats-card"></div>
+        <section id="producers" class="content-section" style="display:none">
+            <h2>💼 Productores</h2>
+            <div id="producerList" class="flex-container"></div>
         </section>
     </main>
 
