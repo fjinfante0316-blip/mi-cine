@@ -61,18 +61,30 @@ async function addMovie(id, title, posterPath) {
 function renderAll() {
     const wCont = document.getElementById('watchedMovies');
     const pCont = document.getElementById('pendingMovies');
-    if (!wCont) return;
+    
+    // 1. Renderizar Películas (Vistas y Pendientes)
+    if (wCont && pCont) {
+        wCont.innerHTML = myMovies.filter(m => m.status === 'watched').map(m => `
+            <div class="card">
+                <img src="${m.poster}">
+                <p><strong>${m.title}</strong></p>
+                <p>⭐ ${m.rating}</p>
+            </div>
+        `).join('');
 
-    wCont.innerHTML = myMovies.filter(m => m.status === 'watched').map(m => `
-        <div class="card"><img src="${m.poster}"><p><strong>${m.title}</strong></p><p>⭐ ${m.rating}</p></div>
-    `).join('');
+        pCont.innerHTML = myMovies.filter(m => m.status === 'pending').map(m => `
+            <div class="card">
+                <img src="${m.poster}" style="filter:grayscale(1)">
+                <p><strong>${m.title}</strong></p>
+                <button onclick="markAsWatched(${m.id})" style="background:#28a745; color:white; border:none; padding:5px; border-radius:5px; cursor:pointer;">¡Ya la he visto!</button>
+            </div>
+        `).join('');
+    }
 
-    pCont.innerHTML = myMovies.filter(m => m.status === 'pending').map(m => `
-        <div class="card"><img src="${m.poster}" style="filter:grayscale(1)"><p>${m.title}</p><button onclick="markAsWatched(${m.id})">Visto</button></div>
-    `).join('');
-
+    // 2. Renderizar Staff (Asegurándonos de que aplanamos las listas de todas las películas)
+    // Usamos flatMap para los actores porque cada película tiene un array de 5 actores
     renderPeople('directorList', myMovies.map(m => m.director));
-    renderPeople('actorList', myMovies.flatMap(m => m.actors));
+    renderPeople('actorList', myMovies.flatMap(m => m.actors)); 
     renderPeople('writerList', myMovies.flatMap(m => m.writers));
     renderPeople('producerList', myMovies.flatMap(m => m.producers));
 }
