@@ -34,18 +34,18 @@ function displayResults(movies) {
 async function addMovieWithRating(id, title, poster) {
     if (myMovies.find(m => m.id === id)) return alert("Ya la tienes guardada");
 
-    // 1. Tú solo pones la nota
+    // 1. Tú solo pones la nota cuando te lo pregunte el navegador
     const rating = prompt(`¿Qué nota le das a "${title}"? (1-10)`);
-    if (rating === null || rating === "") return; // Cancelar si no hay nota
+    if (rating === null || rating === "") return; 
 
-    // 2. El sistema busca AUTOMÁTICAMENTE director y actores
+    // 2. El sistema busca AUTOMÁTICAMENTE director y actores en TMDB
     const res = await fetch(`${BASE_URL}/movie/${id}/credits?api_key=${API_KEY}`);
     const credits = await res.json();
     
     const director = credits.crew.find(p => p.job === 'Director')?.name || 'Desconocido';
     const actors = credits.cast.slice(0, 3).map(a => a.name);
 
-    // 3. Se guarda todo junto
+    // 3. Guarda todo y actualiza las estadísticas
     myMovies.push({ id, title, poster, director, actors, userRating: rating });
     localStorage.setItem('myCineData', JSON.stringify(myMovies));
     renderAll();
