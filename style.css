@@ -52,11 +52,19 @@ nav {
 }
 
 .person-card img {
+    /* ... lo que ya tenías ... */
     width: 80px;
     height: 80px;
     border-radius: 50%; /* Foto circular */
     object-fit: cover;
     border: 2px solid var(--primary);
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.person-card img:hover {
+    transform: scale(1.1); /* Se hace un poco más grande al pasar el ratón */
+    border-color: white;
 }
 
 .person-card p {
