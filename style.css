@@ -45,8 +45,15 @@ body { background: var(--bg); color: white; font-family: Arial, sans-serif; marg
 
 /* GRIDS (PELIS Y STAFF) */
 .movie-grid, .people-grid { 
-    display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; 
-    width: 100%; max-width: 1200px; margin: 0 auto; padding: 20px;
+    display: flex; 
+    flex-wrap: wrap; 
+    justify-content: center; 
+    gap: 15px; /* Espacio reducido para que quepan más */
+    width: 100%; 
+    max-width: 1200px; 
+    margin: 0 auto; 
+    padding: 15px; /* Menos margen lateral en móvil */
+    box-sizing: border-box;
 }
 
 /* TARJETAS STAFF */
@@ -180,4 +187,54 @@ body { background: var(--bg); color: white; font-family: Arial, sans-serif; marg
 @keyframes zoomModal {
     from { transform: scale(0.7); opacity: 0; }
     to { transform: scale(1); opacity: 1; }
+}
+
+/* --- ADAPTACIÓN PARA MÓVILES --- */
+@media (max-width: 600px) {
+    /* Portada: Título más pequeño para que no ocupe todo */
+    .hero-center h1 { font-size: 2.2rem; }
+    
+    /* Películas: 2 por fila aproximadamente */
+    .card {
+        width: calc(50% - 20px); /* 50% del ancho menos el espacio del gap */
+        min-width: 140px;
+    }
+    .card img { height: 210px; }
+
+    /* Staff (Actores, Directores...): 2 por fila */
+    .person-card {
+        width: calc(50% - 20px); 
+        min-width: 150px;
+        padding: 10px;
+    }
+    
+    .person-photo {
+        width: 80px;  /* Fotos un poco más pequeñas */
+        height: 80px;
+    }
+
+    .person-card strong {
+        font-size: 0.85rem; /* Texto más pequeño para que no rompa la fila */
+        min-height: 2.5em;
+    }
+
+    .mini-poster {
+        width: 40px; /* Mini portadas más compactas */
+        height: 60px;
+    }
+
+    /* Buscador de staff más ancho en móvil */
+    .staff-search-input {
+        width: 90%;
+    }
+}
+
+@media (max-width: 600px) {
+    .sidenav { width: 0; } /* Se mantiene la lógica del JS */
+    .sidenav a { font-size: 22px; } /* Enlaces más grandes para dedos */
+    
+    .backup-zone button {
+        padding: 15px; /* Botones más grandes para tocar mejor */
+        font-size: 16px;
+    }
 }
