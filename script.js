@@ -183,6 +183,23 @@ function editPersonPhoto(name) {
     }
 }
 
+function filterStaff(listId, query) {
+    const container = document.getElementById(listId);
+    const cards = container.getElementsByClassName('person-card');
+    const searchTerm = query.toLowerCase();
+
+    Array.from(cards).forEach(card => {
+        // Buscamos el nombre dentro del <strong> de la tarjeta
+        const name = card.querySelector('strong').innerText.toLowerCase();
+        
+        if (name.includes(searchTerm)) {
+            card.style.display = "flex"; // Se muestra
+        } else {
+            card.style.display = "none"; // Se oculta
+        }
+    });
+}
+
 function deleteMovie(id) { if(confirm("¿Borrar?")) { myMovies = myMovies.filter(m => m.id !== id); localStorage.setItem('myCineData', JSON.stringify(myMovies)); renderAll(); } }
 function markAsWatched(id) { const m = myMovies.find(x => x.id === id); m.status = 'watched'; m.rating = prompt("Nota:"); localStorage.setItem('myCineData', JSON.stringify(myMovies)); renderAll(); }
 function openModal(url) { document.getElementById("imageModal").style.display = "flex"; document.getElementById("imgFull").src = url; }
