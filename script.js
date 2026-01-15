@@ -51,8 +51,30 @@ document.getElementById('searchBtn').addEventListener('click', async () => {
     `).join('');
 });
 
+// Función para procesar el staff sin duplicados
+function processStaff(currentStaff, newItems) {
+    newItems.forEach(newItem => {
+        // Buscamos si el artista ya existe por su nombre
+        let existing = currentStaff.find(s => s.name === newItem.name);
+        if (existing) {
+            // Si existe y la película no está en su lista, la añadimos
+            if (!existing.movies.some(m => m.poster === newItem.poster)) {
+                existing.movies.push({ title: newItem.movie, poster: newItem.poster });
+            }
+        } else {
+            // Si no existe, lo creamos con su primera película
+            currentStaff.push({
+                name: newItem.name,
+                photo: newItem.photo,
+                movies: [{ title: newItem.movie, poster: newItem.poster }]
+            });
+        }
+    });
+}
+
 async function addMovie(id, title, posterPath) {
     if (myMovies.find(m => m.id === id)) return alert("Ya guardada");
+    
     const status = confirm(`¿Has visto "${title}"?`) ? 'watched' : 'pending';
     const rating = status === 'watched' ? (prompt("Nota (1-10):") || "N/A") : "N/A";
 
@@ -64,16 +86,21 @@ async function addMovie(id, title, posterPath) {
     const getP = (p) => p ? IMG_URL + p : 'https://via.placeholder.com/200x200?text=Sin+Foto';
     const posterFull = IMG_URL + posterPath;
 
-    myMovies.push({
+    // Estructura de la película
+    const movieData = {
         id, title, rating, status, poster: posterFull,
         runtime: d.runtime || 0,
         genre: d.genres[0]?.name || "Otros",
-        director: { name: c.crew.find(x => x.job === 'Director')?.name, photo: getP(c.crew.find(x => x.job === 'Director')?.profile_path), movie: title, poster: posterFull },
-        actors: c.cast.slice(0, 5).map(a => ({ name: a.name, photo: getP(a.profile_path), movie: title, poster: posterFull })),
-        writers: c.crew.filter(x => x.department === 'Writing').slice(0, 2).map(w => ({ name: w.name, photo: getP(w.profile_path), movie: title, poster: posterFull })),
-        producers: c.crew.filter(x => x.department === 'Production').slice(0, 2).map(p => ({ name: p.name, photo: getP(p.profile_path), movie: title, poster: posterFull }))
-    });
+        // Guardamos el staff bruto de esta película
+        rawStaff: {
+            director: { name: c.crew.find(x => x.job === 'Director')?.name, photo: getP(c.crew.find(x => x.job === 'Director')?.profile_path), movie: title, poster: posterFull },
+            actors: c.cast.slice(0, 5).map(a => ({ name: a.name, photo: getP(a.profile_path), movie: title, poster: posterFull })),
+            writers: c.crew.filter(x => x.department === 'Writing').slice(0, 2).map(w => ({ name: w.name, photo: getP(w.profile_path), movie: title, poster: posterFull })),
+            producers: c.crew.filter(x => x.department === 'Production').slice(0, 2).map(p => ({ name: p.name, photo: getP(p.profile_path), movie: title, poster: posterFull }))
+        }
+    };
 
+    myMovies.push(movieData);
     localStorage.setItem('myCineData', JSON.stringify(myMovies));
     renderAll();
 }
@@ -91,23 +118,37 @@ function renderAll() {
         <div class="card"><button class="delete-btn" onclick="deleteMovie(${m.id})">×</button><img src="${m.poster}" style="filter:grayscale(1)"><button onclick="markAsWatched(${m.id})">¡Vista!</button></div>
     `).join('');
 
-    renderPeople('directorList', myMovies.map(m => m.director));
-    renderPeople('actorList', myMovies.flatMap(m => m.actors));
-    renderPeople('writerList', myMovies.flatMap(m => m.writers));
-    renderPeople('producerList', myMovies.flatMap(m => m.producers));
+    // Procesar listas únicas para el Staff
+    let directors = [], actors = [], writers = [], producers = [];
+
+    myMovies.forEach(m => {
+        if (m.rawStaff.director.name) processStaff(directors, [m.rawStaff.director]);
+        processStaff(actors, m.rawStaff.actors);
+        processStaff(writers, m.rawStaff.writers);
+        processStaff(producers, m.rawStaff.producers);
+    });
+
+    renderPeople('directorList', directors);
+    renderPeople('actorList', actors);
+    renderPeople('writerList', writers);
+    renderPeople('producerList', producers);
 }
 
 function renderPeople(id, arr) {
     const container = document.getElementById(id);
     if (!container) return;
-    const valid = arr.filter(p => p && p.name);
-    container.innerHTML = valid.length ? valid.map(p => `
+    
+    container.innerHTML = arr.map(p => `
         <div class="person-card">
             <img class="person-photo" src="${p.photo}" onclick="editPersonPhoto('${p.name}')">
-            <strong>${p.name}</strong><br>
-            <img class="mini-poster" src="${p.poster}" onclick="openModal('${p.poster}')">
+            <strong>${p.name}</strong>
+            <div class="mini-posters-container">
+                ${p.movies.map(m => `
+                    <img class="mini-poster" src="${m.poster}" title="${m.title}" onclick="openModal('${m.poster}')">
+                `).join('')}
+            </div>
         </div>
-    `).join('') : '<p style="color:gray;">Aún no hay datos.</p>';
+    `).join('');
 }
 
 function updateStatistics() {
