@@ -134,3 +134,22 @@ body {
     border-radius: 50%; width: 20px; height: 20px;
     font-size: 12px; cursor: pointer; z-index: 5;
 }
+
+/* Burbuja de conteo de películas */
+.person-card {
+    position: relative; /* Necesario para posicionar la burbuja */
+}
+
+.movie-count-badge {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    background: var(--primary);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: bold;
+    padding: 2px 8px;
+    border-radius: 10px;
+    z-index: 10;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+}
