@@ -64,18 +64,30 @@
 
         <section id="directors" class="content-section" style="display:none;">
             <h2 class="section-title">🎥 Directores</h2>
+            <div class="staff-search-container">
+                <input type="text" class="staff-search-input" placeholder="Filtrar por nombre..." onkeyup="filterStaff('directorList', this.value)">
+            </div>
             <div id="directorList" class="people-grid"></div>
         </section>
         <section id="actors" class="content-section" style="display:none;">
             <h2 class="section-title">🌟 Reparto</h2>
+            <div class="staff-search-container">
+                <input type="text" class="staff-search-input" placeholder="Filtrar por nombre..." onkeyup="filterStaff('actorList', this.value)">
+            </div>
             <div id="actorList" class="people-grid"></div>
         </section>
         <section id="writers" class="content-section" style="display:none;">
             <h2 class="section-title">✍️ Guionistas</h2>
+            <div class="staff-search-container">
+                <input type="text" class="staff-search-input" placeholder="Filtrar por nombre..." onkeyup="filterStaff('actorList', this.value)">
+            </div>
             <div id="writerList" class="people-grid"></div>
         </section>
         <section id="producers" class="content-section" style="display:none;">
             <h2 class="section-title">💼 Productores</h2>
+            <div class="staff-search-container">
+                <input type="text" class="staff-search-input" placeholder="Filtrar por nombre..." onkeyup="filterStaff('actorList', this.value)">
+            </div>
             <div id="producerList" class="people-grid"></div>
         </section>
     </div>
