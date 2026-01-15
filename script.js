@@ -11,31 +11,13 @@ function toggleMenu() {
 }
 
 function showSection(id) {
-    // Ocultamos todas
-    document.querySelectorAll('.content-section').forEach(s => {
-        s.style.display = 'none';
-    });
-
+    document.querySelectorAll('.content-section').forEach(s => s.style.display = 'none');
     const target = document.getElementById(id);
-    if (target) {
-        // Si es la sección de búsqueda, usamos flex para que el CSS de centrado funcione
-        if (id === 'searchSection') {
-            target.style.display = 'flex';
-        } else {
-            target.style.display = 'block';
-        }
-    }
-
+    if(target) target.style.display = (id === 'searchSection') ? 'flex' : 'block';
     if (id === 'stats') updateStatistics();
-    
-    // Si el menú está abierto, lo cerramos
     const menu = document.getElementById("sideMenu");
-    if (menu.style.width === "250px") {
-        toggleMenu();
-    }
+    if (menu.style.width === "250px") toggleMenu();
 }
-
-function menuVisible() { return document.getElementById("sideMenu").style.width === "250px"; }
 
 document.getElementById('searchBtn').addEventListener('click', async () => {
     const query = document.getElementById('searchInput').value;
@@ -51,30 +33,8 @@ document.getElementById('searchBtn').addEventListener('click', async () => {
     `).join('');
 });
 
-// Función para procesar el staff sin duplicados
-function processStaff(currentStaff, newItems) {
-    newItems.forEach(newItem => {
-        // Buscamos si el artista ya existe por su nombre
-        let existing = currentStaff.find(s => s.name === newItem.name);
-        if (existing) {
-            // Si existe y la película no está en su lista, la añadimos
-            if (!existing.movies.some(m => m.poster === newItem.poster)) {
-                existing.movies.push({ title: newItem.movie, poster: newItem.poster });
-            }
-        } else {
-            // Si no existe, lo creamos con su primera película
-            currentStaff.push({
-                name: newItem.name,
-                photo: newItem.photo,
-                movies: [{ title: newItem.movie, poster: newItem.poster }]
-            });
-        }
-    });
-}
-
 async function addMovie(id, title, posterPath) {
     if (myMovies.find(m => m.id === id)) return alert("Ya guardada");
-    
     const status = confirm(`¿Has visto "${title}"?`) ? 'watched' : 'pending';
     const rating = status === 'watched' ? (prompt("Nota (1-10):") || "N/A") : "N/A";
 
@@ -86,23 +46,38 @@ async function addMovie(id, title, posterPath) {
     const getP = (p) => p ? IMG_URL + p : 'https://via.placeholder.com/200x200?text=Sin+Foto';
     const posterFull = IMG_URL + posterPath;
 
-    // Estructura de la película
-    const movieData = {
+    myMovies.push({
         id, title, rating, status, poster: posterFull,
         runtime: d.runtime || 0,
         genre: d.genres[0]?.name || "Otros",
-        // Guardamos el staff bruto de esta película
+        // Nueva estructura para evitar duplicados
         rawStaff: {
             director: { name: c.crew.find(x => x.job === 'Director')?.name, photo: getP(c.crew.find(x => x.job === 'Director')?.profile_path), movie: title, poster: posterFull },
             actors: c.cast.slice(0, 5).map(a => ({ name: a.name, photo: getP(a.profile_path), movie: title, poster: posterFull })),
             writers: c.crew.filter(x => x.department === 'Writing').slice(0, 2).map(w => ({ name: w.name, photo: getP(w.profile_path), movie: title, poster: posterFull })),
             producers: c.crew.filter(x => x.department === 'Production').slice(0, 2).map(p => ({ name: p.name, photo: getP(p.profile_path), movie: title, poster: posterFull }))
         }
-    };
+    });
 
-    myMovies.push(movieData);
     localStorage.setItem('myCineData', JSON.stringify(myMovies));
     renderAll();
+}
+
+// Función mágica para no repetir personas y agrupar sus pelis
+function processStaff(list, person) {
+    if (!person || !person.name) return;
+    let existing = list.find(p => p.name === person.name);
+    if (existing) {
+        if (!existing.movies.find(m => m.poster === person.poster)) {
+            existing.movies.push({ title: person.movie, poster: person.poster });
+        }
+    } else {
+        list.push({
+            name: person.name,
+            photo: person.photo,
+            movies: [{ title: person.movie, poster: person.poster }]
+        });
+    }
 }
 
 function renderAll() {
@@ -110,6 +85,7 @@ function renderAll() {
     const pCont = document.getElementById('pendingMovies');
     if (!wCont) return;
 
+    // Pintar Películas
     wCont.innerHTML = myMovies.filter(m => m.status === 'watched').map(m => `
         <div class="card"><button class="delete-btn" onclick="deleteMovie(${m.id})">×</button><img src="${m.poster}"><p>⭐ ${m.rating}</p></div>
     `).join('');
@@ -118,14 +94,22 @@ function renderAll() {
         <div class="card"><button class="delete-btn" onclick="deleteMovie(${m.id})">×</button><img src="${m.poster}" style="filter:grayscale(1)"><button onclick="markAsWatched(${m.id})">¡Vista!</button></div>
     `).join('');
 
-    // Procesar listas únicas para el Staff
+    // Procesar Staff Único
     let directors = [], actors = [], writers = [], producers = [];
 
     myMovies.forEach(m => {
-        if (m.rawStaff.director.name) processStaff(directors, [m.rawStaff.director]);
-        processStaff(actors, m.rawStaff.actors);
-        processStaff(writers, m.rawStaff.writers);
-        processStaff(producers, m.rawStaff.producers);
+        // Compatibilidad con pelis viejas (si no tienen rawStaff)
+        const s = m.rawStaff || { 
+            director: m.director, 
+            actors: m.actors || [], 
+            writers: m.writers || [], 
+            producers: m.producers || [] 
+        };
+
+        if (s.director) processStaff(directors, s.director);
+        if (s.actors) s.actors.forEach(a => processStaff(actors, a));
+        if (s.writers) s.writers.forEach(w => processStaff(writers, w));
+        if (s.producers) s.producers.forEach(p => processStaff(producers, p));
     });
 
     renderPeople('directorList', directors);
@@ -137,14 +121,13 @@ function renderAll() {
 function renderPeople(id, arr) {
     const container = document.getElementById(id);
     if (!container) return;
-    
     container.innerHTML = arr.map(p => `
         <div class="person-card">
             <img class="person-photo" src="${p.photo}" onclick="editPersonPhoto('${p.name}')">
             <strong>${p.name}</strong>
             <div class="mini-posters-container">
-                ${p.movies.map(m => `
-                    <img class="mini-poster" src="${m.poster}" title="${m.title}" onclick="openModal('${m.poster}')">
+                ${p.movies.map(mov => `
+                    <img class="mini-poster" src="${mov.poster}" title="${mov.title}" onclick="openModal('${mov.poster}')">
                 `).join('')}
             </div>
         </div>
@@ -153,9 +136,11 @@ function renderPeople(id, arr) {
 
 function updateStatistics() {
     const mins = myMovies.reduce((acc, m) => acc + (parseInt(m.runtime) || 0), 0);
-    document.getElementById('statHours').innerText = `${Math.floor(mins / 60)}h ${mins % 60}m`;
+    const h = Math.floor(mins / 60);
+    const m = mins % 60;
+    document.getElementById('statHours').innerText = `${h}h ${m}m`;
     const data = {};
-    myMovies.forEach(m => data[m.genre] = (data[m.genre] || 0) + 1);
+    myMovies.forEach(mov => data[mov.genre] = (data[mov.genre] || 0) + 1);
     if (genreChart) genreChart.destroy();
     genreChart = new Chart(document.getElementById('genreChart'), {
         type: 'doughnut',
@@ -185,10 +170,13 @@ function editPersonPhoto(name) {
     const url = prompt(`URL de foto para ${name}:`);
     if (url) {
         myMovies.forEach(m => {
-            if (m.director && m.director.name === name) m.director.photo = url;
-            m.actors.forEach(a => { if (a.name === name) a.photo = url; });
-            m.writers.forEach(w => { if (w.name === name) w.photo = url; });
-            m.producers.forEach(p => { if (p.name === name) p.photo = url; });
+            const s = m.rawStaff;
+            if (s) {
+                if (s.director && s.director.name === name) s.director.photo = url;
+                s.actors.forEach(a => { if (a.name === name) a.photo = url; });
+                s.writers.forEach(w => { if (w.name === name) w.photo = url; });
+                s.producers.forEach(p => { if (p.name === name) p.photo = url; });
+            }
         });
         localStorage.setItem('myCineData', JSON.stringify(myMovies));
         renderAll();
