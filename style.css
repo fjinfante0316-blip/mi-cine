@@ -87,8 +87,12 @@ body {
 .stats-center-container { display: flex; justify-content: center; width: 100%; margin: 20px 0; }
 .stat-card-large { background: #1e1e1e; border: 1px solid #333; border-radius: 15px; padding: 20px; width: 200px; text-align: center; }
 .stat-value { font-size: 2rem; color: var(--primary); font-weight: bold; }
-.charts { max-width: 300px; margin: 0 auto; }
-
+.charts {
+    width: 90%;
+    max-width: 400px;
+    margin: 20px auto;
+    padding-bottom: 30px;
+}
 /* --- MODAL --- */
 .modal {
     display: none; position: fixed; z-index: 2000;
