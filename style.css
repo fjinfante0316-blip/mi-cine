@@ -150,3 +150,34 @@ body { background: var(--bg); color: white; font-family: Arial, sans-serif; marg
 .staff-search-input:focus {
     border-color: var(--primary);
 }
+
+/* EL FONDO DEL MODAL */
+.modal {
+    display: none; 
+    position: fixed; /* Cambiado de absolute a fixed */
+    z-index: 9999;   /* Un número muy alto para estar por encima de todo */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9); /* Fondo negro semitransparente */
+    justify-content: center; /* Centra horizontalmente */
+    align-items: center;     /* Centra verticalmente */
+}
+
+/* LA IMAGEN DENTRO DEL MODAL */
+.modal-content {
+    max-width: 90%;
+    max-height: 85vh; /* Evita que la imagen sea más alta que la pantalla */
+    border: 3px solid white;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(229, 9, 20, 0.5); /* Sombra roja estilo Netflix */
+    object-fit: contain;
+    animation: zoomModal 0.3s ease; /* Efecto de aparición suave */
+}
+
+/* Animación opcional para que la foto se agrande al abrirse */
+@keyframes zoomModal {
+    from { transform: scale(0.7); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
