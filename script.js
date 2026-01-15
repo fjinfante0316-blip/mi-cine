@@ -207,20 +207,33 @@ function importData(e) {
 }
 
 function editPersonPhoto(name) {
-    const url = prompt(`URL de foto para ${name}:`);
-    if (url) {
-        myMovies.forEach(m => {
+    const url = prompt(`URL de la nueva foto para ${name}:`);
+    
+    // Si el usuario cancela o deja vacío, no hacemos nada
+    if (!url || url.trim() === "") return;
+
+    myMovies.forEach(m => {
+        // 1. Buscamos en la estructura nueva (rawStaff)
+        if (m.rawStaff) {
             const s = m.rawStaff;
-            if (s) {
-                if (s.director && s.director.name === name) s.director.photo = url;
-                s.actors.forEach(a => { if (a.name === name) a.photo = url; });
-                s.writers.forEach(w => { if (w.name === name) w.photo = url; });
-                s.producers.forEach(p => { if (p.name === name) p.photo = url; });
-            }
-        });
-        localStorage.setItem('myCineData', JSON.stringify(myMovies));
-        renderAll();
-    }
+            if (s.director && s.director.name === name) s.director.photo = url;
+            if (s.actors) s.actors.forEach(a => { if (a.name === name) a.photo = url; });
+            if (s.writers) s.writers.forEach(w => { if (w.name === name) w.photo = url; });
+            if (s.producers) s.producers.forEach(p => { if (p.name === name) p.photo = url; });
+        }
+        
+        // 2. Buscamos en la estructura antigua (por si hay pelis viejas)
+        if (m.director && m.director.name === name) m.director.photo = url;
+        if (m.actors) m.actors.forEach(a => { if (a.name === name) a.photo = url; });
+        if (m.writers) m.writers.forEach(w => { if (w.name === name) w.photo = url; });
+        if (m.producers) m.producers.forEach(p => { if (p.name === name) p.photo = url; });
+    });
+
+    // Guardamos los cambios permanentemente
+    localStorage.setItem('myCineData', JSON.stringify(myMovies));
+    
+    // Volvemos a dibujar todo para que la foto cambie al instante
+    renderAll();
 }
 
 function filterStaff(listId, query) {
