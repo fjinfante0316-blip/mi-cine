@@ -202,6 +202,21 @@ function filterStaff(listId, query) {
 
 function deleteMovie(id) { if(confirm("¿Borrar?")) { myMovies = myMovies.filter(m => m.id !== id); localStorage.setItem('myCineData', JSON.stringify(myMovies)); renderAll(); } }
 function markAsWatched(id) { const m = myMovies.find(x => x.id === id); m.status = 'watched'; m.rating = prompt("Nota:"); localStorage.setItem('myCineData', JSON.stringify(myMovies)); renderAll(); }
-function openModal(url) { document.getElementById("imageModal").style.display = "flex"; document.getElementById("imgFull").src = url; }
+function openModal(url) {
+    const modal = document.getElementById("imageModal");
+    const img = document.getElementById("imgFull");
+    
+    modal.style.display = "flex"; // Forzamos flex para centrar contenido
+    img.src = url;
+    
+    // Opcional: Bloquear el scroll del fondo cuando el modal esté abierto
+    document.body.style.overflow = "hidden";
+}
+
+// Para cerrar el modal al hacer clic en cualquier parte
+document.getElementById("imageModal").onclick = function() {
+    this.style.display = "none";
+    document.body.style.overflow = "auto"; // Devolver el scroll al cerrar
+}
 
 renderAll();
