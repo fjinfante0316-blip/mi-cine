@@ -139,13 +139,42 @@ function updateStatistics() {
     const h = Math.floor(mins / 60);
     const m = mins % 60;
     document.getElementById('statHours').innerText = `${h}h ${m}m`;
+
     const data = {};
     myMovies.forEach(mov => data[mov.genre] = (data[mov.genre] || 0) + 1);
+
+    const labels = Object.keys(data);
+    const values = Object.values(data);
+
+    // Generar colores distintos dinámicamente
+    const colors = labels.map((_, i) => {
+        const hues = [0, 200, 50, 120, 280, 30, 180, 330, 240, 90]; // Tonos base: Rojo, Azul, Amarillo, Verde, Púrpura, etc.
+        return `hsla(${hues[i % hues.length]}, 70%, 50%, 0.8)`;
+    });
+
     if (genreChart) genreChart.destroy();
-    genreChart = new Chart(document.getElementById('genreChart'), {
+    
+    const ctx = document.getElementById('genreChart').getContext('2d');
+    genreChart = new Chart(ctx, {
         type: 'doughnut',
-        data: { labels: Object.keys(data), datasets: [{ data: Object.values(data), backgroundColor: ['#e50914','#444','#888','#b9090b','#fff'] }] },
-        options: { plugins: { legend: { labels: { color: 'white' }, position: 'bottom' } } }
+        data: {
+            labels: labels,
+            datasets: [{
+                data: values,
+                backgroundColor: colors,
+                borderColor: '#141414',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    labels: { color: 'white', font: { size: 12 } },
+                    position: 'bottom'
+                }
+            }
+        }
     });
 }
 
