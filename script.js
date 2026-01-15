@@ -85,7 +85,7 @@ function renderAll() {
     const pCont = document.getElementById('pendingMovies');
     if (!wCont) return;
 
-    // Pintar Películas
+    // 1. Pintar Películas (Vistas y Pendientes)
     wCont.innerHTML = myMovies.filter(m => m.status === 'watched').map(m => `
         <div class="card"><button class="delete-btn" onclick="deleteMovie(${m.id})">×</button><img src="${m.poster}"><p>⭐ ${m.rating}</p></div>
     `).join('');
@@ -94,11 +94,10 @@ function renderAll() {
         <div class="card"><button class="delete-btn" onclick="deleteMovie(${m.id})">×</button><img src="${m.poster}" style="filter:grayscale(1)"><button onclick="markAsWatched(${m.id})">¡Vista!</button></div>
     `).join('');
 
-    // Procesar Staff Único
+    // 2. Procesar Staff Único
     let directors = [], actors = [], writers = [], producers = [];
 
     myMovies.forEach(m => {
-        // Compatibilidad con pelis viejas (si no tienen rawStaff)
         const s = m.rawStaff || { 
             director: m.director, 
             actors: m.actors || [], 
@@ -112,6 +111,16 @@ function renderAll() {
         if (s.producers) s.producers.forEach(p => processStaff(producers, p));
     });
 
+    // --- LÓGICA DE ORDENAMIENTO POR CANTIDAD DE PELÍCULAS ---
+    // Ordenamos de mayor a menor basándonos en el tamaño del array 'movies'
+    const sortByMovies = (a, b) => b.movies.length - a.movies.length;
+
+    directors.sort(sortByMovies);
+    actors.sort(sortByMovies);
+    writers.sort(sortByMovies);
+    producers.sort(sortByMovies);
+
+    // 3. Renderizar en el HTML
     renderPeople('directorList', directors);
     renderPeople('actorList', actors);
     renderPeople('writerList', writers);
@@ -123,6 +132,8 @@ function renderPeople(id, arr) {
     if (!container) return;
     container.innerHTML = arr.map(p => `
         <div class="person-card">
+            <div class="movie-count-badge">${p.movies.length}</div>
+            
             <img class="person-photo" src="${p.photo}" onclick="editPersonPhoto('${p.name}')">
             <strong>${p.name}</strong>
             <div class="mini-posters-container">
