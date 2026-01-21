@@ -4,6 +4,7 @@
     --bg: #141414;
     --card: #1e1e1e;
     --text: #ffffff;
+    --grey: #818181;
 }
 
 body {
@@ -28,7 +29,7 @@ body {
     top: 0; left: 0; background: #111; overflow-x: hidden;
     transition: 0.5s; padding-top: 20px;
 }
-.sidenav a { padding: 10px 32px; text-decoration: none; font-size: 18px; color: #818181; display: block; }
+.sidenav a { padding: 10px 32px; text-decoration: none; font-size: 18px; color: var(--grey); display: block; }
 .menu-icon { font-size: 30px; cursor: pointer; padding: 15px 25px; color: white; }
 
 .backup-zone { padding: 10px 25px; display: flex; flex-direction: column; gap: 8px; }
@@ -45,246 +46,147 @@ body {
 .search-box input { flex: 1; padding: 12px; border-radius: 5px; border: none; background: #222; color: white; }
 .search-box button { padding: 12px 20px; background: var(--primary); border: none; color: white; font-weight: bold; border-radius: 5px; cursor: pointer; }
 
-/* --- GRIDS (ESTRUCTURA DE COLUMNAS) --- */
+/* --- GRIDS --- */
 .movie-grid, .people-grid {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 10px; /* Espacio pequeño para que quepan 3 */
+    gap: 15px;
     width: 100%;
-    padding: 10px;
+    padding: 20px;
     box-sizing: border-box;
 }
 
-.section-title { text-align: center; width: 100%; font-size: 1.8rem; margin: 30px 0 15px; }
+.section-title { text-align: center; width: 100%; font-size: 2rem; margin: 40px 0 20px; }
 
-/* --- TARJETAS (ESCRITORIO) --- */
+/* --- TARJETAS (ESTILO UNIFICADO Y CENTRADO) --- */
 .card, .person-card {
     background: var(--card);
-    width: 160px; /* Tamaño fijo en PC */
+    width: 170px;
     border-radius: 8px;
     position: relative;
-    overflow: hidden;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: center; /* Centra contenido horizontalmente */
+    text-align: center;    /* Centra el texto */
     padding-bottom: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    transition: transform 0.2s;
 }
 
-.card img { width: 100%; height: 230px; object-fit: cover; }
-.person-photo { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; margin-top: 10px; border: 2px solid #333; }
-.person-card strong { font-size: 0.9rem; margin: 10px 5px; text-align: center; min-height: 2.4em; display: block; }
+.card img { width: 100%; height: 250px; object-fit: cover; border-radius: 8px 8px 0 0; }
 
-/* --- MINI PORTADAS DENTRO DE STAFF --- */
-.mini-posters-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; padding: 0 5px; }
-.mini-poster { width: 40px; height: 60px; border: 1px solid var(--primary); border-radius: 3px; object-fit: cover; }
-
-/* --- BUSCADOR DE STAFF --- */
-.staff-search-container { width: 100%; display: flex; justify-content: center; margin-bottom: 15px; }
-.staff-search-input { width: 80%; padding: 10px; border-radius: 20px; border: 1px solid #333; background: #222; color: white; }
-
-/* --- ESTADÍSTICAS --- */
-.stats-center-container { display: flex; justify-content: center; width: 100%; margin: 20px 0; }
-.stat-card-large { background: #1e1e1e; border: 1px solid #333; border-radius: 15px; padding: 20px; width: 200px; text-align: center; }
-.stat-value { font-size: 2rem; color: var(--primary); font-weight: bold; }
-.charts {
-    width: 90%;
-    max-width: 400px;
-    margin: 20px auto;
-    padding-bottom: 30px;
-}
-/* --- MODAL --- */
-.modal {
-    display: none; position: fixed; z-index: 2000;
-    left: 0; top: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.9); justify-content: center; align-items: center;
-}
-.modal-content { max-width: 90%; max-height: 80%; border-radius: 10px; border: 2px solid white; }
-
-/* --- CONFIGURACIÓN PARA MÓVIL (3 COLUMNAS) --- */
-@media (max-width: 600px) {
-    .hero-center h1 { font-size: 2rem; }
-    
-    .movie-grid, .people-grid {
-        gap: 6px; /* Gap mínimo para ganar espacio */
-        padding: 6px;
-    }
-
-    /* Cada tarjeta ocupa el 33% menos un poco de margen */
-    .card, .person-card {
-        width: calc(33.33% - 8px) !important; 
-        min-width: 0; /* Permite que se encojan */
-    }
-
-    .card img { height: 150px; } /* Imagen más corta en móvil */
-    
-    .person-photo { width: 60px; height: 60px; }
-    .person-card strong { font-size: 0.7rem; min-height: 2.2em; }
-
-    .mini-poster { width: 28px; height: 40px; } /* Mini posters más pequeños */
-    
-    .stat-card-large { width: 160px; }
-    .stat-value { font-size: 1.5rem; }
+.card h4 {
+    margin: 10px 0 5px 0;
+    font-size: 0.9rem;
+    padding: 0 5px;
+    width: 100%;
+    display: block;
+    color: var(--text);
 }
 
-/* Botón eliminar */
-.delete-btn {
-    position: absolute; top: 4px; right: 4px;
-    background: var(--primary); color: white; border: none;
-    border-radius: 50%; width: 20px; height: 20px;
-    font-size: 12px; cursor: pointer; z-index: 5;
-}
-
-/* Burbuja de conteo de películas */
-.person-card {
-    position: relative; /* Necesario para posicionar la burbuja */
-}
-
-.movie-count-badge {
-    position: absolute;
-    top: 5px;
-    left: 5px;
-    background: var(--primary);
-    color: white;
-    font-size: 0.7rem;
-    font-weight: bold;
-    padding: 2px 8px;
-    border-radius: 10px;
-    z-index: 10;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.5);
-}
-
-/* --- ESTILO DE LAS SAGAS (CARPETAS) --- */
-
-/* Contenedor de la pila de fotos */
+/* --- EFECTO DE PILA (SAGA STACK) --- */
 .saga-stack {
     position: relative;
-    width: 100%;
-    height: 230px; /* Ajusta según el alto de tus portadas */
-    margin-bottom: 10px;
+    width: 85%; /* Dejamos margen para las capas traseras */
+    height: 250px;
+    margin: 10px auto;
 }
 
-/* Las capas de atrás que simulan una pila de películas */
+.saga-stack img {
+    width: 100%; height: 100%;
+    object-fit: cover; border-radius: 8px;
+    position: relative; z-index: 3;
+    border: 1px solid #444;
+}
+
 .saga-stack::before, .saga-stack::after {
     content: "";
     position: absolute;
-    width: 90%; 
-    height: 100%;
-    background: #2a2a2a;
+    background: #333;
     border: 1px solid #444;
     border-radius: 8px;
-    z-index: -1;
-    transition: 0.3s;
+    left: 50%;
+    transform: translateX(-50%);
 }
 
-.saga-stack::before {
-    top: -6px;
-    left: 5%;
-}
+.saga-stack::before { width: 92%; height: 100%; top: -6px; z-index: 2; }
+.saga-stack::after { width: 84%; height: 100%; top: -12px; z-index: 1; }
 
-.saga-stack::after {
-    top: -12px;
-    left: 10%;
-    width: 80%;
-}
-
-/* Imagen principal de la saga */
-.saga-stack img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 8px;
-    border: 1px solid #555;
-}
-
-/* El panel que se abre al hacer clic en la saga */
 .saga-expanded {
-    display: none; /* El JS cambia esto a 'flex' */
+    display: none;
     flex-wrap: wrap;
     justify-content: center;
     gap: 10px;
     background: rgba(255, 255, 255, 0.05);
     padding: 15px;
     border-radius: 12px;
-    margin: 10px 0 20px 0;
+    margin: 10px 0;
     width: 100%;
-    box-sizing: border-box;
     border: 1px dashed #444;
 }
 
-/* Ajuste para que las pelis dentro de la saga sean un poco más pequeñas */
-.saga-expanded .card {
-    width: 120px;
-}
+/* --- ESTILO PERSONAS --- */
+.person-photo { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; margin-top: 15px; border: 3px solid #333; }
+.person-card strong { font-size: 0.95rem; margin: 10px 0; min-height: 2.4em; padding: 0 5px; }
 
-.saga-expanded .card img {
-    height: 180px;
-}
-
-/* Badge de cantidad de pelis en la saga */
 .movie-count-badge {
-    position: absolute;
-    top: 5px;
-    left: 5px;
-    background: var(--primary);
-    color: white;
-    font-size: 0.75rem;
+    position: absolute; top: 8px; left: 8px;
+    background: var(--primary); color: white;
+    font-size: 0.7rem; font-weight: bold;
+    padding: 2px 8px; border-radius: 10px; z-index: 10;
+}
+
+.mini-posters-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; padding: 5px; }
+.mini-poster { width: 45px; height: 65px; border-radius: 3px; object-fit: cover; cursor: pointer; border: 1px solid transparent; }
+.mini-poster:hover { border-color: var(--primary); }
+
+/* --- AJUSTES MÓVIL (3 COLUMNAS) --- */
+@media (max-width: 600px) {
+    .movie-grid, .people-grid { gap: 8px; padding: 10px; }
+
+    .card, .person-card {
+        width: calc(33.33% - 12px) !important;
+        min-width: 0;
+    }
+
+    .card img, .saga-stack { height: 140px; }
+    
+    .saga-stack { width: 80%; }
+    
+    .card h4 { font-size: 0.7rem; line-height: 1.1; margin: 5px 0; }
+    
+    .person-photo { width: 65px; height: 65px; }
+    .person-card strong { font-size: 0.75rem; }
+    .mini-poster { width: 30px; height: 45px; }
+
+    .hero-center h1 { font-size: 2rem; }
+}
+
+/* Botón eliminar */
+.delete-btn {
+    position: absolute; top: 5px; right: 5px;
+    background: var(--primary); color: white; border: none;
+    border-radius: 50%; width: 22px; height: 22px;
+    font-size: 14px; cursor: pointer; z-index: 20;
+}
+
+/* Estilo para que las sagas se diferencien */
+.saga-card h4 {
+    color: #ffcc00; /* Dorado para nombres de colecciones */
     font-weight: bold;
-    padding: 2px 8px;
-    border-radius: 10px;
-    z-index: 10;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.5);
 }
 
-/* --- AJUSTE MÓVIL (3 COLUMNAS PARA SAGAS) --- */
-@media (max-width: 600px) {
-    .saga-stack {
-        height: 150px; /* Misma altura que pusimos para las pelis normales */
-    }
-    .saga-expanded .card {
-        width: calc(33.33% - 10px);
-    }
-}
+/* --- ESTADÍSTICAS --- */
+.stats-center-container { display: flex; flex-direction: column; align-items: center; gap: 20px; padding: 20px; }
+.stat-card-large { background: var(--card); padding: 20px; border-radius: 15px; text-align: center; width: 200px; }
+.stat-value { font-size: 2rem; color: var(--primary); font-weight: bold; display: block; }
+.charts { width: 100%; max-width: 350px; }
 
-/* Asegura que el contenedor de la tarjeta centre todo su contenido */
-.card {
-    display: flex;
-    flex-direction: column;
-    align-items: center; /* Centra la pila de fotos y el título horizontalmente */
-    text-align: center;  /* Centra el texto del nombre */
-    background: var(--card);
-    border-radius: 8px;
-    overflow: hidden;
-    padding-bottom: 10px;
+/* --- MODAL --- */
+.modal {
+    display: none; position: fixed; z-index: 3000;
+    left: 0; top: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.9); justify-content: center; align-items: center;
 }
-
-/* Estilo específico para el nombre de la saga/película */
-.card h4 {
-    width: 100%;
-    margin: 10px 0 5px 0;
-    padding: 0 5px;
-    font-size: 0.9rem;
-    line-height: 1.2;
-    display: flex;
-    justify-content: center; /* Centrado flex */
-    align-items: center;
-    min-height: 2.4em; /* Mantiene la altura aunque el nombre sea corto */
-    box-sizing: border-box;
-}
-
-.saga-stack {
-    position: relative;
-    width: 90%; /* Un poco menos que el ancho total para que se vean las capas de atrás */
-    height: 230px;
-    margin: 15px auto 5px auto; /* El 'auto' lateral centra la pila */
-}
-
-/* En móvil, ajustamos la altura de la pila */
-@media (max-width: 600px) {
-    .saga-stack {
-        height: 150px;
-    }
-    .card h4 {
-        font-size: 0.75rem; /* Texto un poco más pequeño en móvil para que quepa mejor */
-    }
-}
+.modal-content { max-width: 90%; max-height: 80%; border-radius: 10px; box-shadow: 0 0 20px var(--primary); }
