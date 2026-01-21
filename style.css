@@ -154,45 +154,94 @@ body {
     box-shadow: 0 2px 5px rgba(0,0,0,0.5);
 }
 
-/* Estilo de la "Pila" de la saga */
+/* --- ESTILO DE LAS SAGAS (CARPETAS) --- */
+
+/* Contenedor de la pila de fotos */
 .saga-stack {
     position: relative;
     width: 100%;
-    height: 230px;
+    height: 230px; /* Ajusta según el alto de tus portadas */
+    margin-bottom: 10px;
 }
 
+/* Las capas de atrás que simulan una pila de películas */
 .saga-stack::before, .saga-stack::after {
     content: "";
     position: absolute;
-    width: 90%; height: 100%;
-    background: #333;
+    width: 90%; 
+    height: 100%;
+    background: #2a2a2a;
     border: 1px solid #444;
     border-radius: 8px;
     z-index: -1;
+    transition: 0.3s;
 }
 
-.saga-stack::before { top: -5px; left: 5%; }
-.saga-stack::after { top: -10px; left: 10%; width: 80%; }
+.saga-stack::before {
+    top: -6px;
+    left: 5%;
+}
 
-.saga-badge {
+.saga-stack::after {
+    top: -12px;
+    left: 10%;
+    width: 80%;
+}
+
+/* Imagen principal de la saga */
+.saga-stack img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #555;
+}
+
+/* El panel que se abre al hacer clic en la saga */
+.saga-expanded {
+    display: none; /* El JS cambia esto a 'flex' */
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 15px;
+    border-radius: 12px;
+    margin: 10px 0 20px 0;
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px dashed #444;
+}
+
+/* Ajuste para que las pelis dentro de la saga sean un poco más pequeñas */
+.saga-expanded .card {
+    width: 120px;
+}
+
+.saga-expanded .card img {
+    height: 180px;
+}
+
+/* Badge de cantidad de pelis en la saga */
+.movie-count-badge {
     position: absolute;
-    bottom: 10px;
-    right: 10px;
+    top: 5px;
+    left: 5px;
     background: var(--primary);
     color: white;
-    padding: 5px 10px;
-    border-radius: 20px;
+    font-size: 0.75rem;
     font-weight: bold;
-    font-size: 0.8rem;
+    padding: 2px 8px;
+    border-radius: 10px;
+    z-index: 10;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.5);
 }
 
-.saga-expanded {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    background: #1a1a1a;
-    padding: 20px;
-    border-radius: 10px;
-    margin-top: 10px;
-    justify-content: center;
+/* --- AJUSTE MÓVIL (3 COLUMNAS PARA SAGAS) --- */
+@media (max-width: 600px) {
+    .saga-stack {
+        height: 150px; /* Misma altura que pusimos para las pelis normales */
+    }
+    .saga-expanded .card {
+        width: calc(33.33% - 10px);
+    }
 }
