@@ -245,3 +245,46 @@ body {
         width: calc(33.33% - 10px);
     }
 }
+
+/* Asegura que el contenedor de la tarjeta centre todo su contenido */
+.card {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centra la pila de fotos y el título horizontalmente */
+    text-align: center;  /* Centra el texto del nombre */
+    background: var(--card);
+    border-radius: 8px;
+    overflow: hidden;
+    padding-bottom: 10px;
+}
+
+/* Estilo específico para el nombre de la saga/película */
+.card h4 {
+    width: 100%;
+    margin: 10px 0 5px 0;
+    padding: 0 5px;
+    font-size: 0.9rem;
+    line-height: 1.2;
+    display: flex;
+    justify-content: center; /* Centrado flex */
+    align-items: center;
+    min-height: 2.4em; /* Mantiene la altura aunque el nombre sea corto */
+    box-sizing: border-box;
+}
+
+.saga-stack {
+    position: relative;
+    width: 90%; /* Un poco menos que el ancho total para que se vean las capas de atrás */
+    height: 230px;
+    margin: 15px auto 5px auto; /* El 'auto' lateral centra la pila */
+}
+
+/* En móvil, ajustamos la altura de la pila */
+@media (max-width: 600px) {
+    .saga-stack {
+        height: 150px;
+    }
+    .card h4 {
+        font-size: 0.75rem; /* Texto un poco más pequeño en móvil para que quepa mejor */
+    }
+}
