@@ -17,10 +17,11 @@ body {
 }
 
 #main {
-    width: 100%;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: center; /* Alinea todo al eje central vertical */
+    width: 100%;
+    min-height: 100vh;
 }
 
 /* --- MENÚ LATERAL --- */
@@ -38,12 +39,15 @@ body {
 
 /* --- PORTADA --- */
 /* --- CENTRADO DE BUSCADORES --- */
-#searchSection, .internal-search-container {
+/* Contenedor del buscador de películas nuevas (TMDB) */
+#searchSection {
+    width: 100%;
     display: flex;
     flex-direction: column;
-    align-items: center; /* Centra horizontalmente */
-    width: 100%;
-    margin: 20px 0;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    box-sizing: border-box;
 }
 .hero-center h1 { font-size: 3rem; color: var(--primary); margin-bottom: 20px; }
 .search-box, .internal-search-container {
@@ -200,20 +204,26 @@ body {
 }
 .modal-content { max-width: 90%; max-height: 80%; border-radius: 10px; box-shadow: 0 0 20px var(--primary); }
 
+/* Contenedor del buscador interno (Tu colección) */
 .internal-search-container {
     width: 100%;
-    max-width: 500px;
-    margin: 20px auto;
+    max-width: 500px; /* Limita el ancho para que no se vea gigante */
+    margin: 30px auto; /* Centrado horizontal automático */
+    display: flex;
+    justify-content: center;
     padding: 0 15px;
     box-sizing: border-box;
 }
 
-/* Ajuste para el input interno para que no se pegue a los bordes */
 #internalSearch {
-    width: 90%; 
-    max-width: 500px;
-    display: block;
-    margin: 0 auto;
+    width: 100%;
+    max-width: 400px;
+    padding: 12px 20px;
+    border-radius: 25px;
+    border: 1px solid #333;
+    background: #222;
+    color: white;
+    text-align: center; /* Centra el texto de ejemplo (placeholder) */
 }
 
 #internalSearch:focus {
