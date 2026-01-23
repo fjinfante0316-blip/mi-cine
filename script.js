@@ -86,7 +86,11 @@ function renderAll() {
     renderMoviesGrouped(myMovies.filter(m => m.status === 'pending'), 'pendingMovies');
 
     let directors = [], actors = [], writers = [], producers = [];
+
     myMovies.forEach(m => {
+        // Verificación de seguridad: Si no hay rawStaff, ignoramos esta peli para el conteo de personas
+        if (!m.rawStaff) return; 
+
         const s = m.rawStaff;
         if (s.director) processStaff(directors, s.director);
         if (s.actors) s.actors.forEach(a => processStaff(actors, a));
@@ -94,13 +98,37 @@ function renderAll() {
         if (s.producers) s.producers.forEach(p => processStaff(producers, p));
     });
 
-    const sortByCount = (a, b) => b.movies.length - a.movies.length;
-    [directors, actors, writers, producers].forEach(list => list.sort(sortByCount));
+    // Ordenar por quien tiene más películas
+    const sortByCount = (a, b) => (b.movies ? b.movies.length : 0) - (a.movies ? a.movies.length : 0);
+    
+    directors.sort(sortByCount);
+    actors.sort(sortByCount);
+    writers.sort(sortByCount);
+    producers.sort(sortByCount);
 
     renderPeople('directorList', directors);
     renderPeople('actorList', actors);
     renderPeople('writerList', writers);
     renderPeople('producerList', producers);
+}
+
+// --- PROCESAR STAFF (ASEGURANDO DATOS) ---
+function processStaff(list, person) {
+    if (!person || !person.name) return;
+    
+    let existing = list.find(p => p.name === person.name);
+    if (existing) {
+        // Evitamos duplicar la misma película en el mismo actor
+        if (!existing.movies.find(mov => mov.title === person.movie)) {
+            existing.movies.push({ title: person.movie, poster: person.poster });
+        }
+    } else {
+        list.push({
+            name: person.name,
+            photo: person.photo || 'https://via.placeholder.com/200x200?text=Sin+Foto',
+            movies: [{ title: person.movie, poster: person.poster }]
+        });
+    }
 }
 
 function renderMoviesGrouped(movieList, containerId) {
