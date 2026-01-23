@@ -249,6 +249,48 @@ function updateStatistics() {
     }
 }
 
+// --- FUNCIÓN PARA EXPORTAR ---
+function exportData() {
+    if (myMovies.length === 0) return alert("No hay películas para exportar");
+    
+    const dataStr = JSON.stringify(myMovies, null, 2);
+    const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+    
+    const exportFileDefaultName = 'mi_biblioteca_cine.json';
+    
+    const linkElement = document.createElement('a');
+    linkElement.setAttribute('href', dataUri);
+    linkElement.setAttribute('download', exportFileDefaultName);
+    linkElement.click();
+}
+
+// --- FUNCIÓN PARA IMPORTAR ---
+function importData(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const importedData = JSON.parse(e.target.result);
+            
+            if (Array.isArray(importedData)) {
+                if (confirm(`Se van a importar ${importedData.length} películas. ¿Deseas continuar? (Esto reemplazará tu lista actual)`)) {
+                    myMovies = importedData;
+                    saveAndRefresh();
+                    alert("¡Datos importados con éxito!");
+                    location.reload(); // Recargamos para limpiar cualquier rastro antiguo
+                }
+            } else {
+                alert("El archivo no tiene el formato correcto.");
+            }
+        } catch (err) {
+            alert("Error al leer el archivo. Asegúrate de que sea un .json válido.");
+        }
+    };
+    reader.readAsText(file);
+}
+
 function deleteMovie(id) { if(confirm("¿Eliminar?")) { myMovies = myMovies.filter(m => m.id !== id); saveAndRefresh(); } }
 function saveAndRefresh() { localStorage.setItem('myCineData', JSON.stringify(myMovies)); renderAll(); }
 function openModal(url) { document.getElementById("imageModal").style.display = "flex"; document.getElementById("imgFull").src = url; }
