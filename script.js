@@ -17,10 +17,10 @@ function showSection(id) {
     if(target) target.style.display = (id === 'searchSection') ? 'flex' : 'block';
     if (id === 'stats') updateStatistics();
     const menu = document.getElementById("sideMenu");
-    if (menu.style.width === "250px") toggleMenu();
+    if (menu && menu.style.width === "250px") toggleMenu();
 }
 
-// --- BUSCADOR PRINCIPAL ---
+// --- BUSCADOR PRINCIPAL (TMDB) ---
 document.getElementById('searchBtn').addEventListener('click', async () => {
     const query = document.getElementById('searchInput').value;
     if (!query) return;
@@ -35,7 +35,18 @@ document.getElementById('searchBtn').addEventListener('click', async () => {
     `).join('');
 });
 
-// --- AÑADIR PELÍCULA (CON SAGAS) ---
+// --- BUSCADOR INTERNO (MI COLECCIÓN) ---
+function filterMyMovies() {
+    const term = document.getElementById('internalSearch').value.toLowerCase();
+    const cards = document.querySelectorAll('.movie-grid .card');
+    
+    cards.forEach(card => {
+        const title = card.querySelector('h4')?.innerText.toLowerCase() || "";
+        card.style.display = title.includes(term) ? "flex" : "none";
+    });
+}
+
+// --- AÑADIR PELÍCULA (SISTEMA DE VISTAS) ---
 async function addMovie(id, title, posterPath) {
     if (myMovies.find(m => m.id === id)) return alert("Ya guardada");
     
@@ -44,68 +55,47 @@ async function addMovie(id, title, posterPath) {
     const cRes = await fetch(`${BASE_URL}/movie/${id}/credits?api_key=${API_KEY}`);
     const c = await cRes.json();
     
-    const status = confirm(`¿Has visto "${title}"?`) ? 'watched' : 'pending';
-    const rating = status === 'watched' ? (prompt("Nota (1-10):") || "N/A") : "N/A";
+    const isWatched = confirm(`¿Has visto "${title}"?`);
     const saga = d.belongs_to_collection ? d.belongs_to_collection.name : null;
-
-    const getP = (p) => p ? IMG_URL + p : 'https://via.placeholder.com/200x200?text=Sin+Foto';
     const posterFull = IMG_URL + posterPath;
 
     myMovies.push({
-        id, title, rating, status, poster: posterFull,
+        id, title, 
+        status: isWatched ? 'watched' : 'pending',
+        views: isWatched ? 1 : 0, // Inicia en 1 si ya la vio
+        poster: posterFull,
         runtime: d.runtime || 0,
         genre: d.genres[0]?.name || "Otros",
         saga: saga,
         rawStaff: {
-            director: { name: c.crew.find(x => x.job === 'Director')?.name, photo: getP(c.crew.find(x => x.job === 'Director')?.profile_path), movie: title, poster: posterFull },
-            actors: c.cast.slice(0, 5).map(a => ({ name: a.name, photo: getP(a.profile_path), movie: title, poster: posterFull })),
-            writers: c.crew.filter(x => x.department === 'Writing').slice(0, 2).map(w => ({ name: w.name, photo: getP(w.profile_path), movie: title, poster: posterFull })),
-            producers: c.crew.filter(x => x.department === 'Production').slice(0, 2).map(p => ({ name: p.name, photo: getP(p.profile_path), movie: title, poster: posterFull }))
+            director: { name: c.crew.find(x => x.job === 'Director')?.name, photo: getPhoto(c.crew.find(x => x.job === 'Director')?.profile_path), movie: title, poster: posterFull },
+            actors: c.cast.slice(0, 5).map(a => ({ name: a.name, photo: getPhoto(a.profile_path), movie: title, poster: posterFull })),
+            writers: c.crew.filter(x => x.department === 'Writing').slice(0, 2).map(w => ({ name: w.name, photo: getPhoto(w.profile_path), movie: title, poster: posterFull })),
+            producers: c.crew.filter(x => x.department === 'Production').slice(0, 2).map(p => ({ name: p.name, photo: getPhoto(p.profile_path), movie: title, poster: posterFull }))
         }
     });
 
-    localStorage.setItem('myCineData', JSON.stringify(myMovies));
-    renderAll();
+    saveAndRefresh();
 }
 
-// --- PROCESAR STAFF (PARA AGRUPAR) ---
-function processStaff(list, person) {
-    if (!person || !person.name) return;
-    let existing = list.find(p => p.name === person.name);
-    if (existing) {
-        if (!existing.movies.find(m => m.poster === person.poster)) {
-            existing.movies.push({ title: person.movie, poster: person.poster });
-        }
-    } else {
-        list.push({
-            name: person.name,
-            photo: person.photo,
-            movies: [{ title: person.movie, poster: person.poster }]
-        });
-    }
-}
+function getPhoto(path) { return path ? IMG_URL + path : 'https://via.placeholder.com/200x200?text=Sin+Foto'; }
 
-// --- RENDERIZADO GENERAL ---
+// --- RENDERIZADO CON SAGAS Y VISTAS ---
 function renderAll() {
     renderMoviesGrouped(myMovies.filter(m => m.status === 'watched'), 'watchedMovies');
     renderMoviesGrouped(myMovies.filter(m => m.status === 'pending'), 'pendingMovies');
 
     let directors = [], actors = [], writers = [], producers = [];
-
     myMovies.forEach(m => {
-        const s = m.rawStaff || { director: m.director, actors: m.actors || [], writers: m.writers || [], producers: m.producers || [] };
+        const s = m.rawStaff;
         if (s.director) processStaff(directors, s.director);
         if (s.actors) s.actors.forEach(a => processStaff(actors, a));
         if (s.writers) s.writers.forEach(w => processStaff(writers, w));
         if (s.producers) s.producers.forEach(p => processStaff(producers, p));
     });
 
-    // Ordenar por quien tiene más películas
     const sortByCount = (a, b) => b.movies.length - a.movies.length;
-    directors.sort(sortByCount);
-    actors.sort(sortByCount);
-    writers.sort(sortByCount);
-    producers.sort(sortByCount);
+    [directors, actors, writers, producers].forEach(list => list.sort(sortByCount));
 
     renderPeople('directorList', directors);
     renderPeople('actorList', actors);
@@ -113,7 +103,6 @@ function renderAll() {
     renderPeople('producerList', producers);
 }
 
-// --- RENDERIZAR PELÍCULAS CON SAGAS ---
 function renderMoviesGrouped(movieList, containerId) {
     const container = document.getElementById(containerId);
     if (!container) return;
@@ -131,12 +120,11 @@ function renderMoviesGrouped(movieList, containerId) {
     });
 
     let html = '';
-    // Dibujar Sagas
     for (const name in sagas) {
         const p = sagas[name];
         const safeName = name.replace(/\s/g, "").replace(/'/g, "");
         html += `
-            <div class="card" onclick="document.getElementById('exp-${safeName}').style.display = (document.getElementById('exp-${safeName}').style.display==='none'?'flex':'none')">
+            <div class="card saga-card" onclick="document.getElementById('exp-${safeName}').style.display = (document.getElementById('exp-${safeName}').style.display==='none'?'flex':'none')">
                 <div class="saga-stack">
                     <img src="${p[0].poster}">
                     <div class="movie-count-badge">${p.length}</div>
@@ -144,20 +132,57 @@ function renderMoviesGrouped(movieList, containerId) {
                 <h4>${name}</h4>
             </div>
             <div id="exp-${safeName}" class="saga-expanded" style="display:none; width:100%;">
-                ${p.map(m => `<div class="card"><button class="delete-btn" onclick="deleteMovie(${m.id})">×</button><img src="${m.poster}"><p>⭐ ${m.rating}</p></div>`).join('')}
+                ${p.map(m => `
+                    <div class="card" onclick="event.stopPropagation(); addView(${m.id})">
+                        <button class="delete-btn" onclick="event.stopPropagation(); deleteMovie(${m.id})">×</button>
+                        <img src="${m.poster}">
+                        <div class="view-count-badge">👁️ ${m.views || 1}</div>
+                    </div>`).join('')}
             </div>
         `;
     }
-    // Dibujar Sueltas
+
     html += singles.map(m => `
-        <div class="card">
-            <button class="delete-btn" onclick="deleteMovie(${m.id})">×</button>
+        <div class="card" onclick="${m.status === 'watched' ? `addView(${m.id})` : ''}">
+            <button class="delete-btn" onclick="event.stopPropagation(); deleteMovie(${m.id})">×</button>
             <img src="${m.poster}" ${m.status==='pending'?'style="filter:grayscale(1)"':''}>
-            <p>${m.status === 'watched' ? '⭐ ' + m.rating : `<button onclick="markAsWatched(${m.id})">¡Vista!</button>`}</p>
+            ${m.status === 'watched' ? `<div class="view-count-badge">👁️ ${m.views || 1}</div>` : `<button onclick="event.stopPropagation(); markAsWatched(${m.id})">¡Vista!</button>`}
+            <h4>${m.title}</h4>
         </div>
     `).join('');
 
     container.innerHTML = html;
+}
+
+// --- GESTIÓN DE VISTAS ---
+function addView(id) {
+    const m = myMovies.find(x => x.id === id);
+    if (m) {
+        m.views = (m.views || 0) + 1;
+        saveAndRefresh();
+    }
+}
+
+function markAsWatched(id) {
+    const m = myMovies.find(x => x.id === id);
+    if (m) {
+        m.status = 'watched';
+        m.views = 1;
+        saveAndRefresh();
+    }
+}
+
+// --- RESTO DE FUNCIONES (STAFF, STATS, ETC) ---
+function processStaff(list, person) {
+    if (!person || !person.name) return;
+    let existing = list.find(p => p.name === person.name);
+    if (existing) {
+        if (!existing.movies.find(m => m.poster === person.poster)) {
+            existing.movies.push({ title: person.movie, poster: person.poster });
+        }
+    } else {
+        list.push({ name: person.name, photo: person.photo, movies: [{ title: person.movie, poster: person.poster }] });
+    }
 }
 
 function renderPeople(id, arr) {
@@ -175,58 +200,41 @@ function renderPeople(id, arr) {
     `).join('');
 }
 
-// --- FILTRAR STAFF ---
-function filterStaff(listId, query) {
-    const container = document.getElementById(listId);
-    const cards = container.getElementsByClassName('person-card');
-    const term = query.toLowerCase();
-    Array.from(cards).forEach(card => {
-        const name = card.querySelector('strong').innerText.toLowerCase();
-        card.style.display = name.includes(term) ? "flex" : "none";
-    });
-}
-
-// --- ESTADÍSTICAS ---
 function updateStatistics() {
-    const mins = myMovies.reduce((acc, m) => acc + (parseInt(m.runtime) || 0), 0);
+    const mins = myMovies.filter(m => m.status === 'watched').reduce((acc, m) => acc + (parseInt(m.runtime) || 0) * (m.views || 1), 0);
     document.getElementById('statHours').innerText = `${Math.floor(mins / 60)}h ${mins % 60}m`;
     
     const data = {};
-    myMovies.forEach(mov => data[mov.genre] = (data[mov.genre] || 0) + 1);
+    myMovies.filter(m => m.status === 'watched').forEach(mov => data[mov.genre] = (data[mov.genre] || 0) + 1);
     
     const hues = [0, 200, 50, 120, 280, 30, 180, 330, 240, 90];
     const colors = Object.keys(data).map((_, i) => `hsla(${hues[i % hues.length]}, 70%, 50%, 0.8)`);
 
     if (genreChart) genreChart.destroy();
-    genreChart = new Chart(document.getElementById('genreChart'), {
-        type: 'doughnut',
-        data: { labels: Object.keys(data), datasets: [{ data: Object.values(data), backgroundColor: colors, borderColor: '#141414', borderWidth: 2 }] },
-        options: { plugins: { legend: { labels: { color: 'white' }, position: 'bottom' } } }
-    });
+    const ctx = document.getElementById('genreChart');
+    if (ctx) {
+        genreChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: { labels: Object.keys(data), datasets: [{ data: Object.values(data), backgroundColor: colors, borderColor: '#141414', borderWidth: 2 }] },
+            options: { plugins: { legend: { labels: { color: 'white' }, position: 'bottom' } } }
+        });
+    }
 }
 
-// --- EDITAR FOTO ---
+function deleteMovie(id) { if(confirm("¿Eliminar?")) { myMovies = myMovies.filter(m => m.id !== id); saveAndRefresh(); } }
+function saveAndRefresh() { localStorage.setItem('myCineData', JSON.stringify(myMovies)); renderAll(); }
+function openModal(url) { document.getElementById("imageModal").style.display = "flex"; document.getElementById("imgFull").src = url; }
 function editPersonPhoto(name) {
     const url = prompt(`URL de foto para ${name}:`);
     if (!url) return;
     myMovies.forEach(m => {
         const s = m.rawStaff;
-        if (s) {
-            if (s.director && s.director.name === name) s.director.photo = url;
-            s.actors?.forEach(a => { if (a.name === name) a.photo = url; });
-            s.writers?.forEach(w => { if (w.name === name) w.photo = url; });
-            s.producers?.forEach(p => { if (p.name === name) p.photo = url; });
-        }
+        if (s.director?.name === name) s.director.photo = url;
+        s.actors?.forEach(a => { if (a.name === name) a.photo = url; });
+        s.writers?.forEach(w => { if (w.name === name) w.photo = url; });
+        s.producers?.forEach(p => { if (p.name === name) p.photo = url; });
     });
-    localStorage.setItem('myCineData', JSON.stringify(myMovies));
-    renderAll();
+    saveAndRefresh();
 }
-
-// --- UTILIDADES ---
-function deleteMovie(id) { if(confirm("¿Borrar?")) { myMovies = myMovies.filter(m => m.id !== id); localStorage.setItem('myCineData', JSON.stringify(myMovies)); renderAll(); } }
-function markAsWatched(id) { const m = myMovies.find(x => x.id === id); m.status = 'watched'; m.rating = prompt("Nota:"); localStorage.setItem('myCineData', JSON.stringify(myMovies)); renderAll(); }
-function openModal(url) { document.getElementById("imageModal").style.display = "flex"; document.getElementById("imgFull").src = url; }
-function exportData() { const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([JSON.stringify(myMovies)], {type: "application/json"})); a.download = "mi_cine.json"; a.click(); }
-function importData(e) { const reader = new FileReader(); reader.onload = (event) => { myMovies = JSON.parse(event.target.result); localStorage.setItem('myCineData', JSON.stringify(myMovies)); location.reload(); }; reader.readAsText(e.target.files[0]); }
 
 renderAll();
