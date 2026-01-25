@@ -205,14 +205,42 @@ function exportData() {
     a.click();
 }
 
-function importData(event) {
+async function importData(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
     const reader = new FileReader();
-    reader.onload = (e) => {
-        myMovies = JSON.parse(e.target.result);
-        saveAndRefresh();
-        location.reload();
+    reader.onload = async (e) => {
+        try {
+            let importedData = JSON.parse(e.target.result);
+            
+            if (confirm(`¿Importar ${importedData.length} películas? El sistema buscará los años automáticamente.`)) {
+                
+                // --- PROCESO DE AUTOPARCHE ---
+                for (let m of importedData) {
+                    // Si no tiene año o staff, lo buscamos en la API
+                    if (!m.year || m.year === "Sin Año") {
+                        try {
+                            const res = await fetch(`${BASE_URL}/movie/${m.id}?api_key=${API_KEY}&language=es-ES`);
+                            const data = await res.json();
+                            m.year = data.release_date ? data.release_date.split('-')[0] : "Sin Año";
+                            // Aprovechamos para recuperar el género y duración si faltan
+                            if(!m.runtime) m.runtime = data.runtime;
+                            if(!m.genre) m.genre = data.genres[0]?.name || "Otros";
+                        } catch (err) { console.log("Error recuperando año de:", m.title); }
+                    }
+                }
+
+                myMovies = importedData;
+                localStorage.setItem('myCineData', JSON.stringify(myMovies));
+                alert("¡Importación completa con años actualizados!");
+                renderAll(); // Refresca la pantalla
+            }
+        } catch (err) {
+            alert("El archivo no es válido.");
+        }
     };
-    reader.readAsText(event.target.files[0]);
+    reader.readAsText(file);
 }
 
 function updateStatistics() {
