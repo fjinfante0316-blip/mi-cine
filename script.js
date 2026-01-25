@@ -230,4 +230,25 @@ function updateStatistics() {
     }
 }
 
+async function patchYears() {
+    console.log("Iniciando actualización de años...");
+    for (let m of myMovies) {
+        if (!m.year || m.year === "Sin Año" || m.year === "Desconocido") {
+            try {
+                const res = await fetch(`${BASE_URL}/movie/${m.id}?api_key=${API_KEY}&language=es-ES`);
+                const data = await res.json();
+                if (data.release_date) {
+                    m.year = data.release_date.split('-')[0];
+                    console.log(`Año encontrado para ${m.title}: ${m.year}`);
+                }
+            } catch (error) {
+                console.error(`Error con ${m.title}:`, error);
+            }
+        }
+    }
+    localStorage.setItem('myCineData', JSON.stringify(myMovies));
+    renderAll();
+    alert("¡Años actualizados correctamente!");
+}
+
 renderAll();
