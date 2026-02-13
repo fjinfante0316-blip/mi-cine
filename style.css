@@ -295,3 +295,55 @@ input:focus { border-color: var(--primary); box-shadow: 0 0 8px rgba(229, 9, 20,
         width: calc(100% - 30px);
     }
 }
+
+/* Contenedor principal del botón */
+.menu-container {
+    position: fixed; /* Se queda fijo arriba */
+    top: 15px;
+    left: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    z-index: 2000; /* Por encima de todo */
+    background: rgba(20, 20, 20, 0.8); /* Fondo semi-transparente para que se lea bien */
+    padding: 8px 15px;
+    border-radius: 30px;
+    border: 1px solid #333;
+    transition: 0.3s;
+}
+
+.menu-container:hover {
+    background: var(--primary);
+    border-color: var(--primary);
+}
+
+.menu-icon {
+    font-size: 24px;
+    color: white;
+    line-height: 1;
+}
+
+.menu-text {
+    color: white;
+    font-weight: bold;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+}
+
+/* Ajuste para que el contenido no se pegue al botón fijo */
+#searchSection {
+    padding-top: 80px; /* Espacio extra para que el buscador no tape el botón */
+}
+
+/* En móvil, podemos hacerlo un poco más pequeño */
+@media (max-width: 600px) {
+    .menu-container {
+        padding: 6px 12px;
+        top: 10px;
+        left: 10px;
+    }
+    .menu-text {
+        font-size: 0.8rem;
+    }
+}
