@@ -64,7 +64,7 @@ async function addMovie(id, title, posterPath) {
         saga: d.belongs_to_collection ? d.belongs_to_collection.name : null,
         rawStaff: {
             director: { name: c.crew.find(x => x.job === 'Director')?.name, photo: getPhoto(c.crew.find(x => x.job === 'Director')?.profile_path), movie: title, poster: posterFull },
-            actors: c.cast.slice(0, 5).map(a => ({ name: a.name, photo: getPhoto(a.profile_path), movie: title, poster: posterFull })),
+            actors: c.cast.map(a => ({ name: a.name, photo: getPhoto(a.profile_path), movie: title, poster: posterFull })),
             writers: c.crew.filter(x => x.department === 'Writing').slice(0, 2).map(w => ({ name: w.name, photo: getPhoto(w.profile_path), movie: title, poster: posterFull })),
             producers: c.crew.filter(x => x.department === 'Production').slice(0, 2).map(p => ({ name: p.name, photo: getPhoto(p.profile_path), movie: title, poster: posterFull }))
         }
