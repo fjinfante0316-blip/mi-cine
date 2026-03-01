@@ -347,3 +347,15 @@ input:focus { border-color: var(--primary); box-shadow: 0 0 8px rgba(229, 9, 20,
         font-size: 0.8rem;
     }
 }
+
+.people-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    max-height: 600px; /* Limita la altura de la sección */
+    overflow-y: auto;  /* Añade scroll interno si hay demasiados */
+    padding: 20px;
+    border: 1px solid #222;
+    border-radius: 10px;
+}
