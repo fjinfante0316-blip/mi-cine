@@ -37,16 +37,25 @@ document.getElementById('searchBtn').addEventListener('click', async () => {
 
 function filterMyMovies() {
     const term = document.getElementById('internalSearch').value.toLowerCase();
-    const cards = document.querySelectorAll('.movie-grid .card');
-    cards.forEach(card => {
+    const movieCards = document.querySelectorAll('.movie-grid .card');
+    movieCards.forEach(card => {
         const title = card.querySelector('h4')?.innerText.toLowerCase() || "";
         card.style.display = title.includes(term) ? "flex" : "none";
     });
+    
+    const personCards = document.querySelectorAll('.person-card');
+    personCards.forEach(card => {
+        const name = card.querySelector('strong')?.innerText.toLowerCase() || "";
+        card.style.display = name.includes(term) ? "flex" : "none";
+    });
 }
 
-// --- AÑADIR PELÍCULA ---
+// --- AÑADIR PELÍCULA CON NOTA ---
 async function addMovie(id, title, posterPath) {
     if (myMovies.find(m => m.id === id)) return alert("Ya guardada");
+    
+    const nota = parseFloat(prompt(`¿Qué nota le das a "${title}"? (0-10)`, "5"));
+    if (isNaN(nota) || nota < 0 || nota > 10) return alert("Por favor, pon una nota válida del 0 al 10");
     
     const dRes = await fetch(`${BASE_URL}/movie/${id}?api_key=${API_KEY}&language=es-ES`);
     const d = await dRes.json();
@@ -58,6 +67,7 @@ async function addMovie(id, title, posterPath) {
 
     myMovies.push({
         id, title, status: 'watched', views: 1, year: year,
+        rating: nota,
         poster: posterFull,
         runtime: d.runtime || 0,
         genre: d.genres[0]?.name || "Otros",
@@ -65,8 +75,8 @@ async function addMovie(id, title, posterPath) {
         rawStaff: {
             director: { name: c.crew.find(x => x.job === 'Director')?.name, photo: getPhoto(c.crew.find(x => x.job === 'Director')?.profile_path), movie: title, poster: posterFull },
             actors: c.cast.map(a => ({ name: a.name, photo: getPhoto(a.profile_path), movie: title, poster: posterFull })),
-            writers: c.crew.filter(x => x.department === 'Writing').slice(0, 2).map(w => ({ name: w.name, photo: getPhoto(w.profile_path), movie: title, poster: posterFull })),
-            producers: c.crew.filter(x => x.department === 'Production').slice(0, 2).map(p => ({ name: p.name, photo: getPhoto(p.profile_path), movie: title, poster: posterFull }))
+            writers: c.crew.filter(x => x.department === 'Writing').map(w => ({ name: w.name, photo: getPhoto(w.profile_path), movie: title, poster: posterFull })),
+            producers: c.crew.filter(x => x.department === 'Production').map(p => ({ name: p.name, photo: getPhoto(p.profile_path), movie: title, poster: posterFull }))
         }
     });
 
@@ -75,18 +85,16 @@ async function addMovie(id, title, posterPath) {
 
 function getPhoto(path) { return path ? IMG_URL + path : 'https://via.placeholder.com/200x200?text=Sin+Foto'; }
 
-// --- RENDERIZADO POR AÑOS, SAGAS Y STAFF ---
+// --- RENDERIZADO POR AÑOS, SAGAS Y STAFF CON NOTA MEDIA ---
 function renderAll() {
     const container = document.getElementById('watchedMovies');
     if (!container) return;
     container.innerHTML = "";
 
-    // 1. Agrupar por año y saga
     const groups = {};
     let directors = [], actors = [], writers = [], producers = [];
 
     myMovies.forEach(m => {
-        // Lógica de Años
         const y = m.year || "Sin Año";
         if (!groups[y]) groups[y] = { singles: [], sagas: {} };
         if (m.saga) {
@@ -96,17 +104,16 @@ function renderAll() {
             groups[y].singles.push(m);
         }
 
-        // Lógica de Staff (Contadores)
         if (m.rawStaff) {
             const s = m.rawStaff;
-            if (s.director) processStaff(directors, s.director);
-            if (s.actors) s.actors.forEach(a => processStaff(actors, a));
-            if (s.writers) s.writers.forEach(w => processStaff(writers, w));
-            if (s.producers) s.producers.forEach(p => processStaff(producers, p));
+            const movieRating = m.rating || 0;
+            if (s.director) processStaff(directors, s.director, movieRating);
+            if (s.actors) s.actors.forEach(a => processStaff(actors, a, movieRating));
+            if (s.writers) s.writers.forEach(w => processStaff(writers, w, movieRating));
+            if (s.producers) s.producers.forEach(p => processStaff(producers, p, movieRating));
         }
     });
 
-    // 2. Dibujar Películas por Año
     const sortedYears = Object.keys(groups).sort((a, b) => b - a);
     let html = '';
 
@@ -126,53 +133,66 @@ function renderAll() {
                 </div>
                 <div id="exp-${safeName}" class="saga-expanded" style="display:none; width:100%;">
                     ${p.map(m => `
-                        <div class="card" onclick="event.stopPropagation(); addView(${m.id})">
+                        <div class="card" onclick="event.stopPropagation(); editRating(${m.id})">
                             <button class="delete-btn" onclick="event.stopPropagation(); deleteMovie(${m.id})">×</button>
-                            <img src="${m.poster}">
                             <div class="view-count-badge">👁️ ${m.views || 1}</div>
+                            <div class="rating-badge">⭐ ${m.rating || 0}</div>
+                            <img src="${m.poster}">
                             <h4>${m.title}</h4>
                         </div>`).join('')}
                 </div>`;
         }
 
         html += groups[year].singles.map(m => `
-            <div class="card" onclick="addView(${m.id})">
+            <div class="card" onclick="editRating(${m.id})">
                 <button class="delete-btn" onclick="event.stopPropagation(); deleteMovie(${m.id})">×</button>
-                <img src="${m.poster}">
                 <div class="view-count-badge">👁️ ${m.views || 1}</div>
+                <div class="rating-badge">⭐ ${m.rating || 0}</div>
+                <img src="${m.poster}">
                 <h4>${m.title}</h4>
             </div>`).join('');
         html += `</div>`;
     });
     container.innerHTML = html;
 
-    // 3. Dibujar Staff con contadores
-    const sortByCount = (a, b) => b.movies.length - a.movies.length;
-    renderPeople('directorList', directors.sort(sortByCount));
-    renderPeople('actorList', actors.sort(sortByCount));
-    renderPeople('writerList', writers.sort(sortByCount));
-    renderPeople('producerList', producers.sort(sortByCount));
+    // Ordenar Staff por nota media
+    const sortByRating = (a, b) => b.averageRating - a.averageRating || b.movieCount - a.movieCount;
+    renderPeople('directorList', directors.sort(sortByRating));
+    renderPeople('actorList', actors.sort(sortByRating));
+    renderPeople('writerList', writers.sort(sortByRating));
+    renderPeople('producerList', producers.sort(sortByRating));
 }
 
-function processStaff(list, person) {
+function processStaff(list, person, movieRating) {
     if (!person || !person.name) return;
     let existing = list.find(p => p.name === person.name);
     if (existing) {
+        existing.totalRating += movieRating;
+        existing.movieCount += 1;
+        existing.averageRating = (existing.totalRating / existing.movieCount).toFixed(1);
         if (!existing.movies.find(mov => mov.title === person.movie)) {
             existing.movies.push({ title: person.movie, poster: person.poster });
         }
     } else {
-        list.push({ name: person.name, photo: person.photo, movies: [{ title: person.movie, poster: person.poster }] });
+        list.push({ 
+            name: person.name, 
+            photo: person.photo, 
+            totalRating: movieRating, 
+            movieCount: 1, 
+            averageRating: movieRating.toFixed(1),
+            movies: [{ title: person.movie, poster: person.poster }] 
+        });
     }
 }
 
 function renderPeople(id, arr) {
     const container = document.getElementById(id);
     if (!container) return;
-    container.innerHTML = arr.map(p => `
+    container.innerHTML = arr.slice(0, 50).map(p => `
         <div class="person-card">
-            <div class="movie-count-badge">${p.movies.length}</div>
-            <img class="person-photo" src="${p.photo}" onclick="editPersonPhoto('${p.name.replace(/'/g, "")}')">
+            <div class="rating-badge">⭐ ${p.averageRating}</div>
+            <div class="movie-count-badge">${p.movieCount}</div>
+            <img class="person-photo" src="${p.photo}">
             <strong>${p.name}</strong>
             <div class="mini-posters-container">
                 ${p.movies.map(mov => `<img class="mini-poster" src="${mov.poster}" onclick="openModal('${mov.poster}')">`).join('')}
@@ -181,6 +201,18 @@ function renderPeople(id, arr) {
 }
 
 // --- FUNCIONES AUXILIARES ---
+function editRating(id) {
+    const m = myMovies.find(x => x.id === id);
+    if (m) {
+        const nuevaNota = parseFloat(prompt(`Nueva nota y vista para "${m.title}":`, m.rating));
+        if (!isNaN(nuevaNota) && nuevaNota >= 0 && nuevaNota <= 10) {
+            m.rating = nuevaNota;
+            m.views = (m.views || 0) + 1;
+            saveAndRefresh();
+        }
+    }
+}
+
 function addView(id) {
     const m = myMovies.find(x => x.id === id);
     if (m) { m.views = (m.views || 0) + 1; saveAndRefresh(); }
@@ -208,37 +240,26 @@ function exportData() {
 async function importData(event) {
     const file = event.target.files[0];
     if (!file) return;
-
     const reader = new FileReader();
     reader.onload = async (e) => {
         try {
             let importedData = JSON.parse(e.target.result);
-            
-            if (confirm(`¿Importar ${importedData.length} películas? El sistema buscará los años automáticamente.`)) {
-                
-                // --- PROCESO DE AUTOPARCHE ---
+            if (confirm(`¿Importar ${importedData.length} películas? El sistema actualizará datos faltantes.`)) {
                 for (let m of importedData) {
-                    // Si no tiene año o staff, lo buscamos en la API
                     if (!m.year || m.year === "Sin Año") {
                         try {
                             const res = await fetch(`${BASE_URL}/movie/${m.id}?api_key=${API_KEY}&language=es-ES`);
                             const data = await res.json();
                             m.year = data.release_date ? data.release_date.split('-')[0] : "Sin Año";
-                            // Aprovechamos para recuperar el género y duración si faltan
-                            if(!m.runtime) m.runtime = data.runtime;
-                            if(!m.genre) m.genre = data.genres[0]?.name || "Otros";
-                        } catch (err) { console.log("Error recuperando año de:", m.title); }
+                            if(!m.rating) m.rating = 0;
+                        } catch (err) { console.log(err); }
                     }
                 }
-
                 myMovies = importedData;
                 localStorage.setItem('myCineData', JSON.stringify(myMovies));
-                alert("¡Importación completa con años actualizados!");
-                renderAll(); // Refresca la pantalla
+                renderAll();
             }
-        } catch (err) {
-            alert("El archivo no es válido.");
-        }
+        } catch (err) { alert("Archivo no válido"); }
     };
     reader.readAsText(file);
 }
@@ -256,27 +277,6 @@ function updateStatistics() {
             data: { labels: Object.keys(data), datasets: [{ data: Object.values(data), backgroundColor: ['#e50914', '#564d4d', '#831010', '#b9090b', '#f5f5f1'] }] }
         });
     }
-}
-
-async function patchYears() {
-    console.log("Iniciando actualización de años...");
-    for (let m of myMovies) {
-        if (!m.year || m.year === "Sin Año" || m.year === "Desconocido") {
-            try {
-                const res = await fetch(`${BASE_URL}/movie/${m.id}?api_key=${API_KEY}&language=es-ES`);
-                const data = await res.json();
-                if (data.release_date) {
-                    m.year = data.release_date.split('-')[0];
-                    console.log(`Año encontrado para ${m.title}: ${m.year}`);
-                }
-            } catch (error) {
-                console.error(`Error con ${m.title}:`, error);
-            }
-        }
-    }
-    localStorage.setItem('myCineData', JSON.stringify(myMovies));
-    renderAll();
-    alert("¡Años actualizados correctamente!");
 }
 
 renderAll();
