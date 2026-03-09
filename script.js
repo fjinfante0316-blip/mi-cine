@@ -293,21 +293,52 @@ async function openMovieDetails(movieId) {
     const movie = myMovies.find(m => m.id === movieId);
     if (!movie) return;
 
-    // 1. Pedir datos extras a la API (Sinopsis y Watch Providers)
+    // 1. Pedir datos extras (Añadimos presupuesto y recaudación que vienen en el objeto base)
     const res = await fetch(`${BASE_URL}/movie/${movieId}?api_key=${API_KEY}&language=es-ES&append_to_response=watch/providers`);
     const data = await res.json();
 
-    // 2. Rellenar el modal
+    // 2. Rellenar datos básicos
     document.getElementById('detailPoster').src = movie.poster;
     document.getElementById('detailTitle').innerText = movie.title;
     document.getElementById('detailYear').innerText = movie.year;
     document.getElementById('detailRating').innerText = `⭐ ${movie.rating}/10`;
     document.getElementById('detailOverview').innerText = data.overview || "No hay sinopsis disponible.";
 
+    // --- NUEVA SECCIÓN DE TRIVIA Y FINANZAS ---
+    const triviaSection = document.getElementById('detailTrivia');
+    if (data.budget > 0 || data.revenue > 0) {
+        const profit = data.revenue - data.budget;
+        // Calculamos color de la barra: verde si hay beneficio, rojo si hay pérdida
+        const barColor = profit >= 0 ? '#4CAF50' : '#e50914';
+        
+        triviaSection.innerHTML = `
+            <h3>Datos curiosos y Finanzas</h3>
+            <div class="finance-container">
+                <div class="finance-item">
+                    <span>Presupuesto:</span>
+                    <strong>$${data.budget.toLocaleString()}</strong>
+                </div>
+                <div class="finance-item">
+                    <span>Recaudación:</span>
+                    <strong>$${data.revenue.toLocaleString()}</strong>
+                </div>
+                <div class="profit-bar-wrapper">
+                    <div class="profit-bar" style="width: 100%; background: ${barColor}; opacity: 0.8"></div>
+                </div>
+                <p class="profit-text" style="color: ${barColor}">
+                    ${profit >= 0 ? 'Ganancia estimada' : 'Pérdida estimada'}: $${Math.abs(profit).toLocaleString()}
+                </p>
+            </div>
+            ${data.tagline ? `<p class="trivia-extra">🎬 "${data.tagline}"</p>` : ''}
+        `;
+    } else {
+        triviaSection.innerHTML = data.tagline ? `<p class="trivia-extra">🎬 "${data.tagline}"</p>` : '';
+    }
+
     // 3. Procesar proveedores (ES = España)
     const providersDiv = document.getElementById('detailProviders');
     providersDiv.innerHTML = "";
-    const providers = data['watch/providers']?.results?.ES?.flatrate; // Buscamos plataformas de suscripción
+    const providers = data['watch/providers']?.results?.ES?.flatrate;
 
     if (providers && providers.length > 0) {
         providersDiv.innerHTML = providers.map(p => `
@@ -316,7 +347,7 @@ async function openMovieDetails(movieId) {
             </div>
         `).join('');
     } else {
-        providersDiv.innerText = "No disponible en plataformas de suscripción actualmente.";
+        providersDiv.innerText = "No disponible en plataformas de suscripción.";
     }
 
     modal.style.display = 'flex';
