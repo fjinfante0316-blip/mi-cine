@@ -159,8 +159,9 @@ function renderPeople(id, arr) {
         <div class="person-card">
             <div class="rating-badge">⭐ ${p.averageRating}</div>
             <div class="movie-count-badge">${p.movies.length}</div>
-            <img class="person-photo" src="${p.photo}">
-            <strong>${p.name}</strong>
+            // Busca esta línea en tu función renderPeople y actualízala:
+            <img class="person-photo" src="${p.photo}" onclick="showStaffTimeline('${p.name}')" style="cursor:pointer">
+            <strong onclick="showStaffTimeline('${p.name}')" style="cursor:pointer">${p.name}</strong>
             <div class="mini-posters-container">
                 ${p.movies.map(mov => `<img class="mini-poster" src="${mov.poster}" onclick="openModal('${mov.poster}')">`).join('')}
             </div>
