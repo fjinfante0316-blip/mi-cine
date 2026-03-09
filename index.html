@@ -101,8 +101,26 @@
         </section>
     </div>
 
-    <div id="imageModal" class="modal" onclick="this.style.display='none'">
-        <img id="imgFull" class="modal-content">
+   <div id="movieModal" class="movie-detail-modal">
+    <button class="close-detail-btn" onclick="closeMovieDetails()">×</button>
+    <div class="movie-detail-content">
+        <div class="detail-grid">
+            <img id="detailPoster" src="" alt="Poster">
+            <div class="detail-info">
+                <h2 id="detailTitle"></h2>
+                <div class="detail-meta">
+                    <span id="detailYear"></span> | 
+                    <span id="detailRating" style="color:var(--gold); font-weight:bold;"></span>
+                </div>
+                <h3>Sinopsis</h3>
+                <p id="detailOverview"></p>
+                <h3>¿Dónde ver?</h3>
+                <div id="detailProviders" class="providers-list">
+                    </div>
+            </div>
+        </div>
+    </div>
+</div>
     </div>
 
     <script src="script.js"></script>
