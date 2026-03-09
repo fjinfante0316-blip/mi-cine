@@ -126,11 +126,13 @@ function renderAll() {
 function movieCardTemplate(m) {
     return `
         <div class="card" onclick="openMovieDetails(${m.id})">
-            <button class="delete-btn" onclick="event.stopPropagation(); deleteMovie(${m.id})">×</button>
             <div class="view-count-badge">👁️ ${m.views || 1}</div>
             <div class="rating-badge">⭐ ${m.rating || 0}</div>
             <img src="${m.poster}">
-            <h4>${m.title}</h4>
+            <div class="card-footer">
+                <h4>${m.title}</h4>
+                <button class="delete-btn-new" onclick="event.stopPropagation(); deleteMovie(${m.id})">×</button>
+            </div>
         </div>`;
 }
 
