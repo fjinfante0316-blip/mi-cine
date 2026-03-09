@@ -317,3 +317,50 @@ input[type="text"] {
     .movie-detail-content { width: 95%; padding: 20px; }
     .detail-info h2 { font-size: 1.8rem; text-align: center; }
 }
+
+/* Contenedor del título y el botón de borrar */
+.card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 10px;
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: 10px;
+}
+
+/* Ajuste del título para que no choque con el botón */
+.card-footer h4 {
+    margin: 0;
+    font-size: 0.85rem;
+    text-align: left;
+    flex: 1; /* Ocupa todo el espacio disponible */
+    padding-right: 5px;
+    min-height: auto; /* Ya no necesita altura mínima fija */
+    display: block; /* Volvemos a modo bloque estándar */
+}
+
+/* El nuevo botón de borrar al lado del nombre */
+.delete-btn-new {
+    background: none;
+    border: none;
+    color: var(--grey);
+    font-size: 1.4rem;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0 5px;
+    transition: 0.3s;
+    opacity: 0.6;
+}
+
+.delete-btn-new:hover {
+    color: var(--primary);
+    opacity: 1;
+    transform: scale(1.2);
+}
+
+/* En móvil, hacemos que la X sea un poco más fácil de pulsar */
+@media (max-width: 600px) {
+    .card-footer h4 { font-size: 0.7rem; }
+    .delete-btn-new { font-size: 1.2rem; }
+}
