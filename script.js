@@ -38,19 +38,17 @@ document.getElementById('searchBtn').addEventListener('click', async () => {
 
 function filterMyMovies() {
     const term = document.getElementById('internalSearch').value.toLowerCase();
-    // Filtro para películas
     document.querySelectorAll('.movie-grid .card').forEach(card => {
         const title = card.querySelector('h4')?.innerText.toLowerCase() || "";
         card.style.display = title.includes(term) ? "flex" : "none";
     });
-    // Filtro para staff
     document.querySelectorAll('.person-card').forEach(card => {
         const name = card.querySelector('strong')?.innerText.toLowerCase() || "";
         card.style.display = name.includes(term) ? "flex" : "none";
     });
 }
 
-// --- AÑADIR PELÍCULA CON NOTA ---
+// --- AÑADIR PELÍCULA ---
 async function addMovie(id, title, posterPath) {
     if (myMovies.find(m => m.id === id)) return alert("Ya guardada");
     
@@ -71,12 +69,11 @@ async function addMovie(id, title, posterPath) {
         poster: posterFull,
         runtime: d.runtime || 0,
         genre: d.genres[0]?.name || "Otros",
-        saga: d.belongs_to_collection ? d.belongs_to_collection.name : null,
         rawStaff: {
             director: { name: c.crew.find(x => x.job === 'Director')?.name, photo: getPhoto(c.crew.find(x => x.job === 'Director')?.profile_path), movie: title, poster: posterFull },
-            actors: c.cast.map(a => ({ name: a.name, photo: getPhoto(a.profile_path), movie: title, poster: posterFull })),
-            writers: c.crew.filter(x => x.department === 'Writing').map(w => ({ name: w.name, photo: getPhoto(w.profile_path), movie: title, poster: posterFull })),
-            producers: c.crew.filter(x => x.department === 'Production').map(p => ({ name: p.name, photo: getPhoto(p.profile_path), movie: title, poster: posterFull }))
+            actors: c.cast.slice(0, 5).map(a => ({ name: a.name, photo: getPhoto(a.profile_path), movie: title, poster: posterFull })),
+            writers: c.crew.filter(x => x.department === 'Writing').slice(0, 2).map(w => ({ name: w.name, photo: getPhoto(w.profile_path), movie: title, poster: posterFull })),
+            producers: c.crew.filter(x => x.department === 'Production').slice(0, 2).map(p => ({ name: p.name, photo: getPhoto(p.profile_path), movie: title, poster: posterFull }))
         }
     });
 
@@ -85,7 +82,7 @@ async function addMovie(id, title, posterPath) {
 
 function getPhoto(path) { return path ? IMG_URL + path : 'https://via.placeholder.com/200x200?text=Sin+Foto'; }
 
-// --- RENDERIZADO POR AÑOS, SAGAS Y STAFF ---
+// --- RENDERIZADO POR AÑOS (INDIVIDUAL) ---
 function renderAll() {
     const container = document.getElementById('watchedMovies');
     if (!container) return;
@@ -96,13 +93,8 @@ function renderAll() {
 
     myMovies.forEach(m => {
         const y = m.year || "Sin Año";
-        if (!groups[y]) groups[y] = { singles: [], sagas: {} };
-        if (m.saga) {
-            if (!groups[y].sagas[m.saga]) groups[y].sagas[m.saga] = [];
-            groups[y].sagas[m.saga].push(m);
-        } else {
-            groups[y].singles.push(m);
-        }
+        if (!groups[y]) groups[y] = [];
+        groups[y].push(m);
 
         if (m.rawStaff) {
             const s = m.rawStaff;
@@ -119,22 +111,7 @@ function renderAll() {
 
     sortedYears.forEach(year => {
         html += `<div class="year-divider">${year}</div><div class="movie-grid">`;
-        for (const sagaName in groups[year].sagas) {
-            const p = groups[year].sagas[sagaName];
-            const safeName = sagaName.replace(/\s/g, "").replace(/'/g, "");
-            html += `
-                <div class="card saga-card" onclick="toggleSaga('${safeName}')">
-                    <div class="saga-stack">
-                        <img src="${p[0].poster}">
-                        <div class="movie-count-badge">${p.length}</div>
-                    </div>
-                    <h4>${sagaName}</h4>
-                </div>
-                <div id="exp-${safeName}" class="saga-expanded" style="display:none; width:100%;">
-                    ${p.map(m => movieCardTemplate(m)).join('')}
-                </div>`;
-        }
-        html += groups[year].singles.map(m => movieCardTemplate(m)).join('');
+        html += groups[year].map(m => movieCardTemplate(m)).join('');
         html += `</div>`;
     });
     container.innerHTML = html;
@@ -190,7 +167,6 @@ function renderPeople(id, arr) {
         </div>`).join('');
 }
 
-// --- EDICIÓN Y NOTAS ---
 function editRating(id) {
     const m = myMovies.find(x => x.id === id);
     if (m) {
@@ -203,17 +179,14 @@ function editRating(id) {
     }
 }
 
-// --- AUXILIARES Y ESTADÍSTICAS ---
 function saveAndRefresh() { localStorage.setItem('myCineData', JSON.stringify(myMovies)); renderAll(); }
 function openModal(url) { document.getElementById("imageModal").style.display = "flex"; document.getElementById("imgFull").src = url; }
 function deleteMovie(id) { if(confirm("¿Eliminar?")) { myMovies = myMovies.filter(m => m.id !== id); saveAndRefresh(); } }
-function toggleSaga(id) { const el = document.getElementById('exp-' + id); el.style.display = (el.style.display === 'none') ? 'flex' : 'none'; }
 
 function updateStatistics() {
     const mins = myMovies.reduce((acc, m) => acc + (parseInt(m.runtime) || 0) * (m.views || 1), 0);
     document.getElementById('statHours').innerText = `${Math.floor(mins / 60)}h ${mins % 60}m`;
     
-    // Gráfico de Géneros
     const genData = {};
     myMovies.forEach(mov => genData[mov.genre] = (genData[mov.genre] || 0) + 1);
     if (genreChart) genreChart.destroy();
@@ -222,7 +195,6 @@ function updateStatistics() {
         data: { labels: Object.keys(genData), datasets: [{ data: Object.values(genData), backgroundColor: ['#e50914', '#564d4d', '#831010', '#b9090b', '#f5f5f1'] }] }
     });
 
-    // Gráfico de Evolución de Notas
     const yearRatings = {};
     myMovies.forEach(m => {
         if (m.year && m.year !== "Sin Año") {
@@ -258,14 +230,6 @@ async function importData(event) {
     const reader = new FileReader();
     reader.onload = async (e) => {
         let imported = JSON.parse(e.target.result);
-        for (let m of imported) {
-            if (!m.year || m.year === "Sin Año") {
-                const res = await fetch(`${BASE_URL}/movie/${m.id}?api_key=${API_KEY}&language=es-ES`);
-                const d = await res.json();
-                m.year = d.release_date?.split('-')[0] || "Sin Año";
-                m.rating = m.rating || 0;
-            }
-        }
         myMovies = imported;
         saveAndRefresh();
     };
