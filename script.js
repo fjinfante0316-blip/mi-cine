@@ -4,6 +4,7 @@ const IMG_URL = 'https://image.tmdb.org/t/p/w300';
 
 let myMovies = JSON.parse(localStorage.getItem('myCineData')) || [];
 let genreChart = null;
+let ratingChart = null;
 
 // --- NAVEGACIÓN ---
 function toggleMenu() {
@@ -37,14 +38,13 @@ document.getElementById('searchBtn').addEventListener('click', async () => {
 
 function filterMyMovies() {
     const term = document.getElementById('internalSearch').value.toLowerCase();
-    const movieCards = document.querySelectorAll('.movie-grid .card');
-    movieCards.forEach(card => {
+    // Filtro para películas
+    document.querySelectorAll('.movie-grid .card').forEach(card => {
         const title = card.querySelector('h4')?.innerText.toLowerCase() || "";
         card.style.display = title.includes(term) ? "flex" : "none";
     });
-    
-    const personCards = document.querySelectorAll('.person-card');
-    personCards.forEach(card => {
+    // Filtro para staff
+    document.querySelectorAll('.person-card').forEach(card => {
         const name = card.querySelector('strong')?.innerText.toLowerCase() || "";
         card.style.display = name.includes(term) ? "flex" : "none";
     });
@@ -55,8 +55,8 @@ async function addMovie(id, title, posterPath) {
     if (myMovies.find(m => m.id === id)) return alert("Ya guardada");
     
     const nota = parseFloat(prompt(`¿Qué nota le das a "${title}"? (0-10)`, "5"));
-    if (isNaN(nota) || nota < 0 || nota > 10) return alert("Por favor, pon una nota válida del 0 al 10");
-    
+    if (isNaN(nota) || nota < 0 || nota > 10) return alert("Pon una nota válida");
+
     const dRes = await fetch(`${BASE_URL}/movie/${id}?api_key=${API_KEY}&language=es-ES`);
     const d = await dRes.json();
     const cRes = await fetch(`${BASE_URL}/movie/${id}/credits?api_key=${API_KEY}`);
@@ -85,7 +85,7 @@ async function addMovie(id, title, posterPath) {
 
 function getPhoto(path) { return path ? IMG_URL + path : 'https://via.placeholder.com/200x200?text=Sin+Foto'; }
 
-// --- RENDERIZADO POR AÑOS, SAGAS Y STAFF CON NOTA MEDIA ---
+// --- RENDERIZADO POR AÑOS, SAGAS Y STAFF ---
 function renderAll() {
     const container = document.getElementById('watchedMovies');
     if (!container) return;
@@ -106,11 +106,11 @@ function renderAll() {
 
         if (m.rawStaff) {
             const s = m.rawStaff;
-            const movieRating = m.rating || 0;
-            if (s.director) processStaff(directors, s.director, movieRating);
-            if (s.actors) s.actors.forEach(a => processStaff(actors, a, movieRating));
-            if (s.writers) s.writers.forEach(w => processStaff(writers, w, movieRating));
-            if (s.producers) s.producers.forEach(p => processStaff(producers, p, movieRating));
+            const r = m.rating || 0;
+            if (s.director) processStaff(directors, s.director, r);
+            if (s.actors) s.actors.forEach(a => processStaff(actors, a, r));
+            if (s.writers) s.writers.forEach(w => processStaff(writers, w, r));
+            if (s.producers) s.producers.forEach(p => processStaff(producers, p, r));
         }
     });
 
@@ -119,7 +119,6 @@ function renderAll() {
 
     sortedYears.forEach(year => {
         html += `<div class="year-divider">${year}</div><div class="movie-grid">`;
-
         for (const sagaName in groups[year].sagas) {
             const p = groups[year].sagas[sagaName];
             const safeName = sagaName.replace(/\s/g, "").replace(/'/g, "");
@@ -132,54 +131,45 @@ function renderAll() {
                     <h4>${sagaName}</h4>
                 </div>
                 <div id="exp-${safeName}" class="saga-expanded" style="display:none; width:100%;">
-                    ${p.map(m => `
-                        <div class="card" onclick="event.stopPropagation(); editRating(${m.id})">
-                            <button class="delete-btn" onclick="event.stopPropagation(); deleteMovie(${m.id})">×</button>
-                            <div class="view-count-badge">👁️ ${m.views || 1}</div>
-                            <div class="rating-badge">⭐ ${m.rating || 0}</div>
-                            <img src="${m.poster}">
-                            <h4>${m.title}</h4>
-                        </div>`).join('')}
+                    ${p.map(m => movieCardTemplate(m)).join('')}
                 </div>`;
         }
-
-        html += groups[year].singles.map(m => `
-            <div class="card" onclick="editRating(${m.id})">
-                <button class="delete-btn" onclick="event.stopPropagation(); deleteMovie(${m.id})">×</button>
-                <div class="view-count-badge">👁️ ${m.views || 1}</div>
-                <div class="rating-badge">⭐ ${m.rating || 0}</div>
-                <img src="${m.poster}">
-                <h4>${m.title}</h4>
-            </div>`).join('');
+        html += groups[year].singles.map(m => movieCardTemplate(m)).join('');
         html += `</div>`;
     });
     container.innerHTML = html;
 
-    // Ordenar Staff por nota media
-    const sortByRating = (a, b) => b.averageRating - a.averageRating || b.movieCount - a.movieCount;
+    const sortByRating = (a, b) => b.averageRating - a.averageRating || b.movies.length - a.movies.length;
     renderPeople('directorList', directors.sort(sortByRating));
     renderPeople('actorList', actors.sort(sortByRating));
     renderPeople('writerList', writers.sort(sortByRating));
     renderPeople('producerList', producers.sort(sortByRating));
 }
 
-function processStaff(list, person, movieRating) {
+function movieCardTemplate(m) {
+    return `
+        <div class="card" onclick="editRating(${m.id})">
+            <button class="delete-btn" onclick="event.stopPropagation(); deleteMovie(${m.id})">×</button>
+            <div class="view-count-badge">👁️ ${m.views || 1}</div>
+            <div class="rating-badge">⭐ ${m.rating || 0}</div>
+            <img src="${m.poster}">
+            <h4>${m.title}</h4>
+        </div>`;
+}
+
+function processStaff(list, person, rating) {
     if (!person || !person.name) return;
     let existing = list.find(p => p.name === person.name);
     if (existing) {
-        existing.totalRating += movieRating;
-        existing.movieCount += 1;
-        existing.averageRating = (existing.totalRating / existing.movieCount).toFixed(1);
+        existing.totalRating += rating;
         if (!existing.movies.find(mov => mov.title === person.movie)) {
             existing.movies.push({ title: person.movie, poster: person.poster });
+            existing.averageRating = (existing.totalRating / existing.movies.length).toFixed(1);
         }
     } else {
         list.push({ 
-            name: person.name, 
-            photo: person.photo, 
-            totalRating: movieRating, 
-            movieCount: 1, 
-            averageRating: movieRating.toFixed(1),
+            name: person.name, photo: person.photo, 
+            totalRating: rating, averageRating: rating.toFixed(1),
             movies: [{ title: person.movie, poster: person.poster }] 
         });
     }
@@ -191,7 +181,7 @@ function renderPeople(id, arr) {
     container.innerHTML = arr.slice(0, 50).map(p => `
         <div class="person-card">
             <div class="rating-badge">⭐ ${p.averageRating}</div>
-            <div class="movie-count-badge">${p.movieCount}</div>
+            <div class="movie-count-badge">${p.movies.length}</div>
             <img class="person-photo" src="${p.photo}">
             <strong>${p.name}</strong>
             <div class="mini-posters-container">
@@ -200,11 +190,11 @@ function renderPeople(id, arr) {
         </div>`).join('');
 }
 
-// --- FUNCIONES AUXILIARES ---
+// --- EDICIÓN Y NOTAS ---
 function editRating(id) {
     const m = myMovies.find(x => x.id === id);
     if (m) {
-        const nuevaNota = parseFloat(prompt(`Nueva nota y vista para "${m.title}":`, m.rating));
+        const nuevaNota = parseFloat(prompt(`Nueva nota para "${m.title}" (actual: ${m.rating}):`, m.rating));
         if (!isNaN(nuevaNota) && nuevaNota >= 0 && nuevaNota <= 10) {
             m.rating = nuevaNota;
             m.views = (m.views || 0) + 1;
@@ -213,21 +203,47 @@ function editRating(id) {
     }
 }
 
-function addView(id) {
-    const m = myMovies.find(x => x.id === id);
-    if (m) { m.views = (m.views || 0) + 1; saveAndRefresh(); }
-}
-
-function toggleSaga(id) {
-    const el = document.getElementById('exp-' + id);
-    el.style.display = (el.style.display === 'none') ? 'flex' : 'none';
-}
-
-function deleteMovie(id) { if(confirm("¿Eliminar?")) { myMovies = myMovies.filter(m => m.id !== id); saveAndRefresh(); } }
-
+// --- AUXILIARES Y ESTADÍSTICAS ---
 function saveAndRefresh() { localStorage.setItem('myCineData', JSON.stringify(myMovies)); renderAll(); }
-
 function openModal(url) { document.getElementById("imageModal").style.display = "flex"; document.getElementById("imgFull").src = url; }
+function deleteMovie(id) { if(confirm("¿Eliminar?")) { myMovies = myMovies.filter(m => m.id !== id); saveAndRefresh(); } }
+function toggleSaga(id) { const el = document.getElementById('exp-' + id); el.style.display = (el.style.display === 'none') ? 'flex' : 'none'; }
+
+function updateStatistics() {
+    const mins = myMovies.reduce((acc, m) => acc + (parseInt(m.runtime) || 0) * (m.views || 1), 0);
+    document.getElementById('statHours').innerText = `${Math.floor(mins / 60)}h ${mins % 60}m`;
+    
+    // Gráfico de Géneros
+    const genData = {};
+    myMovies.forEach(mov => genData[mov.genre] = (genData[mov.genre] || 0) + 1);
+    if (genreChart) genreChart.destroy();
+    genreChart = new Chart(document.getElementById('genreChart'), {
+        type: 'doughnut',
+        data: { labels: Object.keys(genData), datasets: [{ data: Object.values(genData), backgroundColor: ['#e50914', '#564d4d', '#831010', '#b9090b', '#f5f5f1'] }] }
+    });
+
+    // Gráfico de Evolución de Notas
+    const yearRatings = {};
+    myMovies.forEach(m => {
+        if (m.year && m.year !== "Sin Año") {
+            if (!yearRatings[m.year]) yearRatings[m.year] = { total: 0, count: 0 };
+            yearRatings[m.year].total += (m.rating || 0);
+            yearRatings[m.year].count += 1;
+        }
+    });
+    const sortedY = Object.keys(yearRatings).sort();
+    const avgS = sortedY.map(y => (yearRatings[y].total / yearRatings[y].count).toFixed(1));
+
+    if (ratingChart) ratingChart.destroy();
+    ratingChart = new Chart(document.getElementById('ratingHistoryChart'), {
+        type: 'line',
+        data: { 
+            labels: sortedY, 
+            datasets: [{ label: 'Nota Media', data: avgS, borderColor: '#e50914', tension: 0.3, fill: true, backgroundColor: 'rgba(229, 9, 20, 0.1)' }] 
+        },
+        options: { scales: { y: { min: 0, max: 10 } } }
+    });
+}
 
 function exportData() {
     const blob = new Blob([JSON.stringify(myMovies, null, 2)], { type: "application/json" });
@@ -239,44 +255,21 @@ function exportData() {
 
 async function importData(event) {
     const file = event.target.files[0];
-    if (!file) return;
     const reader = new FileReader();
     reader.onload = async (e) => {
-        try {
-            let importedData = JSON.parse(e.target.result);
-            if (confirm(`¿Importar ${importedData.length} películas? El sistema actualizará datos faltantes.`)) {
-                for (let m of importedData) {
-                    if (!m.year || m.year === "Sin Año") {
-                        try {
-                            const res = await fetch(`${BASE_URL}/movie/${m.id}?api_key=${API_KEY}&language=es-ES`);
-                            const data = await res.json();
-                            m.year = data.release_date ? data.release_date.split('-')[0] : "Sin Año";
-                            if(!m.rating) m.rating = 0;
-                        } catch (err) { console.log(err); }
-                    }
-                }
-                myMovies = importedData;
-                localStorage.setItem('myCineData', JSON.stringify(myMovies));
-                renderAll();
+        let imported = JSON.parse(e.target.result);
+        for (let m of imported) {
+            if (!m.year || m.year === "Sin Año") {
+                const res = await fetch(`${BASE_URL}/movie/${m.id}?api_key=${API_KEY}&language=es-ES`);
+                const d = await res.json();
+                m.year = d.release_date?.split('-')[0] || "Sin Año";
+                m.rating = m.rating || 0;
             }
-        } catch (err) { alert("Archivo no válido"); }
+        }
+        myMovies = imported;
+        saveAndRefresh();
     };
     reader.readAsText(file);
-}
-
-function updateStatistics() {
-    const mins = myMovies.reduce((acc, m) => acc + (parseInt(m.runtime) || 0) * (m.views || 1), 0);
-    document.getElementById('statHours').innerText = `${Math.floor(mins / 60)}h ${mins % 60}m`;
-    const data = {};
-    myMovies.forEach(mov => data[mov.genre] = (data[mov.genre] || 0) + 1);
-    if (genreChart) genreChart.destroy();
-    const ctx = document.getElementById('genreChart');
-    if (ctx) {
-        genreChart = new Chart(ctx, {
-            type: 'doughnut',
-            data: { labels: Object.keys(data), datasets: [{ data: Object.values(data), backgroundColor: ['#e50914', '#564d4d', '#831010', '#b9090b', '#f5f5f1'] }] }
-        });
-    }
 }
 
 renderAll();
