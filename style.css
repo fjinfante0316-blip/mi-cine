@@ -364,3 +364,99 @@ input[type="text"] {
     .card-footer h4 { font-size: 0.7rem; }
     .delete-btn-new { font-size: 1.2rem; }
 }
+
+/* --- ESTADÍSTICAS DASHBOARD --- */
+.stats-center-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 20px;
+    width: 90%;
+    max-width: 1200px;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* Tarjetas de métricas rápidas (Pelis totales, Horas, etc.) */
+.stat-card-large {
+    background: linear-gradient(145deg, #1e1e1e, #141414);
+    padding: 25px;
+    border-radius: 20px;
+    text-align: center;
+    border: 1px solid #333;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+    transition: 0.3s;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.stat-card-large:hover {
+    transform: translateY(-5px);
+    border-color: var(--primary);
+    box-shadow: 0 10px 25px rgba(229, 9, 20, 0.2);
+}
+
+.stat-card-large h3 {
+    color: var(--grey);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+}
+
+.stat-card-large .stat-value {
+    font-size: 3rem;
+    font-weight: 800;
+    color: var(--text);
+    line-height: 1;
+}
+
+.stat-card-large .stat-unit {
+    color: var(--primary);
+    font-size: 1rem;
+    margin-top: 5px;
+    font-weight: bold;
+}
+
+/* Contenedor de Gráficos */
+.charts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 25px;
+    width: 90%;
+    max-width: 1200px;
+    margin-top: 30px;
+    padding-bottom: 50px;
+}
+
+.charts {
+    background: var(--card);
+    padding: 25px;
+    border-radius: 20px;
+    border: 1px solid #333;
+    box-shadow: 0 8px 15px rgba(0,0,0,0.4);
+    height: 100%;
+}
+
+.charts h3 {
+    text-align: left;
+    margin-bottom: 25px;
+    font-size: 1.2rem;
+    color: var(--text);
+    border-left: 4px solid var(--primary);
+    padding-left: 15px;
+}
+
+/* Adaptación móvil para gráficos */
+@media (max-width: 600px) {
+    .charts-grid {
+        grid-template-columns: 1fr;
+    }
+    .stat-card-large .stat-value {
+        font-size: 2.2rem;
+    }
+    .stats-center-container {
+        grid-template-columns: 1fr 1fr; /* Dos columnas de tarjetas pequeñas en móvil */
+    }
+}
