@@ -125,7 +125,7 @@ function renderAll() {
 
 function movieCardTemplate(m) {
     return `
-        <div class="card" onclick="editRating(${m.id})">
+        <div class="card" onclick="openMovieDetails(${m.id})">
             <button class="delete-btn" onclick="event.stopPropagation(); deleteMovie(${m.id})">×</button>
             <div class="view-count-badge">👁️ ${m.views || 1}</div>
             <div class="rating-badge">⭐ ${m.rating || 0}</div>
@@ -284,6 +284,46 @@ function showStaffTimeline(name) {
 function closeTimeline() {
     document.getElementById('timelineOverlay').style.display = 'none';
     document.body.style.overflow = 'auto'; // Devuelve el scroll
+}
+
+async function openMovieDetails(movieId) {
+    const modal = document.getElementById('movieModal');
+    const movie = myMovies.find(m => m.id === movieId);
+    if (!movie) return;
+
+    // 1. Pedir datos extras a la API (Sinopsis y Watch Providers)
+    const res = await fetch(`${BASE_URL}/movie/${movieId}?api_key=${API_KEY}&language=es-ES&append_to_response=watch/providers`);
+    const data = await res.json();
+
+    // 2. Rellenar el modal
+    document.getElementById('detailPoster').src = movie.poster;
+    document.getElementById('detailTitle').innerText = movie.title;
+    document.getElementById('detailYear').innerText = movie.year;
+    document.getElementById('detailRating').innerText = `⭐ ${movie.rating}/10`;
+    document.getElementById('detailOverview').innerText = data.overview || "No hay sinopsis disponible.";
+
+    // 3. Procesar proveedores (ES = España)
+    const providersDiv = document.getElementById('detailProviders');
+    providersDiv.innerHTML = "";
+    const providers = data['watch/providers']?.results?.ES?.flatrate; // Buscamos plataformas de suscripción
+
+    if (providers && providers.length > 0) {
+        providersDiv.innerHTML = providers.map(p => `
+            <div class="provider-item">
+                <img src="https://image.tmdb.org/t/p/original${p.logo_path}" title="${p.provider_name}">
+            </div>
+        `).join('');
+    } else {
+        providersDiv.innerText = "No disponible en plataformas de suscripción actualmente.";
+    }
+
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+
+function closeMovieDetails() {
+    document.getElementById('movieModal').style.display = 'none';
+    document.body.style.overflow = 'auto';
 }
 
 renderAll();
