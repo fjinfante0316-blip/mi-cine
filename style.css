@@ -5,7 +5,7 @@
     --card: #1e1e1e;
     --text: #ffffff;
     --grey: #818181;
-    --gold: #ffcc00; /* Color para las estrellas y notas */
+    --gold: #ffcc00;
 }
 
 /* --- BASE Y CENTRADO --- */
@@ -13,8 +13,7 @@ body {
     background: var(--bg);
     color: var(--text);
     font-family: 'Segoe UI', Arial, sans-serif;
-    margin: 0;
-    padding: 0;
+    margin: 0; padding: 0;
     overflow-x: hidden;
     display: flex;
     flex-direction: column;
@@ -37,8 +36,6 @@ body {
 .sidenav a { padding: 10px 32px; text-decoration: none; font-size: 18px; color: var(--grey); display: block; transition: 0.3s; }
 .sidenav a:hover { color: white; background: rgba(255,255,255,0.05); }
 
-.closebtn { position: absolute; top: 0; right: 25px; font-size: 36px !important; margin-left: 50px; }
-
 /* --- BOTÓN MENÚ FIJO --- */
 .menu-container {
     position: fixed;
@@ -50,8 +47,6 @@ body {
     border: 1px solid #333; transition: 0.3s;
 }
 .menu-container:hover { background: var(--primary); border-color: var(--primary); }
-.menu-icon { font-size: 24px; color: white; line-height: 1; }
-.menu-text { color: white; font-weight: bold; font-size: 0.9rem; letter-spacing: 1px; }
 
 /* --- BUSCADORES --- */
 #searchSection {
@@ -60,109 +55,86 @@ body {
     padding: 100px 20px 40px; box-sizing: border-box;
 }
 .hero-center h1 { font-size: 3rem; color: var(--primary); margin-bottom: 20px; text-align: center; }
-.search-box { display: flex; width: 100%; max-width: 500px; gap: 10px; justify-content: center; }
 
 input[type="text"] {
     padding: 12px 20px; border-radius: 25px; border: 1px solid #333;
     background: #222; color: white; outline: none; transition: 0.3s;
 }
-input:focus { border-color: var(--primary); box-shadow: 0 0 8px rgba(229, 9, 20, 0.4); }
 
-.search-box button {
-    padding: 12px 25px; background: var(--primary); border: none;
-    color: white; font-weight: bold; border-radius: 25px; cursor: pointer;
-}
-
-/* --- GRIDS --- */
+/* --- GRIDS (MÁXIMA LIMPIEZA) --- */
 .movie-grid, .people-grid {
     display: flex; flex-wrap: wrap; justify-content: center;
     gap: 15px; width: 100%; max-width: 1200px; padding: 20px; box-sizing: border-box;
 }
 
-/* --- TARJETAS --- */
+/* --- TARJETAS INDIVIDUALES --- */
 .card, .person-card {
     background: var(--card);
     width: 170px; border-radius: 8px; position: relative;
     display: flex; flex-direction: column; align-items: center;
     text-align: center; padding-bottom: 10px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.5); overflow: hidden;
-    cursor: pointer; transition: transform 0.2s;
+    cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;
 }
-.card:hover { transform: scale(1.03); }
+.card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.7); }
 .card img { width: 100%; height: 250px; object-fit: cover; }
 .card h4 {
     margin: 10px 0 5px 0; font-size: 0.85rem; padding: 0 8px;
     color: var(--text); min-height: 2.5em; display: flex; align-items: center; justify-content: center;
 }
 
-/* --- BADGES (VISTAS Y NOTAS) --- */
+/* --- BADGES --- */
 .view-count-badge, .rating-badge {
-    position: absolute; top: 8px; background: rgba(0, 0, 0, 0.8);
+    position: absolute; top: 8px; background: rgba(0, 0, 0, 0.85);
     color: #fff; font-size: 0.7rem; padding: 3px 7px;
     border-radius: 5px; z-index: 10; font-weight: bold;
 }
 .view-count-badge { left: 8px; border: 1px solid var(--primary); }
-.rating-badge { 
-    right: 8px; 
-    border: 1px solid var(--gold); 
-    color: var(--gold);
+.rating-badge { right: 8px; border: 1px solid var(--gold); color: var(--gold); }
+
+/* Efecto Especial para Obras Maestras (Rating 10) */
+.card[data-rating="10"] {
+    border: 1px solid var(--gold);
+    box-shadow: 0 0 15px rgba(255, 204, 0, 0.3);
 }
 
-/* --- STAFF ESPECÍFICO --- */
-.person-card { cursor: default; }
-.person-photo { width: 90px; height: 90px; border-radius: 50%; object-fit: cover; margin-top: 15px; border: 3px solid #333; }
-.person-card strong { margin: 10px 0; font-size: 0.9rem; padding: 0 5px; }
-
-.mini-posters-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 3px; padding: 5px; }
-.mini-poster { width: 30px; height: 45px; border-radius: 2px; object-fit: cover; cursor: pointer; }
-
 /* --- ESTADÍSTICAS --- */
-.stats-center-container { display: flex; flex-direction: column; align-items: center; gap: 30px; width: 100%; padding: 20px; box-sizing: border-box; }
+.stats-center-container { display: flex; flex-direction: column; align-items: center; gap: 30px; width: 100%; padding: 20px; }
 .stat-card-large { background: var(--card); padding: 30px; border-radius: 20px; text-align: center; width: 250px; border: 1px solid #333; }
-.charts { width: 100%; max-width: 450px; background: #1a1a1a; padding: 20px; border-radius: 15px; border: 1px solid #333; }
-.charts h3 { text-align: center; margin-bottom: 20px; font-size: 1.1rem; color: var(--grey); }
+.charts { width: 100%; max-width: 500px; background: #1a1a1a; padding: 20px; border-radius: 15px; border: 1px solid #333; margin-bottom: 20px; }
 
-/* --- AÑOS Y SAGAS --- */
+/* --- SEPARADOR DE AÑOS --- */
 .year-divider {
-    width: 100%; max-width: 1100px; margin: 50px auto 20px; padding: 10px 0;
-    font-size: 2rem; font-weight: 800; color: var(--primary);
+    width: 95%; max-width: 1100px; margin: 40px auto 10px; padding: 10px 0;
+    font-size: 1.8rem; font-weight: 800; color: var(--primary);
     border-bottom: 2px solid #333; text-align: left; letter-spacing: 2px;
 }
 
-.saga-card h4 { color: var(--gold) !important; font-weight: bold; }
-.saga-expanded {
-    display: none; flex-wrap: wrap; justify-content: center; gap: 12px;
-    background: rgba(255, 255, 255, 0.03); padding: 20px; border-radius: 12px;
-    width: 95%; border: 1px dashed #444; margin: 10px auto;
-}
+/* --- PERSONAS --- */
+.person-photo { width: 90px; height: 90px; border-radius: 50%; object-fit: cover; margin-top: 15px; border: 3px solid #333; }
+.mini-posters-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 3px; padding: 5px; }
+.mini-poster { width: 30px; height: 45px; border-radius: 2px; object-fit: cover; }
 
-/* --- RESPONSIVE MÓVIL (3 COLUMNAS) --- */
+/* --- RESPONSIVE (3 COLUMNAS MÓVIL) --- */
 @media (max-width: 600px) {
     .movie-grid, .people-grid { gap: 8px; padding: 10px; }
-    .card, .person-card { width: calc(33.33% - 12px) !important; }
+    .card, .person-card { width: calc(33.33% - 10px) !important; }
     .card img { height: 140px; }
-    .card h4 { font-size: 0.65rem; min-height: 3em; }
-    .hero-center h1 { font-size: 2.2rem; }
-    .stat-card-large { width: 80%; }
-    .year-divider { font-size: 1.5rem; margin-left: 15px; width: calc(100% - 30px); }
-    
-    .person-photo { width: 60px; height: 60px; margin-top: 10px; }
-    .person-card strong { font-size: 0.7rem; }
-    .rating-badge, .view-count-badge { font-size: 0.6rem; padding: 2px 4px; top: 4px; }
-    .rating-badge { right: 4px; }
-    .view-count-badge { left: 4px; }
+    .card h4 { font-size: 0.65rem; padding: 0 3px; }
+    .year-divider { font-size: 1.4rem; margin-left: 10px; }
+    .stat-card-large { width: 200px; }
 }
 
 /* --- OTROS --- */
 .delete-btn {
     position: absolute; top: 5px; right: 5px; background: var(--primary);
     color: white; border: none; border-radius: 50%; width: 22px; height: 22px;
-    font-size: 14px; cursor: pointer; z-index: 20; opacity: 0.8;
+    font-size: 14px; cursor: pointer; z-index: 20; opacity: 0; transition: 0.2s;
 }
-.delete-btn:hover { opacity: 1; transform: scale(1.1); }
+.card:hover .delete-btn { opacity: 1; }
 
 .modal {
     display: none; position: fixed; z-index: 5000; left: 0; top: 0; width: 100%; height: 100%;
     background: rgba(0,0,0,0.95); justify-content: center; align-items: center;
 }
-.modal-content { max-width: 90%; max-height: 85%; border-radius: 10px; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
+.modal-content { max-width: 90%; max-height: 85%; border-radius: 10px; }
