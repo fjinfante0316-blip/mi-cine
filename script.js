@@ -159,7 +159,6 @@ function renderPeople(id, arr) {
         <div class="person-card">
             <div class="rating-badge">⭐ ${p.averageRating}</div>
             <div class="movie-count-badge">${p.movies.length}</div>
-            // Busca esta línea en tu función renderPeople y actualízala:
             <img class="person-photo" src="${p.photo}" onclick="showStaffTimeline('${p.name}')" style="cursor:pointer">
             <strong onclick="showStaffTimeline('${p.name}')" style="cursor:pointer">${p.name}</strong>
             <div class="mini-posters-container">
@@ -238,7 +237,7 @@ async function importData(event) {
 }
 
 function showStaffTimeline(name) {
-    // 1. Filtrar todas las películas donde aparece este artista
+    // 1. Filtrar y ordenar películas (igual que antes)
     const staffMovies = myMovies.filter(m => {
         const s = m.rawStaff;
         return s.director?.name === name || 
@@ -246,35 +245,45 @@ function showStaffTimeline(name) {
                s.writers?.some(w => w.name === name) ||
                s.producers?.some(p => p.name === name);
     });
-
-    // 2. Ordenar por año (de más antigua a más reciente)
     staffMovies.sort((a, b) => parseInt(a.year) - parseInt(b.year));
 
-    // 3. Crear el HTML de la Timeline
-    const timelineHTML = `
-        <div class="timeline-container">
-            <h2 class="timeline-title">Cronología: ${name}</h2>
-            <div class="timeline-track">
-                ${staffMovies.map(m => `
-                    <div class="timeline-item">
-                        <div class="timeline-year">${m.year}</div>
-                        <div class="timeline-dot"></div>
-                        <div class="card timeline-card">
-                            <div class="rating-badge">⭐ ${m.rating}</div>
-                            <img src="${m.poster}">
-                            <h4>${m.title}</h4>
-                        </div>
+    // 2. Crear el contenedor si no existe
+    let timelineOverlay = document.getElementById('timelineOverlay');
+    if (!timelineOverlay) {
+        timelineOverlay = document.createElement('div');
+        timelineOverlay.id = 'timelineOverlay';
+        document.body.appendChild(timelineOverlay);
+    }
+
+    // 3. Insertar contenido con el BOTÓN DE VOLVER
+    timelineOverlay.innerHTML = `
+        <div class="timeline-header">
+            <button class="back-btn" onclick="closeTimeline()">← Volver al Staff</button>
+            <h2 class="timeline-title">Evolución: ${name}</h2>
+        </div>
+        <div class="timeline-track">
+            ${staffMovies.map(m => `
+                <div class="timeline-item">
+                    <div class="timeline-year">${m.year}</div>
+                    <div class="timeline-dot"></div>
+                    <div class="card timeline-card">
+                        <div class="rating-badge">⭐ ${m.rating}</div>
+                        <img src="${m.poster}">
+                        <h4>${m.title}</h4>
                     </div>
-                `).join('')}
-            </div>
-            <button class="btn-export" onclick="showSection('staff')">Volver al Staff</button>
+                </div>
+            `).join('')}
         </div>
     `;
 
-    // 4. Mostrarlo en un contenedor (puedes usar una sección nueva o el modal)
-    const container = document.getElementById('staffDetails') || document.getElementById('main');
-    container.innerHTML = timelineHTML;
-    window.scrollTo({top: 0, behavior: 'smooth'});
+    timelineOverlay.style.display = 'block';
+    document.body.style.overflow = 'hidden'; // Bloquea el scroll del fondo
+}
+
+// Función para cerrar y volver
+function closeTimeline() {
+    document.getElementById('timelineOverlay').style.display = 'none';
+    document.body.style.overflow = 'auto'; // Devuelve el scroll
 }
 
 renderAll();
