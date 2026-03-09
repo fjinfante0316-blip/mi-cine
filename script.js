@@ -236,4 +236,44 @@ async function importData(event) {
     reader.readAsText(file);
 }
 
+function showStaffTimeline(name) {
+    // 1. Filtrar todas las películas donde aparece este artista
+    const staffMovies = myMovies.filter(m => {
+        const s = m.rawStaff;
+        return s.director?.name === name || 
+               s.actors?.some(a => a.name === name) ||
+               s.writers?.some(w => w.name === name) ||
+               s.producers?.some(p => p.name === name);
+    });
+
+    // 2. Ordenar por año (de más antigua a más reciente)
+    staffMovies.sort((a, b) => parseInt(a.year) - parseInt(b.year));
+
+    // 3. Crear el HTML de la Timeline
+    const timelineHTML = `
+        <div class="timeline-container">
+            <h2 class="timeline-title">Cronología: ${name}</h2>
+            <div class="timeline-track">
+                ${staffMovies.map(m => `
+                    <div class="timeline-item">
+                        <div class="timeline-year">${m.year}</div>
+                        <div class="timeline-dot"></div>
+                        <div class="card timeline-card">
+                            <div class="rating-badge">⭐ ${m.rating}</div>
+                            <img src="${m.poster}">
+                            <h4>${m.title}</h4>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+            <button class="btn-export" onclick="showSection('staff')">Volver al Staff</button>
+        </div>
+    `;
+
+    // 4. Mostrarlo en un contenedor (puedes usar una sección nueva o el modal)
+    const container = document.getElementById('staffDetails') || document.getElementById('main');
+    container.innerHTML = timelineHTML;
+    window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
 renderAll();
