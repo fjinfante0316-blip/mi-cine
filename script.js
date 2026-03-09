@@ -303,6 +303,7 @@ async function openMovieDetails(movieId) {
     document.getElementById('detailYear').innerText = movie.year;
     document.getElementById('detailRating').innerText = `⭐ ${movie.rating}/10`;
     document.getElementById('detailOverview').innerText = data.overview || "No hay sinopsis disponible.";
+    document.getElementById('detailTagline').innerText = data.tagline ? `"${data.tagline}"` : "";
 
     // --- NUEVA SECCIÓN DE TRIVIA Y FINANZAS ---
     const triviaSection = document.getElementById('detailTrivia');
