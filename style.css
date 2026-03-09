@@ -1,4 +1,4 @@
-/* --- VARIABLES (Sin cambios) --- */
+/* --- VARIABLES --- */
 :root {
     --primary: #e50914;
     --bg: #141414;
@@ -8,41 +8,87 @@
     --gold: #ffcc00;
 }
 
-/* --- BASE, CENTRADO Y MENÚ (Mantener correcciones anteriores) --- */
+/* --- BASE Y CENTRADO --- */
 body {
-    background: var(--bg); color: var(--text);
+    background: var(--bg);
+    color: var(--text);
     font-family: 'Segoe UI', Arial, sans-serif;
-    margin: 0; padding: 0; overflow-x: hidden;
-    display: flex; flex-direction: column; align-items: center;
+    margin: 0; padding: 0;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-#main { width: 100%; display: flex; flex-direction: column; align-items: center; }
+#main {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
 
+/* --- CORRECCIÓN DE SECCIONES (EVITA QUE EL MENÚ TAPE TÍTULOS) --- */
 .content-section {
-    padding-top: 110px; /* Corrección para que el menú no tape títulos */
-    width: 100%; box-sizing: border-box;
-    display: flex; flex-direction: column; align-items: center;
+    padding-top: 100px; /* Espacio extra para que el botón fijo no tape nada */
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
+/* Títulos de sección (Reparto, Productores, etc.) */
 .section-title {
-    text-align: center; width: 100%; font-size: 2.2rem;
-    margin: 40px 0 20px; color: var(--primary);
-    text-transform: uppercase; letter-spacing: 2px;
+    text-align: center;
+    width: 100%;
+    font-size: 2.2rem;
+    margin: 40px 0 20px;
+    color: var(--primary);
+    text-transform: uppercase;
+    letter-spacing: 2px;
 }
 
+/* --- MENÚ LATERAL --- */
+.sidenav {
+    height: 100%; width: 0; position: fixed; z-index: 3000;
+    top: 0; left: 0; background: #111; overflow-x: hidden;
+    transition: 0.5s; padding-top: 20px;
+}
+.sidenav a { padding: 10px 32px; text-decoration: none; font-size: 18px; color: var(--grey); display: block; transition: 0.3s; }
+.sidenav a:hover { color: white; background: rgba(255,255,255,0.05); }
+
+/* --- BOTÓN MENÚ FIJO (MODERNIZADO) --- */
 .menu-container {
-    position: fixed; top: 15px; left: 15px;
+    position: fixed;
+    top: 15px; left: 15px;
     display: flex; align-items: center; gap: 10px;
     cursor: pointer; z-index: 2000;
     background: rgba(20, 20, 20, 0.95);
-    backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px); /* Efecto cristal pro */
     padding: 8px 18px; border-radius: 30px;
     border: 1px solid #333; transition: 0.3s;
 }
-.menu-container:hover { background: var(--primary); border-color: var(--primary); }
+.menu-container:hover { background: var(--primary); border-color: var(--primary); transform: scale(1.05); }
 
-/* --- TARJETAS DE PELÍCULAS (Siguen siendo rectangulares) --- */
-.card {
+/* --- BUSCADORES --- */
+#searchSection {
+    padding-top: 120px; /* Más espacio en la búsqueda principal */
+}
+.hero-center h1 { font-size: 3rem; color: var(--primary); margin-bottom: 20px; text-align: center; }
+
+input[type="text"] {
+    padding: 12px 20px; border-radius: 25px; border: 1px solid #333;
+    background: #222; color: white; outline: none; transition: 0.3s;
+}
+
+/* --- GRIDS --- */
+.movie-grid, .people-grid {
+    display: flex; flex-wrap: wrap; justify-content: center;
+    gap: 15px; width: 100%; max-width: 1200px; padding: 20px; box-sizing: border-box;
+}
+
+/* --- TARJETAS --- */
+.card, .person-card {
     background: var(--card);
     width: 170px; border-radius: 8px; position: relative;
     display: flex; flex-direction: column; align-items: center;
@@ -57,7 +103,7 @@ body {
     color: var(--text); min-height: 2.5em; display: flex; align-items: center; justify-content: center;
 }
 
-/* --- BADGES (Vistas y Notas) --- */
+/* --- BADGES --- */
 .view-count-badge, .rating-badge {
     position: absolute; top: 8px; background: rgba(0, 0, 0, 0.85);
     color: #fff; font-size: 0.7rem; padding: 3px 7px;
@@ -101,63 +147,98 @@ body {
 .mini-posters-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; padding: 5px; }
 .mini-poster { width: 35px; height: 50px; border-radius: 3px; object-fit: cover; border: 1px solid #222; }
 
-/* --- SEPARADOR DE AÑOS Y TIMELINE (Mantener correcciones) --- */
+/* --- SEPARADOR DE AÑOS --- */
 .year-divider {
     width: 95%; max-width: 1100px; margin: 50px auto 15px; padding: 10px 0;
     font-size: 2rem; font-weight: 800; color: var(--primary);
     border-bottom: 2px solid #333; text-align: left; letter-spacing: 2px;
 }
 
+/* --- TIMELINE (CORREGIDA) --- */
 #timelineOverlay {
-    display: none; position: fixed; top: 0; left: 0;
-    width: 100%; height: 100%; background: var(--bg);
-    z-index: 4000; overflow-y: auto; padding: 20px;
-    box-sizing: border-box; animation: fadeIn 0.3s ease;
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: var(--bg);
+    z-index: 4000;
+    overflow-y: auto;
+    padding: 20px;
+    box-sizing: border-box;
+    animation: fadeIn 0.3s ease;
 }
 
 .timeline-header {
-    display: flex; flex-direction: column; align-items: center;
-    padding-top: 90px; margin-bottom: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 80px; /* Para que el título de la cronología no se pierda */
+    margin-bottom: 40px;
 }
 
+/* Botón de volver a la DERECHA para que no choque con el de menú */
 .back-btn {
-    position: fixed; top: 20px; right: 20px; /* Corrección de posición */
-    background: var(--primary); color: white; border: none;
-    padding: 12px 25px; border-radius: 30px; cursor: pointer;
-    font-weight: bold; z-index: 4500;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.5); transition: 0.3s;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-weight: bold;
+    z-index: 4500;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    transition: 0.3s;
 }
 .back-btn:hover { transform: scale(1.1); background: #ff0000; }
 
 .timeline-track {
-    display: flex; flex-wrap: nowrap; overflow-x: auto;
-    padding: 60px 20px; gap: 30px; border-top: 2px solid #333;
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding: 60px 20px;
+    gap: 30px;
+    border-top: 2px solid #333;
     min-height: 400px;
 }
 
-.timeline-item { display: flex; flex-direction: column; align-items: center; min-width: 180px; }
-.timeline-year { font-weight: bold; font-size: 1.4rem; color: var(--gold); margin-bottom: 15px; }
+.timeline-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 180px;
+}
+
+.timeline-year {
+    font-weight: bold;
+    font-size: 1.4rem;
+    color: var(--gold);
+    margin-bottom: 15px;
+}
+
 .timeline-dot {
-    width: 14px; height: 14px; background: var(--primary);
-    border-radius: 50%; margin-bottom: 25px;
-    position: relative; top: -68px;
+    width: 14px; height: 14px;
+    background: var(--primary);
+    border-radius: 50%;
+    margin-bottom: 25px;
+    position: relative;
+    top: -68px; /* Ajuste preciso sobre la línea */
     box-shadow: 0 0 10px var(--primary);
 }
 
 /* --- RESPONSIVE --- */
 @media (max-width: 600px) {
-    .content-section { padding-top: 90px; }
-    .card { width: calc(33.33% - 10px) !important; }
+    .content-section { padding-top: 80px; }
+    .card, .person-card { width: calc(33.33% - 10px) !important; }
     .card img { height: 140px; }
-    .card h4 { font-size: 0.65rem; }
-    
-    /* Responsive para fotos redondas */
-    .person-card { width: calc(50% - 20px) !important; } /* 2 columnas de staff en móvil */
-    .person-photo { width: 90px; height: 90px; }
-    .person-card strong { font-size: 0.8rem; }
-    
+    .section-title { font-size: 1.5rem; }
     .year-divider { font-size: 1.4rem; }
     .back-btn { padding: 8px 15px; font-size: 0.8rem; top: 15px; right: 15px; }
 }
 
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
