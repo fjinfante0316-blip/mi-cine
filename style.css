@@ -991,3 +991,113 @@ input[type="text"] {
     font-weight: bold;
 
     margin: 0;
+
+    /* --- CONTENEDOR STAFF (LISTA VERTICAL) --- */
+.people-grid {
+    display: flex;
+    flex-direction: column; /* Un actor debajo de otro */
+    gap: 15px;
+    padding: 20px;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* --- FILA DE STAFF (FILMOGRAFÍA) --- */
+.person-card {
+    display: flex;
+    align-items: center;
+    background: #1a1a1a;
+    border-radius: 12px;
+    overflow: hidden;
+    height: 150px; /* Altura fija para que sea uniforme */
+    border: 1px solid #333;
+    transition: 0.3s;
+}
+
+.person-card:hover {
+    border-color: var(--primary);
+    background: #222;
+}
+
+/* Bloque del Artista (Izquierda) */
+.person-info-block {
+    min-width: 160px;
+    max-width: 160px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background: rgba(0,0,0,0.3);
+    border-right: 1px solid #333;
+    padding: 10px;
+    cursor: pointer;
+}
+
+.person-photo {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%; /* Fotos redondas para el staff en este modo */
+    object-fit: cover;
+    margin-bottom: 8px;
+    border: 2px solid #444;
+}
+
+.person-info-block strong {
+    font-size: 0.9rem;
+    line-height: 1.2;
+    color: var(--text);
+}
+
+.person-info-block .staff-avg-badge {
+    margin-top: 5px;
+    font-size: 0.7rem;
+    background: var(--gold);
+    color: #000;
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-weight: bold;
+}
+
+/* Contenedor de Películas (Derecha con Scroll) */
+.person-movies-block {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    overflow-x: auto; /* Permite deslizar a la derecha */
+    align-items: center;
+    gap: 12px;
+    padding: 0 20px;
+    height: 100%;
+    scroll-behavior: smooth;
+}
+
+/* Quitar barra de scroll visualmente */
+.person-movies-block::-webkit-scrollbar { height: 4px; }
+.person-movies-block::-webkit-scrollbar-thumb { background: #444; border-radius: 10px; }
+
+/* Mini Posters */
+.mini-poster {
+    min-width: 80px;
+    height: 110px;
+    border-radius: 6px;
+    object-fit: cover;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.mini-poster:hover {
+    transform: scale(1.1);
+    z-index: 10;
+}
+
+/* Ajuste móvil */
+@media (max-width: 600px) {
+    .person-info-block { min-width: 120px; max-width: 120px; }
+    .person-photo { width: 50px; height: 50px; }
+    .person-card { height: 130px; }
+    .mini-poster { min-width: 65px; height: 90px; }
+}
