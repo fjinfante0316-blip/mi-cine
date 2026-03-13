@@ -27,9 +27,9 @@ body {
     align-items: center;
 }
 
-/* --- CORRECCIÓN DE SECCIONES (EVITA QUE EL MENÚ TAPE TÍTULOS) --- */
+/* --- CORRECCIÓN DE SECCIONES --- */
 .content-section {
-    padding-top: 100px; /* Espacio extra para que el botón fijo no tape nada */
+    padding-top: 100px;
     width: 100%;
     box-sizing: border-box;
     display: flex;
@@ -37,12 +37,15 @@ body {
     align-items: center;
 }
 
-/* Títulos de sección (Reparto, Productores, etc.) */
 .section-title {
+    width: 100%;
+    max-width: 1200px;
     text-align: left;
-    padding-left: 45px;
+    padding-left: 20px;
     font-size: 1.8rem;
-    margin-top: 60px;
+    margin-top: 40px;
+    border-left: 5px solid var(--primary);
+    box-sizing: border-box;
 }
 
 /* --- MENÚ LATERAL --- */
@@ -54,38 +57,25 @@ body {
 .sidenav a { padding: 10px 32px; text-decoration: none; font-size: 18px; color: var(--grey); display: block; transition: 0.3s; }
 .sidenav a:hover { color: white; background: rgba(255,255,255,0.05); }
 
-/* --- BOTÓN MENÚ FIJO (MODERNIZADO) --- */
 .menu-container {
     position: fixed;
     top: 15px; left: 15px;
     display: flex; align-items: center; gap: 10px;
     cursor: pointer; z-index: 2000;
     background: rgba(20, 20, 20, 0.95);
-    backdrop-filter: blur(8px); /* Efecto cristal pro */
+    backdrop-filter: blur(8px);
     padding: 8px 18px; border-radius: 30px;
     border: 1px solid #333; transition: 0.3s;
 }
 .menu-container:hover { background: var(--primary); border-color: var(--primary); transform: scale(1.05); }
 
-/* --- BUSCADORES --- */
-#searchSection {
-    padding-top: 120px; /* Más espacio en la búsqueda principal */
-}
-.hero-center h1 { font-size: 3rem; color: var(--primary); margin-bottom: 20px; text-align: center; }
-
-input[type="text"] {
-    padding: 12px 20px; border-radius: 25px; border: 1px solid #333;
-    background: #222; color: white; outline: none; transition: 0.3s;
-}
-
-/* --- GRIDS --- */
-.movie-grid, .people-grid {
+/* --- GRIDS Y CARDS DE PELÍCULAS --- */
+.movie-grid {
     display: flex; flex-wrap: wrap; justify-content: center;
     gap: 15px; width: 100%; max-width: 1200px; padding: 20px; box-sizing: border-box;
 }
 
-/* --- TARJETAS --- */
-.card, .person-card {
+.card {
     background: var(--card);
     width: 170px; border-radius: 8px; position: relative;
     display: flex; flex-direction: column; align-items: center;
@@ -95,39 +85,39 @@ input[type="text"] {
 }
 .card:hover { transform: translateY(-8px); box-shadow: 0 10px 25px rgba(0,0,0,0.8); }
 .card img { width: 100%; height: 250px; object-fit: cover; }
-.card h4 {
-    margin: 10px 0 5px 0; font-size: 0.85rem; padding: 0 8px;
-    color: var(--text); min-height: 2.5em; display: flex; align-items: center; justify-content: center;
-}
 
-/* --- BADGES --- */
-.view-count-badge, .rating-badge {
-    position: absolute; top: 8px; background: rgba(0, 0, 0, 0.85);
-    color: #fff; font-size: 0.7rem; padding: 3px 7px;
-    border-radius: 5px; z-index: 10; font-weight: bold;
-}
-.view-count-badge { left: 8px; border: 1px solid var(--primary); }
-.rating-badge { right: 8px; border: 1px solid var(--gold); color: var(--gold); }
-
-/* --- PERSONAS Y STAFF (FOTOS REDONDAS RESTAURADAS) --- */
+/* --- STAFF: CARRUSEL LATERAL --- */
 .people-grid {
-    display: flex; flex-wrap: wrap; justify-content: center;
-    gap: 20px; padding: 20px;
+    display: flex;
+    flex-direction: row; 
+    overflow-x: auto; 
+    overflow-y: hidden;
+    gap: 25px;
+    padding: 20px 40px;
+    width: 100%;
+    max-width: 1400px;
+    box-sizing: border-box;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
 }
+
+.people-grid::-webkit-scrollbar { height: 6px; }
+.people-grid::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+.people-grid::-webkit-scrollbar-thumb:hover { background: var(--primary); }
 
 .person-card {
-    background: none; /* Eliminamos el fondo de tarjeta para un look más limpio */
-    width: 140px; /* Un poco más estrechas */
+    min-width: 140px;
+    flex-shrink: 0;
     display: flex; flex-direction: column; align-items: center;
     text-align: center; cursor: pointer;
     position: relative; transition: 0.3s;
+    background: none; padding-bottom: 10px;
 }
 .person-card:hover { transform: scale(1.05); }
 
-/* La foto redonda */
 .person-photo {
     width: 120px; height: 120px;
-    border-radius: 50%; /* ESTA ES LA LÍNEA CLAVE */
+    border-radius: 50%;
     object-fit: cover;
     border: 4px solid #333;
     box-shadow: 0 4px 10px rgba(0,0,0,0.5);
@@ -136,406 +126,72 @@ input[type="text"] {
 .person-card:hover .person-photo { border-color: var(--primary); box-shadow: 0 0 15px rgba(229, 9, 20, 0.5); }
 
 .person-card strong {
-    margin: 15px 0 5px; font-size: 0.95rem;
+    margin: 12px 0 2px; font-size: 0.95rem;
     color: var(--text); font-weight: 600;
 }
 
-/* Mini posters debajo de la persona (opcional, si los usas) */
-.mini-posters-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; padding: 5px; }
-.mini-poster { width: 35px; height: 50px; border-radius: 3px; object-fit: cover; border: 1px solid #222; }
-
-/* --- SEPARADOR DE AÑOS --- */
-.year-divider {
-    width: 95%; max-width: 1100px; margin: 50px auto 15px; padding: 10px 0;
-    font-size: 2rem; font-weight: 800; color: var(--primary);
-    border-bottom: 2px solid #333; text-align: left; letter-spacing: 2px;
+/* --- BADGES (MÉTRICAS) --- */
+.view-count-badge, .rating-badge, .movie-count-badge {
+    position: absolute; background: rgba(0, 0, 0, 0.85);
+    color: #fff; font-size: 0.7rem; padding: 3px 7px;
+    border-radius: 5px; z-index: 10; font-weight: bold;
 }
+.view-count-badge { top: 8px; left: 8px; border: 1px solid var(--primary); }
+.rating-badge { top: 8px; right: 8px; border: 1px solid var(--gold); color: var(--gold); }
+.movie-count-badge { top: 8px; left: 8px; border: 1px solid var(--text); }
 
-/* --- TIMELINE (CORREGIDA) --- */
-#timelineOverlay {
-    display: none;
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: var(--bg);
-    z-index: 4000;
-    overflow-y: auto;
-    padding: 20px;
-    box-sizing: border-box;
-    animation: fadeIn 0.3s ease;
-}
-
-.timeline-header {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding-top: 80px; /* Para que el título de la cronología no se pierda */
-    margin-bottom: 40px;
-}
-
-/* Botón de volver a la DERECHA para que no choque con el de menú */
-.back-btn {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background: var(--primary);
-    color: white;
-    border: none;
-    padding: 12px 25px;
-    border-radius: 30px;
-    cursor: pointer;
-    font-weight: bold;
-    z-index: 4500;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-    transition: 0.3s;
-}
-.back-btn:hover { transform: scale(1.1); background: #ff0000; }
-
-.timeline-track {
-    display: flex;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    padding: 60px 20px;
-    gap: 30px;
-    border-top: 2px solid #333;
-    min-height: 400px;
-}
-
-.timeline-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-width: 180px;
-}
-
-.timeline-year {
-    font-weight: bold;
-    font-size: 1.4rem;
-    color: var(--gold);
-    margin-bottom: 15px;
-}
-
-.timeline-dot {
-    width: 14px; height: 14px;
-    background: var(--primary);
-    border-radius: 50%;
-    margin-bottom: 25px;
-    position: relative;
-    top: -68px; /* Ajuste preciso sobre la línea */
-    box-shadow: 0 0 10px var(--primary);
-}
-
-/* --- RESPONSIVE --- */
-@media (max-width: 600px) {
-    .content-section { padding-top: 80px; }
-    .card, .person-card { width: calc(33.33% - 10px) !important; }
-    .card img { height: 140px; }
-    .section-title { font-size: 1.5rem; }
-    .year-divider { font-size: 1.4rem; }
-    .back-btn { padding: 8px 15px; font-size: 0.8rem; top: 15px; right: 15px; }
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-.movie-detail-modal {
-    display: none;
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: rgba(0, 0, 0, 0.95);
-    z-index: 5000;
-    justify-content: center;
-    align-items: center;
-    backdrop-filter: blur(10px);
-}
-
-.movie-detail-content {
-    background: #181818;
-    width: 90%;
-    max-width: 900px;
-    max-height: 85vh;
-    border-radius: 15px;
-    overflow-y: auto;
-    position: relative;
-    padding: 30px;
-    box-shadow: 0 0 30px rgba(0,0,0,0.5);
-}
-
-.detail-grid {
-    display: grid;
-    grid-template-columns: 300px 1fr;
-    gap: 30px;
-}
-
-#detailPoster {
-    width: 100%;
-    border-radius: 10px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-}
-
-.detail-info h2 { font-size: 2.5rem; margin-top: 0; color: var(--primary); }
-.detail-meta { margin-bottom: 20px; color: var(--grey); }
-.detail-info h3 { color: var(--gold); margin-top: 20px; font-size: 1.1rem; }
-.detail-info p { line-height: 1.6; color: #ccc; }
-
-.providers-list {
-    display: flex;
-    gap: 15px;
-    margin-top: 10px;
-}
-
-.provider-item img {
-    width: 45px;
-    height: 45px;
-    border-radius: 8px;
-}
-
-.close-detail-btn {
-    position: absolute;
-    top: 20px;
-    right: 30px;
-    background: none;
-    border: none;
-    color: white;
-    font-size: 3rem;
-    cursor: pointer;
-    z-index: 5100;
-    transition: 0.3s;
-}
-.close-detail-btn:hover { color: var(--primary); transform: rotate(90deg); }
-
-/* Adaptación móvil */
-@media (max-width: 700px) {
-    .detail-grid { grid-template-columns: 1fr; }
-    #detailPoster { width: 200px; margin: 0 auto; }
-    .movie-detail-content { width: 95%; padding: 20px; }
-    .detail-info h2 { font-size: 1.8rem; text-align: center; }
-}
-
-/* Contenedor del título y el botón de borrar */
-.card-footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 10px;
-    width: 100%;
-    box-sizing: border-box;
-    margin-top: 10px;
-}
-
-/* Ajuste del título para que no choque con el botón */
-.card-footer h4 {
-    margin: 0;
-    font-size: 0.85rem;
-    text-align: left;
-    flex: 1; /* Ocupa todo el espacio disponible */
-    padding-right: 5px;
-    min-height: auto; /* Ya no necesita altura mínima fija */
-    display: block; /* Volvemos a modo bloque estándar */
-}
-
-/* El nuevo botón de borrar al lado del nombre */
-.delete-btn-new {
-    background: none;
-    border: none;
-    color: var(--grey);
-    font-size: 1.4rem;
-    cursor: pointer;
-    line-height: 1;
-    padding: 0 5px;
-    transition: 0.3s;
-    opacity: 0.6;
-}
-
-.delete-btn-new:hover {
-    color: var(--primary);
-    opacity: 1;
-    transform: scale(1.2);
-}
-
-/* En móvil, hacemos que la X sea un poco más fácil de pulsar */
-@media (max-width: 600px) {
-    .card-footer h4 { font-size: 0.7rem; }
-    .delete-btn-new { font-size: 1.2rem; }
-}
-
-/* --- ESTADÍSTICAS DASHBOARD --- */
-.stats-center-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 20px;
-    width: 90%;
-    max-width: 1200px;
-    padding: 20px;
-    box-sizing: border-box;
-}
-
-/* Tarjetas de métricas rápidas (Pelis totales, Horas, etc.) */
-.stat-card-large {
-    background: linear-gradient(145deg, #1e1e1e, #141414);
-    padding: 25px;
-    border-radius: 20px;
-    text-align: center;
-    border: 1px solid #333;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
-    transition: 0.3s;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-}
-
-.stat-card-large:hover {
-    transform: translateY(-5px);
-    border-color: var(--primary);
-    box-shadow: 0 10px 25px rgba(229, 9, 20, 0.2);
-}
-
-.stat-card-large h3 {
-    color: var(--grey);
-    font-size: 0.9rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 10px;
-}
-
-.stat-card-large .stat-value {
-    font-size: 3rem;
-    font-weight: 800;
-    color: var(--text);
-    line-height: 1;
-}
-
-.stat-card-large .stat-unit {
-    color: var(--primary);
-    font-size: 1rem;
-    margin-top: 5px;
-    font-weight: bold;
-}
-
-/* Contenedor de Gráficos */
-.charts-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-    gap: 25px;
-    width: 90%;
-    max-width: 1200px;
-    margin-top: 30px;
-    padding-bottom: 50px;
-}
-
-.charts {
-    background: var(--card);
-    padding: 25px;
-    border-radius: 20px;
-    border: 1px solid #333;
-    box-shadow: 0 8px 15px rgba(0,0,0,0.4);
-    height: 100%;
-}
-
-.charts h3 {
-    text-align: left;
-    margin-bottom: 25px;
-    font-size: 1.2rem;
-    color: var(--text);
-    border-left: 4px solid var(--primary);
-    padding-left: 15px;
-}
-
-/* Adaptación móvil para gráficos */
-@media (max-width: 600px) {
-    .charts-grid {
-        grid-template-columns: 1fr;
-    }
-    .stat-card-large .stat-value {
-        font-size: 2.2rem;
-    }
-    .stats-center-container {
-        grid-template-columns: 1fr 1fr; /* Dos columnas de tarjetas pequeñas en móvil */
-    }
-}
-
-/* --- ESTILOS DE TRIVIA Y FINANZAS --- */
-.finance-container {
-    background: #222;
-    padding: 15px;
-    border-radius: 10px;
-    margin-top: 15px;
-    border-left: 4px solid var(--gold);
-}
-
-.finance-item {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 8px;
-    font-size: 0.9rem;
-}
-
-.finance-item span { color: var(--grey); }
-
-.profit-bar-wrapper {
-    width: 100%;
-    height: 10px;
-    background: #333;
-    border-radius: 5px;
-    margin: 15px 0 5px;
-    overflow: hidden;
-}
-
-.profit-bar {
-    height: 100%;
-    transition: width 1s ease-in-out;
-}
-
-.profit-text {
-    font-size: 0.8rem;
-    text-align: right;
-    font-weight: bold;
-    margin: 0;
-}
-
-.trivia-extra {
-    font-style: italic;
-    font-size: 0.9rem;
-    margin-top: 15px;
-    color: var(--gold);
-}
-
-/* --- PANELES LATERALES DE STAFF --- */
-.people-grid {
-    display: flex;
-    flex-direction: row; /* Fuerza el orden horizontal */
-    overflow-x: auto;    /* Permite el scroll lateral */
-    overflow-y: hidden;
-    gap: 25px;
-    padding: 20px 40px;
-    width: 100%;
-    box-sizing: border-box;
-    scroll-behavior: smooth;
-    -webkit-overflow-scrolling: touch; /* Scroll suave en móviles */
-}
-
-/* Estilo para la barra de scroll del staff */
-.people-grid::-webkit-scrollbar { height: 6px; }
-.people-grid::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
-.people-grid::-webkit-scrollbar-thumb:hover { background: var(--primary); }
-
-.person-card {
-    min-width: 130px; /* Evita que las fotos se aplasten */
-    flex-shrink: 0;   /* Mantiene el tamaño en el flexbox */
-}
-
-/* Badge de Nota Media del Artista */
 .staff-avg-badge {
     background: var(--gold);
     color: #000;
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     font-weight: bold;
     padding: 2px 8px;
     border-radius: 10px;
     margin-top: 5px;
-    box-shadow: 0 0 10px rgba(255, 204, 0, 0.3);
+}
+
+/* --- TRIVIA Y FINANZAS EN MODAL --- */
+.finance-container {
+    background: #222;
+    padding: 15px;
+    border-radius: 10px;
+    margin: 20px 0;
+    border-left: 4px solid var(--gold);
+}
+.finance-item {
+    display: flex; justify-content: space-between;
+    margin-bottom: 8px; font-size: 0.9rem;
+}
+.finance-item span { color: var(--grey); }
+.profit-bar-wrapper {
+    width: 100%; height: 8px; background: #333;
+    border-radius: 4px; margin: 12px 0 5px; overflow: hidden;
+}
+.profit-bar { height: 100%; transition: width 1s ease; }
+.profit-text { font-size: 0.85rem; text-align: right; font-weight: bold; }
+
+/* --- MODAL DETALLES --- */
+.movie-detail-modal {
+    display: none; position: fixed; top: 0; left: 0;
+    width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95);
+    z-index: 5000; justify-content: center; align-items: center;
+    backdrop-filter: blur(10px);
+}
+.movie-detail-content {
+    background: #181818; width: 90%; max-width: 900px;
+    max-height: 85vh; border-radius: 15px; overflow-y: auto;
+    position: relative; padding: 40px; box-shadow: 0 0 30px rgba(0,0,0,0.5);
+}
+.detail-grid { display: grid; grid-template-columns: 300px 1fr; gap: 30px; }
+#detailPoster { width: 100%; border-radius: 10px; }
+.detail-info h2 { font-size: 2.5rem; margin: 0; color: var(--primary); }
+.detail-info h3 { color: var(--gold); margin: 25px 0 10px; font-size: 1.1rem; border-bottom: 1px solid #333; padding-bottom: 5px; }
+
+/* --- RESPONSIVE --- */
+@media (max-width: 700px) {
+    .detail-grid { grid-template-columns: 1fr; }
+    #detailPoster { width: 180px; margin: 0 auto; }
+    .movie-detail-content { padding: 20px; }
+    .card { width: calc(50% - 20px); } /* 2 por fila en móvil */
+    .person-card { min-width: 120px; }
 }
