@@ -166,23 +166,33 @@ function renderPeople(id, arr) {
     const container = document.getElementById(id);
     if (!container) return;
     
-    container.innerHTML = arr.slice(0, 50).map(p => {
+    // Limpiamos y aseguramos que no haya scroll horizontal
+    container.style.overflowX = "hidden";
+    
+    container.innerHTML = arr.slice(0, 30).map(p => {
         return `
         <div class="person-card">
-            <div class="movie-count-badge">${p.movies.length} Pelis</div>
+            <div class="person-info-block">
+                <img class="person-photo" src="${p.photo}" 
+                     onclick="showStaffTimeline('${p.name}')" 
+                     alt="${p.name}">
+                <strong onclick="showStaffTimeline('${p.name}')">${p.name}</strong>
+                <div class="staff-avg-badge">⭐ ${p.averageRating}</div>
+                <small style="color:var(--grey); margin-top:5px;">${p.movies.length} obras</small>
+            </div>
             
-            <img class="person-photo" src="${p.photo}" 
-                 onclick="showStaffTimeline('${p.name}')" 
-                 alt="${p.name}">
-            
-            <strong onclick="showStaffTimeline('${p.name}')">${p.name}</strong>
-            
-            <div class="staff-avg-badge">⭐ Media: ${p.averageRating}</div>
-            
-            <div class="mini-posters-container">
-                ${p.movies.slice(0, 4).map(mov => `
-                    <img class="mini-poster" src="${mov.poster}" title="${mov.title}">
-                `).join('')}
+            <div class="person-movies-block">
+                <h5>Filmografía en mi lista:</h5>
+                ${p.movies.map(mov => {
+                    // Buscamos el ID original de la película para que el clic funcione
+                    const movieData = myMovies.find(m => m.title === mov.title);
+                    return `
+                        <img class="mini-poster" 
+                             src="${mov.poster}" 
+                             title="${mov.title}" 
+                             onclick="openMovieDetails(${movieData ? movieData.id : 0})">
+                    `;
+                }).join('')}
             </div>
         </div>`;
     }).join('');
