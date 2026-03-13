@@ -166,11 +166,10 @@ function renderPeople(id, arr) {
     const container = document.getElementById(id);
     if (!container) return;
     
-    // Mostramos los 40 con mejor nota media
-    container.innerHTML = arr.slice(0, 40).map(p => {
+    container.innerHTML = arr.slice(0, 45).map(p => {
         return `
-        <div class="person-card">
-            <div class="person-info-block" onclick="showStaffTimeline('${p.name}')">
+        <div class="person-card" onclick="showStaffTimeline('${p.name}')">
+            <div class="person-info-block">
                 <img class="person-photo" src="${p.photo}" alt="${p.name}">
                 <strong>${p.name}</strong>
                 <div class="staff-avg-badge">⭐ ${p.averageRating}</div>
@@ -178,16 +177,8 @@ function renderPeople(id, arr) {
             
             <div class="person-movies-block">
                 ${p.movies.map(mov => {
-                    // Buscamos el ID original de la peli para poder abrir su modal
                     const movieFull = myMovies.find(m => m.title === mov.title);
-                    const movieID = movieFull ? movieFull.id : null;
-                    
-                    return `
-                        <img class="mini-poster" 
-                             src="${mov.poster}" 
-                             title="${mov.title}" 
-                             onclick="openMovieDetails(${movieID})">
-                    `;
+                    return `<img class="mini-poster" src="${mov.poster}" title="${mov.title}">`;
                 }).join('')}
             </div>
         </div>`;
