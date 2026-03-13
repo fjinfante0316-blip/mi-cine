@@ -1101,3 +1101,62 @@ input[type="text"] {
     .person-card { height: 130px; }
     .mini-poster { min-width: 65px; height: 90px; }
 }
+
+/* --- AJUSTES PARA MÓVIL (FILAS DE 3) --- */
+@media (max-width: 700px) {
+    /* Contenedor de staff en móvil */
+    .people-grid {
+        display: grid; 
+        /* Creamos 3 columnas iguales que ocupan todo el ancho */
+        grid-template-columns: repeat(3, 1fr); 
+        gap: 10px; /* Espacio pequeño entre tarjetas */
+        padding: 10px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    /* Ajuste de la tarjeta de staff para que no sea una fila larga, sino un bloque */
+    .person-card {
+        display: flex;
+        flex-direction: column; /* Foto arriba, texto abajo */
+        height: auto; 
+        min-width: 0; /* Permite que la tarjeta se encoja al 33% */
+        border-radius: 8px;
+        background: #1a1a1a;
+    }
+
+    /* Bloque del Artista (Ocupa todo el ancho de su columna) */
+    .person-info-block {
+        width: 100%;
+        min-width: 100%;
+        max-width: 100%;
+        border-right: none;
+        border-bottom: 1px solid #333;
+        padding: 8px 4px;
+    }
+
+    .person-photo {
+        width: 60px; /* Tamaño optimizado para 3 columnas */
+        height: 60px;
+        margin-bottom: 5px;
+    }
+
+    .person-info-block strong {
+        font-size: 0.75rem; /* Texto más pequeño para que no se corte */
+        display: -webkit-box;
+        -webkit-line-clamp: 2; /* Máximo 2 líneas de nombre */
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    /* Ocultamos el carrusel lateral en este modo de 3 columnas para ahorrar espacio */
+    /* o lo dejamos muy pequeño debajo de la foto */
+    .person-movies-block {
+        display: none; /* En la rejilla de 3, las pelis al lado se verían muy mal */
+    }
+
+    .person-info-block .staff-avg-badge {
+        font-size: 0.6rem;
+        padding: 1px 4px;
+    }
+}
