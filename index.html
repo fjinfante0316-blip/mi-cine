@@ -12,11 +12,16 @@
     <div id="sideMenu" class="sidenav">
         <a href="javascript:void(0)" class="closebtn" onclick="toggleMenu()">&times;</a>
         
-        <div class="backup-zone">
-            <button class="btn-export" onclick="exportData()">📤 Exportar Copia</button>
-            <button class="btn-import" onclick="document.getElementById('importInput').click()">📥 Importar Copia</button>
-            <input type="file" id="importInput" style="display: none;" onchange="importData(event)" accept=".json">
-        </div>
+        <div class="data-actions" style="padding: 20px; display: flex; flex-direction: column; gap: 10px;">
+    <button class="menu-btn" onclick="exportData()" style="background: #222; color: white; border: 1px solid #444; padding: 10px; border-radius: 5px; cursor: pointer;">
+        📤 Exportar Biblioteca (JSON)
+    </button>
+    
+    <button class="menu-btn" onclick="document.getElementById('importFile').click()" style="background: #222; color: white; border: 1px solid #444; padding: 10px; border-radius: 5px; cursor: pointer;">
+        📥 Importar Biblioteca (JSON)
+    </button>
+    <input type="file" id="importFile" style="display: none" onchange="importData(event)" accept=".json">
+</div>
 
         <hr class="menu-divider">
         
