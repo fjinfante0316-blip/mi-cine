@@ -39,13 +39,10 @@ body {
 
 /* Títulos de sección (Reparto, Productores, etc.) */
 .section-title {
-    text-align: center;
-    width: 100%;
-    font-size: 2.2rem;
-    margin: 40px 0 20px;
-    color: var(--primary);
-    text-transform: uppercase;
-    letter-spacing: 2px;
+    text-align: left;
+    padding-left: 45px;
+    font-size: 1.8rem;
+    margin-top: 60px;
 }
 
 /* --- MENÚ LATERAL --- */
@@ -505,4 +502,40 @@ input[type="text"] {
     font-size: 0.9rem;
     margin-top: 15px;
     color: var(--gold);
+}
+
+/* --- PANELES LATERALES DE STAFF --- */
+.people-grid {
+    display: flex;
+    flex-direction: row; /* Fuerza el orden horizontal */
+    overflow-x: auto;    /* Permite el scroll lateral */
+    overflow-y: hidden;
+    gap: 25px;
+    padding: 20px 40px;
+    width: 100%;
+    box-sizing: border-box;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch; /* Scroll suave en móviles */
+}
+
+/* Estilo para la barra de scroll del staff */
+.people-grid::-webkit-scrollbar { height: 6px; }
+.people-grid::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+.people-grid::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+.person-card {
+    min-width: 130px; /* Evita que las fotos se aplasten */
+    flex-shrink: 0;   /* Mantiene el tamaño en el flexbox */
+}
+
+/* Badge de Nota Media del Artista */
+.staff-avg-badge {
+    background: var(--gold);
+    color: #000;
+    font-size: 0.75rem;
+    font-weight: bold;
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-top: 5px;
+    box-shadow: 0 0 10px rgba(255, 204, 0, 0.3);
 }
