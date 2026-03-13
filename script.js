@@ -290,4 +290,59 @@ function closeMovieDetails() {
     document.body.style.overflow = 'auto';
 }
 
+// --- EXPORTAR DATOS ---
+function exportData() {
+    if (myMovies.length === 0) {
+        alert("No hay películas en tu biblioteca para exportar.");
+        return;
+    }
+
+    // Convertimos el array de películas a un string JSON con formato
+    const dataStr = JSON.stringify(myMovies, null, 2);
+    const blob = new Blob([dataStr], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    
+    // Creamos un link temporal para la descarga
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `mi_cine_backup_${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(link);
+    link.click();
+    
+    // Limpieza
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+}
+
+// --- IMPORTAR DATOS ---
+function importData(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const importedData = JSON.parse(e.target.result);
+            
+            // Validación básica: comprobamos si es un array
+            if (Array.isArray(importedData)) {
+                if (confirm(`Se han encontrado ${importedData.length} películas. ¿Deseas sobreescribir tu biblioteca actual?`)) {
+                    myMovies = importedData;
+                    saveAndRefresh(); // Esta función ya guarda en LocalStorage y refresca el render
+                    alert("¡Biblioteca importada con éxito!");
+                }
+            } else {
+                alert("El archivo no tiene el formato correcto.");
+            }
+        } catch (err) {
+            console.error("Error al importar:", err);
+            alert("Hubo un error al leer el archivo. Asegúrate de que sea un JSON válido.");
+        }
+    };
+    reader.readAsText(file);
+    
+    // Resetear el input para permitir importar el mismo archivo de nuevo si fuera necesario
+    event.target.value = '';
+}
+
 renderAll();
