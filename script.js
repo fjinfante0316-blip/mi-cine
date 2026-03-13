@@ -166,31 +166,27 @@ function renderPeople(id, arr) {
     const container = document.getElementById(id);
     if (!container) return;
     
-    // Limpiamos y aseguramos que no haya scroll horizontal
-    container.style.overflowX = "hidden";
-    
-    container.innerHTML = arr.slice(0, 30).map(p => {
+    // Mostramos los 40 con mejor nota media
+    container.innerHTML = arr.slice(0, 40).map(p => {
         return `
         <div class="person-card">
-            <div class="person-info-block">
-                <img class="person-photo" src="${p.photo}" 
-                     onclick="showStaffTimeline('${p.name}')" 
-                     alt="${p.name}">
-                <strong onclick="showStaffTimeline('${p.name}')">${p.name}</strong>
+            <div class="person-info-block" onclick="showStaffTimeline('${p.name}')">
+                <img class="person-photo" src="${p.photo}" alt="${p.name}">
+                <strong>${p.name}</strong>
                 <div class="staff-avg-badge">⭐ ${p.averageRating}</div>
-                <small style="color:var(--grey); margin-top:5px;">${p.movies.length} obras</small>
             </div>
             
             <div class="person-movies-block">
-                <h5>Filmografía en mi lista:</h5>
                 ${p.movies.map(mov => {
-                    // Buscamos el ID original de la película para que el clic funcione
-                    const movieData = myMovies.find(m => m.title === mov.title);
+                    // Buscamos el ID original de la peli para poder abrir su modal
+                    const movieFull = myMovies.find(m => m.title === mov.title);
+                    const movieID = movieFull ? movieFull.id : null;
+                    
                     return `
                         <img class="mini-poster" 
                              src="${mov.poster}" 
                              title="${mov.title}" 
-                             onclick="openMovieDetails(${movieData ? movieData.id : 0})">
+                             onclick="openMovieDetails(${movieID})">
                     `;
                 }).join('')}
             </div>
@@ -217,6 +213,7 @@ function updateStatistics() {
 }
 
 function showStaffTimeline(name) {
+    // Filtrar películas donde aparece el artista
     const staffMovies = myMovies.filter(m => {
         const s = m.rawStaff;
         return s.director?.name === name || 
@@ -224,6 +221,8 @@ function showStaffTimeline(name) {
                s.writers?.some(w => w.name === name) ||
                s.producers?.some(p => p.name === name);
     });
+
+    // Ordenar de más vieja a más nueva
     staffMovies.sort((a, b) => parseInt(a.year) - parseInt(b.year));
 
     let timelineOverlay = document.getElementById('timelineOverlay');
@@ -236,7 +235,7 @@ function showStaffTimeline(name) {
     timelineOverlay.innerHTML = `
         <div class="timeline-header">
             <button class="back-btn" onclick="closeTimeline()">← Volver</button>
-            <h2 class="timeline-title">${name}</h2>
+            <h2 class="timeline-title">Trayectoria: ${name}</h2>
         </div>
         <div class="timeline-track">
             ${staffMovies.map(m => `
@@ -252,8 +251,9 @@ function showStaffTimeline(name) {
             `).join('')}
         </div>
     `;
+
     timelineOverlay.style.display = 'block';
-    document.body.style.overflow = 'hidden';
+    document.body.style.overflow = 'hidden'; // Bloquea el scroll de la página principal
 }
 
 function closeTimeline() {
