@@ -157,18 +157,35 @@ function processStaff(list, person, rating) {
 function renderPeople(id, arr) {
     const container = document.getElementById(id);
     if (!container) return;
-    container.innerHTML = arr.slice(0, 50).map(p => `
+    
+    // Añadimos la clase para el scroll horizontal
+    container.className = "people-grid staff-carousel"; 
+    
+    container.innerHTML = arr.slice(0, 50).map(p => {
+        // El cálculo de p.averageRating ya lo tienes en processStaff, 
+        // así que aquí lo mostramos con un diseño más limpio.
+        return `
         <div class="person-card">
             <div class="rating-badge">⭐ ${p.averageRating}</div>
             <div class="movie-count-badge">${p.movies.length}</div>
-            <img class="person-photo" src="${p.photo}" onclick="showStaffTimeline('${p.name}')" style="cursor:pointer">
-            <strong onclick="showStaffTimeline('${p.name}')" style="cursor:pointer">${p.name}</strong>
+            
+            <img class="person-photo" src="${p.photo}" 
+                 onclick="showStaffTimeline('${p.name}')" 
+                 style="cursor:pointer" alt="${p.name}">
+            
+            <strong onclick="showStaffTimeline('${p.name}')" style="cursor:pointer">
+                ${p.name}
+            </strong>
+            
             <div class="mini-posters-container">
-                ${p.movies.map(mov => `<img class="mini-poster" src="${mov.poster}" onclick="openModal('${mov.poster}')">`).join('')}
+                ${p.movies.slice(0, 3).map(mov => `
+                    <img class="mini-poster" src="${mov.poster}" 
+                         onclick="openMovieDetails(${myMovies.find(m => m.poster === mov.poster)?.id})">
+                `).join('')}
             </div>
-        </div>`).join('');
+        </div>`;
+    }).join('');
 }
-
 function editRating(id) {
     const m = myMovies.find(x => x.id === id);
     if (m) {
