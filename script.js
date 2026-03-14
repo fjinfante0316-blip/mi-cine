@@ -7,6 +7,10 @@ let myMovies = JSON.parse(localStorage.getItem('myCineData')) || [];
 let genreChart = null;
 let ratingChart = null;
 
+window.onload = () => {
+    showSection('searchSection'); 
+};
+
 // --- NAVEGACIÓN ---
 function toggleMenu() {
     const menu = document.getElementById("sideMenu");
@@ -178,16 +182,15 @@ function renderPeople(id, arr) {
     
     container.innerHTML = arr.map(p => `
         <div class="person-card">
-            <div class="person-info-block" onclick="showStaffTimeline('${p.name.replace(/'/g, "\\'")}')">
+            <div class="person-info-block" style="cursor:pointer;" onclick="showStaffTimeline('${p.name.replace(/'/g, "\\'")}')">
                 <img class="person-photo" src="${p.photo}">
                 <strong>${p.name}</strong>
                 <div class="staff-avg-badge">⭐ ${p.averageRating}</div>
             </div>
             <div class="person-movies-block">
-                ${p.movies.map(mov => {
-                    const mData = myMovies.find(m => m.title === mov.title);
-                    return `<img class="mini-poster" src="${mov.poster}" onclick="openMovieDetails(${mData ? mData.id : 0})">`;
-                }).join('')}
+                ${p.movies.map(mov => `
+                    <img class="mini-poster" src="${mov.poster}" onclick="openMovieDetailsByName('${mov.title.replace(/'/g, "\\'")}')">
+                `).join('')}
             </div>
         </div>
     `).join('');
@@ -283,6 +286,12 @@ function showStaffTimeline(name) {
         </div>
     `;
     overlay.style.display = 'block';
+}
+
+// 3. Función para abrir detalles por nombre (usada en mini-posters)
+function openMovieDetailsByName(title) {
+    const movie = myMovies.find(m => m.title === title);
+    if (movie) openMovieDetails(movie.id);
 }
 
 // --- FUNCIÓN UNIFICADA PARA ABRIR DETALLES (CENTRADO) ---
