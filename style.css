@@ -28,129 +28,164 @@ body {
     align-items: center;
 }
 
-/* --- SECCIONES --- */
+/* --- SECCIONES GENERALES --- */
 .content-section {
-    padding-top: 100px;
     width: 100%;
     max-width: 1400px;
+    padding: 100px 20px 40px;
     box-sizing: border-box;
-    display: none; /* JS controla esto */
+    display: none; /* Controlado por JS */
     flex-direction: column;
+    align-items: center;
 }
 
 .section-title {
-    text-align: left;
-    padding-left: 25px;
+    align-self: flex-start;
+    padding-left: 20px;
     font-size: 2rem;
-    margin: 40px 0 20px;
+    margin: 20px 0;
     border-left: 5px solid var(--primary);
 }
 
-/* --- MENÚ LATERAL --- */
-.sidenav {
-    height: 100%; width: 0; position: fixed; z-index: 3000;
-    top: 0; left: 0; background: rgba(17, 17, 17, 0.98); 
-    overflow-x: hidden; transition: var(--transition); padding-top: 60px;
-    backdrop-filter: blur(10px);
+/* --- PORTADA DE LA APP (HERO SECTION) --- */
+#searchSection {
+    min-height: 80vh;
+    background: linear-gradient(rgba(20,20,20,0.7), var(--bg)), 
+                url('https://assets.nflxext.com/ffe/siteui/vlv3/f841d4c7-10e1-40af-bcae-07a3f8dc141a/f6ed7c9a-4100-410d-b108-757917e94e77/ES-es-20220502-popsignuptwoweeks-perspective_alpha_website_medium.jpg');
+    background-size: cover;
+    background-position: center;
+    justify-content: center;
 }
 
-.sidenav a { 
-    padding: 15px 32px; text-decoration: none; font-size: 1.1rem; 
-    color: var(--grey); display: block; transition: var(--transition); 
+.hero-center h1 {
+    font-size: clamp(2.5rem, 8vw, 4rem);
+    color: var(--primary);
+    margin: 0;
+    text-shadow: 2px 2px 15px rgba(0,0,0,0.5);
 }
 
-.sidenav a:hover { color: white; background: rgba(229, 9, 20, 0.1); padding-left: 45px; }
-
-/* --- BOTÓN MENÚ FIJO --- */
-.menu-container {
-    position: fixed; top: 20px; left: 20px;
-    display: flex; align-items: center; gap: 10px;
-    cursor: pointer; z-index: 2000;
-    background: rgba(20, 20, 20, 0.8);
-    backdrop-filter: blur(12px);
-    padding: 10px 20px; border-radius: 40px;
-    border: 1px solid rgba(255,255,255,0.1); transition: var(--transition);
-}
-
-.menu-container:hover { background: var(--primary); transform: scale(1.05); }
-
-/* --- BUSCADORES --- */
-#searchSection { align-items: center; text-align: center; }
-.hero-center h1 { font-size: 3.5rem; color: var(--primary); margin-bottom: 30px; }
-
-input[type="text"] {
-    padding: 14px 25px; border-radius: 30px; border: 1px solid #333;
-    background: #222; color: white; outline: none; transition: var(--transition);
-    width: 300px; max-width: 80%;
-}
-
-/* --- GRIDS PELÍCULAS --- */
+/* --- HEMEROTECA (MOVIE GRID) --- */
 .movie-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-    gap: 20px; width: 100%; padding: 25px; box-sizing: border-box;
+    grid-template-columns: repeat(3, 1fr); /* 3 columnas en móvil por defecto */
+    gap: 15px;
+    width: 100%;
+    padding: 20px 0;
+}
+
+@media (min-width: 768px) {
+    .movie-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
 }
 
 .card {
     background: var(--card);
-    border-radius: 12px; position: relative;
-    overflow: hidden; cursor: pointer; transition: var(--transition);
+    border-radius: 10px;
+    overflow: hidden;
+    transition: var(--transition);
     border: 1px solid transparent;
 }
 
 .card:hover { transform: translateY(-10px); border-color: #444; }
 .card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; }
 
-/* --- DISEÑO DE STAFF (UNIFICADO PC Y MÓVIL) --- */
+/* --- STAFF / PERSONS --- */
 .people-grid {
     display: flex;
     flex-direction: column;
     gap: 15px;
-    padding: 20px;
     width: 100%;
 }
 
 .person-card {
-    display: flex; /* Mantiene la fila */
+    display: flex;
     align-items: center;
     background: rgba(255,255,255,0.03);
-    border-radius: 15px;
+    border-radius: 12px;
     height: 140px;
     border: 1px solid #222;
     overflow: hidden;
 }
 
 .person-info-block {
-    min-width: 130px; max-width: 130px; height: 100%;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    background: rgba(0,0,0,0.3); border-right: 1px solid #222; padding: 10px;
-    text-align: center;
+    min-width: 120px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.2);
+    padding: 10px;
 }
 
 .person-photo {
     width: 60px; height: 60px; border-radius: 50%;
-    object-fit: cover; border: 2px solid var(--primary); margin-bottom: 5px;
+    object-fit: cover; border: 2px solid var(--primary);
 }
 
 .person-movies-block {
-    flex: 1; display: flex; overflow-x: auto;
-    align-items: center; gap: 10px; padding: 0 15px;
+    flex: 1;
+    display: flex;
+    overflow-x: auto;
+    gap: 10px;
+    padding: 0 15px;
 }
-
-/* Ocultar scrollbar pero mantener funcionalidad */
 .person-movies-block::-webkit-scrollbar { display: none; }
 
-.mini-poster {
-    min-width: 75px; height: 110px; border-radius: 6px;
-    object-fit: cover; transition: var(--transition);
+/* --- ESTADÍSTICAS REPARADAS --- */
+.stats-center-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 2 tarjetas por fila */
+    gap: 15px;
+    width: 100%;
+    max-width: 900px;
+    margin-bottom: 30px;
 }
 
-/* --- MODAL DE DETALLES (CENTRAL) --- */
+.stat-card-large {
+    background: var(--card);
+    padding: 20px;
+    border-radius: 15px;
+    border: 1px solid #333;
+    text-align: center;
+}
+
+.stat-value { font-size: 2rem; font-weight: bold; color: var(--primary); }
+
+/* --- GRÁFICOS (CHART.JS SAFE) --- */
+.charts-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 25px;
+    width: 100%;
+    max-width: 900px;
+}
+
+@media (min-width: 768px) {
+    .charts-grid { grid-template-columns: 1fr 1fr; }
+}
+
+.charts {
+    background: var(--card);
+    padding: 20px;
+    border-radius: 15px;
+    border: 1px solid #333;
+    height: 380px; /* Altura fija para estabilidad */
+    display: flex;
+    flex-direction: column;
+}
+
+.chart-container {
+    flex: 1;
+    position: relative; /* REQUERIDO para Chart.js maintainAspectRatio: false */
+    width: 100%;
+}
+
+/* --- MODAL DETALLES --- */
 .movie-detail-modal {
-    display: none; 
+    display: none;
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.9);
+    background: rgba(0,0,0,0.9);
     z-index: 5000;
     backdrop-filter: blur(10px);
     justify-content: center;
@@ -160,254 +195,29 @@ input[type="text"] {
 
 .movie-detail-wrapper {
     background: #181818;
-    width: 95%;
-    max-width: 600px;
+    width: 100%;
+    max-width: 500px;
     border-radius: 20px;
-    position: relative;
-    max-height: 90vh;
+    max-height: 85vh;
     overflow-y: auto;
     border: 1px solid #333;
 }
 
-.close-detail-btn {
-    position: absolute; top: 15px; right: 15px;
-    background: rgba(0,0,0,0.5); border: none; color: white;
-    font-size: 2rem; cursor: pointer; z-index: 10;
-    width: 40px; height: 40px; border-radius: 50%;
+/* --- MENÚ LATERAL --- */
+.sidenav {
+    height: 100%; width: 0; position: fixed; z-index: 3000;
+    top: 0; left: 0; background: rgba(17,17,17,0.98); 
+    overflow-x: hidden; transition: var(--transition); padding-top: 60px;
 }
 
-.movie-detail-content {
-    display: flex; flex-direction: column; align-items: center; padding-bottom: 30px;
+.sidenav a { 
+    padding: 15px 32px; text-decoration: none; font-size: 1.1rem; 
+    color: var(--grey); display: block; transition: var(--transition); 
 }
 
-.detail-poster-container {
-    width: 100%; display: flex; justify-content: center; padding: 30px 20px 10px;
-}
-
-#detailPoster {
-    width: 100%; max-width: 220px; border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-}
-
-.detail-info-container { padding: 0 30px; text-align: center; }
-.detail-info-container h2 { font-size: 2rem; margin: 10px 0; }
-.detail-sep { width: 50px; height: 3px; background: var(--primary); margin: 15px auto; }
-
-/* --- ESTADÍSTICAS (KPIs) --- */
-.stats-center-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 20px; padding: 20px;
-}
-
-.stat-card-large {
-    background: var(--card); padding: 20px; border-radius: 15px;
-    text-align: center; border: 1px solid #333;
-}
-
-.stat-value { font-size: 2.5rem; font-weight: bold; display: block; }
-
-.charts-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 20px; padding: 20px;
-}
-
-.charts { background: var(--card); padding: 20px; border-radius: 15px; min-height: 350px; }
-
-/* --- TIMELINE (TRAYECTORIA) --- */
-#timelineOverlay {
-    position: fixed; inset: 0; background: var(--bg);
-    z-index: 4000; overflow-y: auto; display: none;
-}
-
-.timeline-track {
-    display: flex; overflow-x: auto; padding: 80px 20px; gap: 30px;
-    align-items: flex-start;
-}
-
-.mini-card-timeline { width: 100px; text-align: center; cursor: pointer; }
-
-/* --- RESPONSIVE MÓVIL --- */
+/* --- RESPONSIVE EXTRA --- */
 @media (max-width: 600px) {
-    .hero-center h1 { font-size: 2.5rem; }
-    .person-info-block { min-width: 100px; max-width: 100px; }
-    .person-photo { width: 50px; height: 50px; }
-    .movie-grid { grid-template-columns: repeat(2, 1fr); padding: 10px; }
-    .stats-center-container { grid-template-columns: repeat(2, 1fr); }
-    .stat-value { font-size: 1.8rem; }
-}
-
-@keyframes modalShow {
-    from { opacity: 0; transform: scale(0.9); }
-    to { opacity: 1; transform: scale(1); }
-}
-
-/* --- HEMEROTECA: 3 COLUMNAS EN MÓVIL --- */
-@media (max-width: 600px) {
-    .movie-grid {
-        grid-template-columns: repeat(3, 1fr); /* 3 columnas */
-        gap: 8px;
-        padding: 10px;
-    }
-
-    .card h4 {
-        font-size: 0.65rem; /* Títulos más pequeños para que no ocupen mucho */
-        margin: 5px;
-    }
-
-    .rating-badge, .view-count-badge {
-        font-size: 0.6rem;
-        padding: 2px 4px;
-    }
-}
-
-/* --- ESTADÍSTICAS ADAPTIVE --- */
-.stats-center-container {
-    display: flex;
-    flex-wrap: wrap; /* Para que bajen si no caben */
-    gap: 15px;
-    justify-content: center;
-    padding: 20px;
-}
-
-.stat-card-large {
-    flex: 1;
-    min-width: 140px; /* Tamaño mínimo para móvil */
-    background: var(--card);
-    padding: 15px;
-    border-radius: 12px;
-    text-align: center;
-    border: 1px solid #333;
-}
-
-.charts-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    width: 100%;
-    align-items: center;
-}
-
-.charts {
-    width: 90%;
-    max-width: 500px;
-    height: 300px; /* Altura fija para que el gráfico respire */
-    background: var(--card);
-    padding: 15px;
-    border-radius: 15px;
-}
-
-/* --- CORRECCIÓN DE CENTRADO GENERAL --- */
-.content-section {
-    width: 100%;
-    max-width: 100vw;
-    display: none; /* Se activa por JS */
-    flex-direction: column;
-    align-items: center; /* Centra el contenido internamente */
-    padding: 80px 10px 20px 10px;
-    box-sizing: border-box;
-}
-
-/* --- HEMEROTECA: 3 COLUMNAS EN MÓVIL --- */
-.movie-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 3 columnas fijas en móvil */
-    gap: 10px;
-    width: 100%;
-    max-width: 1200px;
-    padding: 10px;
-    box-sizing: border-box;
-}
-
-/* Ajuste para pantallas grandes (PC) */
-@media (min-width: 768px) {
-    .movie-grid {
-        grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-    }
-}
-
-.card {
-    width: 100%;
-    background: var(--card);
-    border-radius: 8px;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.card img {
-    width: 100%;
-    aspect-ratio: 2/3;
-    object-fit: cover;
-    display: block;
-}
-
-/* --- ESTADÍSTICAS REPARADAS --- */
-.stats-center-container {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr); /* 2 columnas en móvil */
-    gap: 15px;
-    width: 100%;
-    max-width: 800px;
-    padding: 15px;
-    box-sizing: border-box;
-}
-
-.stat-card-large {
-    background: var(--card);
-    padding: 20px;
-    border-radius: 15px;
-    border: 1px solid #333;
-    text-align: center;
-}
-
-.charts-grid {
-    width: 100%;
-    max-width: 500px;
-    padding: 15px;
-    box-sizing: border-box;
-}
-
-.charts {
-    background: var(--card);
-    padding: 15px;
-    border-radius: 15px;
-    height: 350px; /* Altura necesaria para que se vea el gráfico */
-    position: relative;
-}
-
-/* --- TARJETAS DE GRÁFICOS CORREGIDAS --- */
-.charts {
-    background: var(--card);
-    padding: 20px;
-    border-radius: 15px;
-    border: 1px solid #333;
-    width: 100%;
-    max-width: 450px; /* Evita que crezca demasiado */
-    height: 350px;    /* Altura fija para que el gráfico no se salga */
-    box-sizing: border-box;
-    position: relative; /* CRÍTICO para Chart.js */
-    display: flex;
-    flex-direction: column;
-}
-
-.charts h3 {
-    margin: 0 0 15px 0;
-    font-size: 1.1rem;
-    color: var(--text);
-}
-
-/* Contenedor interno para el canvas */
-.chart-container {
-    flex: 1; /* Ocupa el resto del espacio de la tarjeta */
-    position: relative;
-    width: 100%;
-    height: 100%;
-}
-
-canvas {
-    width: 100% !important;
-    height: 100% !important;
+    .section-title { font-size: 1.5rem; }
+    .stat-value { font-size: 1.5rem; }
+    .hero-center h1 { font-size: 2.2rem; }
 }
