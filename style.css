@@ -321,3 +321,91 @@ input[type="text"]:focus { border-color: var(--primary); box-shadow: 0 0 10px rg
     color: var(--primary);
     margin-bottom: 10px;
 }
+
+/* --- DISEÑO DE STAFF GLOBAL (PC Y MÓVIL) --- */
+.people-grid {
+    display: flex;
+    flex-direction: column; /* Lista vertical de personas */
+    gap: 15px;
+    padding: 15px;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.person-card {
+    display: flex; /* Mantiene formato horizontal siempre */
+    align-items: center;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    height: 140px; 
+    border: 1px solid #333;
+    overflow: hidden;
+}
+
+/* Bloque del Artista (Izquierda) */
+.person-info-block {
+    min-width: 130px;
+    max-width: 130px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.4);
+    border-right: 1px solid #333;
+    cursor: pointer;
+    text-align: center;
+    padding: 5px;
+}
+
+.person-photo {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--primary);
+    margin-bottom: 5px;
+}
+
+.person-info-block strong {
+    font-size: 0.8rem;
+    color: white;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Carrusel de Películas (Derecha) */
+.person-movies-block {
+    flex: 1;
+    display: flex;
+    overflow-x: auto; /* Scroll lateral en móvil y PC */
+    align-items: center;
+    gap: 10px;
+    padding: 0 15px;
+    height: 100%;
+    scrollbar-width: none; /* Oculta scroll en Firefox */
+}
+
+.person-movies-block::-webkit-scrollbar { display: none; } /* Oculta scroll en Chrome/Safari */
+
+.mini-poster {
+    min-width: 75px;
+    height: 110px;
+    border-radius: 6px;
+    object-fit: cover;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.mini-poster:hover { transform: scale(1.1); }
+
+/* Esto asegura que el modal NO se vea nunca al cargar la página */
+.movie-detail-modal {
+    display: none; 
+    position: fixed;
+    z-index: 9999;
+    /* ... resto de tu estilo ... */
+}
