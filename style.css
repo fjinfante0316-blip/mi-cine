@@ -297,3 +297,83 @@ input[type="text"] {
     padding: 15px;
     border-radius: 15px;
 }
+
+/* --- CORRECCIÓN DE CENTRADO GENERAL --- */
+.content-section {
+    width: 100%;
+    max-width: 100vw;
+    display: none; /* Se activa por JS */
+    flex-direction: column;
+    align-items: center; /* Centra el contenido internamente */
+    padding: 80px 10px 20px 10px;
+    box-sizing: border-box;
+}
+
+/* --- HEMEROTECA: 3 COLUMNAS EN MÓVIL --- */
+.movie-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3 columnas fijas en móvil */
+    gap: 10px;
+    width: 100%;
+    max-width: 1200px;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+/* Ajuste para pantallas grandes (PC) */
+@media (min-width: 768px) {
+    .movie-grid {
+        grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    }
+}
+
+.card {
+    width: 100%;
+    background: var(--card);
+    border-radius: 8px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.card img {
+    width: 100%;
+    aspect-ratio: 2/3;
+    object-fit: cover;
+    display: block;
+}
+
+/* --- ESTADÍSTICAS REPARADAS --- */
+.stats-center-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 2 columnas en móvil */
+    gap: 15px;
+    width: 100%;
+    max-width: 800px;
+    padding: 15px;
+    box-sizing: border-box;
+}
+
+.stat-card-large {
+    background: var(--card);
+    padding: 20px;
+    border-radius: 15px;
+    border: 1px solid #333;
+    text-align: center;
+}
+
+.charts-grid {
+    width: 100%;
+    max-width: 500px;
+    padding: 15px;
+    box-sizing: border-box;
+}
+
+.charts {
+    background: var(--card);
+    padding: 15px;
+    border-radius: 15px;
+    height: 350px; /* Altura necesaria para que se vea el gráfico */
+    position: relative;
+}
