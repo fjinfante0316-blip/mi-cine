@@ -409,3 +409,172 @@ input[type="text"]:focus { border-color: var(--primary); box-shadow: 0 0 10px rg
     z-index: 9999;
     /* ... resto de tu estilo ... */
 }
+
+/* --- ESTILOS DEL MODAL UNIFICADO Y CENTRADO --- */
+
+.movie-detail-modal {
+    display: none; /* Se activa con JS a 'flex' */
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 5000;
+    backdrop-filter: blur(10px);
+    justify-content: center; /* Centrado horizontal */
+    align-items: center;    /* Centrado vertical */
+    overflow-y: auto;       /* Scroll si el contenido es muy largo */
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* Contenedor blanco/oscuro adaptado a la pantalla */
+.movie-detail-wrapper {
+    background: #181818;
+    width: 90%;
+    max-width: 600px; /* Ancho máximo para que no se estire demasiado en PC */
+    border-radius: 20px;
+    position: relative;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+    border: 1px solid #333;
+    animation: modalShow 0.4s ease;
+    overflow: hidden; /* Para que el borde redondeado corte el contenido */
+}
+
+/* Botón de cierre */
+.close-detail-btn {
+    position: absolute;
+    top: 15px; right: 15px;
+    background: rgba(0,0,0,0.5);
+    border: none;
+    color: white;
+    font-size: 2rem;
+    cursor: pointer;
+    z-index: 5100;
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    transition: 0.3s;
+}
+.close-detail-btn:hover { background: var(--primary); transform: rotate(90deg); }
+
+/* Contenido del modal */
+.movie-detail-content {
+    display: flex;
+    flex-direction: column; /* Contenido uno debajo de otro */
+    align-items: center;    /* Todo centrado */
+    padding: 0;
+}
+
+/* Contenedor de la Portada Centrada */
+.detail-poster-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 30px 20px 10px 20px;
+    position: relative;
+    background: linear-gradient(to bottom, rgba(0,0,0,0), #181818);
+}
+
+#detailPoster {
+    width: 100%;
+    max-width: 250px; /* Tamaño de la portada centrada */
+    height: auto;
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.6);
+    border: 2px solid #333;
+}
+
+/* Badge de nota sobre la portada */
+.detail-rating-badge {
+    position: absolute;
+    bottom: 20px; right: calc(50% - 110px); /* Ajustado para estar sobre la portada */
+    background: rgba(0, 0, 0, 0.8);
+    color: var(--gold);
+    padding: 5px 10px;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 1rem;
+    border: 1px solid var(--gold);
+}
+
+/* Contenedor de Información */
+.detail-info-container {
+    width: 100%;
+    padding: 20px 30px 40px 30px;
+    box-sizing: border-box;
+    text-align: center; /* Textos centrados */
+}
+
+.detail-info-container h2 {
+    font-size: 2.2rem;
+    color: white;
+    margin: 0 0 5px 0;
+    font-weight: 800;
+}
+
+#detailTagline {
+    font-style: italic;
+    color: var(--gold);
+    margin: 0 0 15px 0;
+    font-size: 1rem;
+    opacity: 0.9;
+}
+
+.detail-meta {
+    color: var(--grey);
+    font-size: 0.9rem;
+    margin-bottom: 15px;
+}
+
+.detail-sep {
+    width: 50px;
+    height: 3px;
+    background: var(--primary);
+    margin: 20px auto;
+    border-radius: 2px;
+}
+
+.detail-info-container h3 {
+    color: var(--gold);
+    font-size: 1.2rem;
+    margin: 25px 0 10px 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.detail-info-container p {
+    line-height: 1.6;
+    color: #ccc;
+    font-size: 0.95rem;
+    margin: 0;
+}
+
+/* Proveedores de Streaming */
+.providers-list {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 15px;
+}
+
+.provider-item img {
+    width: 45px; height: 45px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+
+/* Animación de aparición */
+@keyframes modalShow {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+/* Adaptación para móviles */
+@media (max-width: 600px) {
+    .movie-detail-wrapper { width: 95%; border-radius: 15px; }
+    #detailPoster { max-width: 180px; }
+    .detail-rating-badge { right: calc(50% - 80px); font-size: 0.8rem; }
+    .detail-info-container h2 { font-size: 1.6rem; }
+    .detail-info-container { padding: 15px 20px 30px 20px; }
+}
