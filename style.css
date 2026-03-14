@@ -250,3 +250,74 @@ input[type="text"]:focus { border-color: var(--primary); box-shadow: 0 0 10px rg
     color: var(--gold);
     font-size: 1.1rem;
 }
+
+/* --- ESTILOS LÍNEA DE TIEMPO OPTIMIZADOS --- */
+
+.timeline-track {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding: 80px 50px;
+    gap: 40px;
+    scroll-behavior: smooth;
+    align-items: flex-start;
+}
+
+/* Contenedor individual de cada película en la línea */
+.mini-card-timeline {
+    width: 100px; /* Tamaño pequeño y elegante */
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    text-align: center;
+}
+
+.mini-card-timeline:hover {
+    transform: scale(1.1);
+}
+
+.mini-card-timeline .mini-poster {
+    width: 100px;
+    height: 150px;
+    border-radius: 8px;
+    object-fit: cover;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    border: 1px solid #333;
+}
+
+.mini-card-timeline .mini-title {
+    font-size: 0.75rem;
+    margin-top: 8px;
+    color: var(--text);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.2;
+}
+
+.mini-rating {
+    font-size: 0.7rem;
+    color: var(--gold);
+    font-weight: bold;
+    margin-top: 4px;
+}
+
+/* La línea horizontal que une los puntos */
+.timeline-track::before {
+    content: "";
+    position: absolute;
+    top: 205px; /* Ajustar según la posición del punto */
+    left: 0;
+    width: 1000%; /* Muy larga para que cubra todos los actores */
+    height: 2px;
+    background: #333;
+    z-index: -1;
+}
+
+/* Estilo del año */
+.timeline-year {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--primary);
+    margin-bottom: 10px;
+}
