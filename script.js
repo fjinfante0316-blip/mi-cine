@@ -165,25 +165,24 @@ function processStaff(list, person, rating) {
 function renderPeople(id, arr) {
     const container = document.getElementById(id);
     if (!container) return;
-
-    // Eliminamos el .slice() para que procese el array COMPLETO
-    container.innerHTML = arr.map(p => { 
+    
+    // Sin .slice() para mostrar todos (91 o más)
+    container.innerHTML = arr.map(p => {
         return `
-        <div class="person-card" onclick="showStaffTimeline('${p.name}')">
-            <div class="person-info-block">
+        <div class="person-card">
+            <div class="person-info-block" onclick="showStaffTimeline('${p.name}')">
                 <img class="person-photo" src="${p.photo}" alt="${p.name}">
                 <strong>${p.name}</strong>
                 <div class="staff-avg-badge">⭐ ${p.averageRating}</div>
             </div>
-            
             <div class="person-movies-block">
                 ${p.movies.map(mov => {
-                    const movieFull = myMovies.find(m => m.title === mov.title);
+                    // Buscamos el ID real para que el clic abra la sinopsis/ganancias
+                    const mData = myMovies.find(m => m.title === mov.title);
                     return `
                         <img class="mini-poster" 
                              src="${mov.poster}" 
-                             title="${mov.title}" 
-                             onclick="event.stopPropagation(); openMovieDetails(${movieFull?.id})">
+                             onclick="openMovieDetails(${mData ? mData.id : 0})">
                     `;
                 }).join('')}
             </div>
@@ -210,54 +209,37 @@ function updateStatistics() {
 }
 
 function showStaffTimeline(name) {
-    // 1. Filtrar películas del artista
     const staffMovies = myMovies.filter(m => {
         const s = m.rawStaff;
-        return s.director?.name === name || 
-               s.actors?.some(a => a.name === name) ||
-               s.writers?.some(w => w.name === name) ||
-               s.producers?.some(p => p.name === name);
-    });
+        return s.director?.name === name || s.actors?.some(a => a.name === name);
+    }).sort((a, b) => parseInt(a.year) - parseInt(b.year));
 
-    // 2. Ordenar cronológicamente (Sin límites)
-    staffMovies.sort((a, b) => parseInt(a.year) - parseInt(b.year));
-
-    let timelineOverlay = document.getElementById('timelineOverlay');
-    if (!timelineOverlay) {
-        timelineOverlay = document.createElement('div');
-        timelineOverlay.id = 'timelineOverlay';
-        document.body.appendChild(timelineOverlay);
-    }
-
-    // 3. Renderizar con el tamaño de portada pequeña (mini-poster)
-    timelineOverlay.innerHTML = `
+    const overlay = document.getElementById('timelineOverlay');
+    overlay.innerHTML = `
         <div class="timeline-header">
             <button class="back-btn" onclick="closeTimeline()">← Volver</button>
-            <h2 class="timeline-title">Trayectoria de ${name}</h2>
-            <p style="color: var(--grey)">${staffMovies.length} títulos encontrados</p>
+            <h2 style="margin-top:20px;">Trayectoria: ${name}</h2>
         </div>
         <div class="timeline-track">
             ${staffMovies.map(m => `
-                <div class="timeline-item">
+                <div class="timeline-item" onclick="openMovieDetails(${m.id})">
                     <div class="timeline-year">${m.year}</div>
                     <div class="timeline-dot"></div>
-                    <div class="mini-card-timeline" onclick="openMovieDetails(${m.id})">
-                        <img src="${m.poster}" class="mini-poster" alt="${m.title}">
-                        <div class="mini-rating">⭐ ${m.rating}</div>
-                        <h4 class="mini-title">${m.title}</h4>
-                    </div>
+                    <img src="${m.poster}" class="mini-poster" style="width:90px; height:130px;">
+                    <p style="font-size:0.7rem; margin-top:5px; max-width:90px;">${m.title}</p>
                 </div>
             `).join('')}
         </div>
     `;
-
-    timelineOverlay.style.display = 'block';
-    document.body.style.overflow = 'hidden';
+    overlay.style.display = 'block';
 }
 
-function closeTimeline() {
-    document.getElementById('timelineOverlay').style.display = 'none';
+function closeMovieDetails() {
+    document.getElementById('movieModal').style.display = 'none';
     document.body.style.overflow = 'auto';
+    // Limpiamos para que no se vea el contenido anterior al abrir otra
+    document.getElementById('detailTitle').innerText = "";
+    document.getElementById('detailOverview').innerText = "";
 }
 
 async function openMovieDetails(movieId) {
