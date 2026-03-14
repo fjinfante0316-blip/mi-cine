@@ -197,15 +197,27 @@ function deleteMovie(id) { if(confirm("¿Eliminar?")) { myMovies = myMovies.filt
 function updateStatistics() {
     const mins = myMovies.reduce((acc, m) => acc + (parseInt(m.runtime) || 0) * (m.views || 1), 0);
     document.getElementById('statHours').innerText = `${Math.floor(mins / 60)}h ${mins % 60}m`;
-    
+    document.getElementById('statTotal').innerText = myMovies.length; // Asegúrate de tener este ID
+
     const genData = {};
     myMovies.forEach(mov => genData[mov.genre] = (genData[mov.genre] || 0) + 1);
+    
     if (genreChart) genreChart.destroy();
     genreChart = new Chart(document.getElementById('genreChart'), {
         type: 'doughnut',
-        data: { labels: Object.keys(genData), datasets: [{ data: Object.values(genData), backgroundColor: ['#e50914', '#564d4d', '#831010', '#b9090b', '#f5f5f1'] }] }
+        data: { 
+            labels: Object.keys(genData), 
+            datasets: [{ 
+                data: Object.values(genData), 
+                backgroundColor: ['#e50914', '#564d4d', '#831010', '#b9090b', '#f5f5f1'] 
+            }] 
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false, // CLAVE PARA EL MÓVIL
+            plugins: { legend: { position: 'bottom', labels: { color: 'white' } } }
+        }
     });
-    // ... (resto del código de charts)
 }
 
 function showStaffTimeline(name) {
