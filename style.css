@@ -578,3 +578,115 @@ input[type="text"]:focus { border-color: var(--primary); box-shadow: 0 0 10px rg
     .detail-info-container h2 { font-size: 1.6rem; }
     .detail-info-container { padding: 15px 20px 30px 20px; }
 }
+
+/* --- CONTENEDOR PRINCIPAL DE ESTADÍSTICAS --- */
+.stats-center-container {
+    display: grid;
+    /* En PC: hasta 4 columnas, en móvil: se adaptan solas */
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    width: 95%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* --- TARJETAS DE MÉTRICAS (KPIs) --- */
+.stat-card-large {
+    background: linear-gradient(145deg, #1e1e1e, #141414);
+    padding: 20px;
+    border-radius: 15px;
+    text-align: center;
+    border: 1px solid #333;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    transition: 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 120px;
+}
+
+.stat-card-large:hover {
+    transform: translateY(-5px);
+    border-color: var(--primary);
+}
+
+.stat-card-large h3 {
+    color: var(--grey);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 0 0 10px 0;
+}
+
+.stat-card-large .stat-value {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: white;
+    line-height: 1;
+}
+
+.stat-card-large .stat-unit {
+    color: var(--primary);
+    font-size: 0.9rem;
+    font-weight: bold;
+    margin-top: 5px;
+}
+
+/* --- CONTENEDOR DE GRÁFICOS --- */
+.charts-grid {
+    display: grid;
+    /* En PC: 2 gráficos por fila. En móvil: 1 por fila */
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 25px;
+    width: 95%;
+    max-width: 1200px;
+    margin: 30px auto;
+    padding-bottom: 50px;
+}
+
+.charts {
+    background: var(--card);
+    padding: 20px;
+    border-radius: 15px;
+    border: 1px solid #333;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+    min-height: 350px; /* Asegura espacio para el Canvas de Chart.js */
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.charts h3 {
+    text-align: left;
+    margin-bottom: 20px;
+    font-size: 1.1rem;
+    color: white;
+    border-left: 4px solid var(--primary);
+    padding-left: 15px;
+}
+
+/* --- AJUSTES ESPECÍFICOS PARA MÓVIL --- */
+@media (max-width: 600px) {
+    .stats-center-container {
+        /* En móviles muy pequeños, 2 tarjetas por fila para no ocupar tanto espacio vertical */
+        grid-template-columns: repeat(2, 1fr);
+        padding: 10px;
+        gap: 10px;
+    }
+
+    .stat-card-large .stat-value {
+        font-size: 1.8rem; /* Números un poco más pequeños en móvil */
+    }
+
+    .charts-grid {
+        grid-template-columns: 1fr; /* Un gráfico debajo de otro */
+        width: 100%;
+        padding: 10px;
+    }
+    
+    .charts {
+        padding: 15px;
+        min-height: 300px;
+    }
+}
