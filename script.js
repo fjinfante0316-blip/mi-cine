@@ -234,57 +234,105 @@ function showStaffTimeline(name) {
     overlay.style.display = 'block';
 }
 
-function closeMovieDetails() {
-    document.getElementById('movieModal').style.display = 'none';
-    document.body.style.overflow = 'auto';
-    // Limpiamos para que no se vea el contenido anterior al abrir otra
-    document.getElementById('detailTitle').innerText = "";
-    document.getElementById('detailOverview').innerText = "";
-}
-
+// --- FUNCIÓN UNIFICADA PARA ABRIR DETALLES (CENTRADO) ---
 async function openMovieDetails(movieId) {
+    if (!movieId) return;
     const modal = document.getElementById('movieModal');
+    
+    // 1. Limpieza previa para evitar "parpadeos" de datos antiguos
+    closeMovieDetails(); // Cerramos y limpiamos antes de cargar
+
+    // Buscamos la película en nuestra biblioteca local (myMovies)
     const movie = myMovies.find(m => m.id === movieId);
     if (!movie) return;
 
-    const res = await fetch(`${BASE_URL}/movie/${movieId}?api_key=${API_KEY}&language=es-ES&append_to_response=watch/providers`);
-    const data = await res.json();
-
+    // 2. Cargar datos básicos de nuestra biblioteca local
     document.getElementById('detailPoster').src = movie.poster;
     document.getElementById('detailTitle').innerText = movie.title;
     document.getElementById('detailYear').innerText = movie.year;
     document.getElementById('detailRating').innerText = `⭐ ${movie.rating}/10`;
-    document.getElementById('detailOverview').innerText = data.overview || "Sin sinopsis.";
+    
+    // Calculamos la duración (runtime) si la tenemos
+    const runtimeSpan = document.getElementById('detailRuntime');
+    if (movie.runtime) {
+        runtimeSpan.innerText = `${Math.floor(movie.runtime / 60)}h ${movie.runtime % 60}m`;
+    } else {
+        runtimeSpan.innerText = "Duración desconocida";
+    }
 
-    // Trivia y Finanzas
+    // 3. Pedir datos extras a TMDB (Sinopsis, Finanzas, Proveedores)
+    // Usamos append_to_response para traer proveedores en la misma llamada
+    const res = await fetch(`${BASE_URL}/movie/${movieId}?api_key=${API_KEY}&language=es-ES&append_to_response=watch/providers`);
+    const data = await res.json();
+
+    // 4. Rellenar datos dinámicos de TMDB
+    document.getElementById('detailOverview').innerText = data.overview || "No hay sinopsis disponible.";
+    document.getElementById('detailTagline').innerText = data.tagline ? `"${data.tagline}"` : "";
+
+    // --- SECCIÓN DE FINANZAS ---
     const triviaSection = document.getElementById('detailTrivia');
+    triviaSection.innerHTML = ""; // Limpiamos trivia anterior
+
     if (data.budget > 0 || data.revenue > 0) {
         const profit = data.revenue - data.budget;
+        // Color de la barra: verde si hay beneficio, rojo si hay pérdida
         const barColor = profit >= 0 ? '#4CAF50' : '#e50914';
+        
         triviaSection.innerHTML = `
             <h3>Finanzas</h3>
             <div class="finance-container">
-                <div class="finance-item"><span>Presupuesto:</span><strong>$${data.budget.toLocaleString()}</strong></div>
-                <div class="finance-item"><span>Recaudación:</span><strong>$${data.revenue.toLocaleString()}</strong></div>
-                <div class="profit-bar-wrapper"><div class="profit-bar" style="width: 100%; background: ${barColor}"></div></div>
-                <p class="profit-text" style="color: ${barColor}">${profit >= 0 ? 'Ganancia' : 'Pérdida'}: $${Math.abs(profit).toLocaleString()}</p>
-            </div>`;
+                <div class="finance-item">
+                    <span>Presupuesto:</span>
+                    <strong>$${data.budget.toLocaleString()}</strong>
+                </div>
+                <div class="finance-item">
+                    <span>Recaudación:</span>
+                    <strong>$${data.revenue.toLocaleString()}</strong>
+                </div>
+                <div class="profit-bar-wrapper">
+                    <div class="profit-bar" style="width: 100%; background: ${barColor};"></div>
+                </div>
+                <p class="profit-text" style="color: ${barColor}">
+                    ${profit >= 0 ? 'Ganancia estimada' : 'Pérdida estimada'}: $${Math.abs(profit).toLocaleString()}
+                </p>
+            </div>
+        `;
     }
 
+    // 5. Procesar proveedores (ES = España)
+    const providersDiv = document.getElementById('detailProviders');
+    providersDiv.innerHTML = ""; // Limpiamos proveedores anteriores
+    const providers = data['watch/providers']?.results?.ES?.flatrate;
+
+    if (providers && providers.length > 0) {
+        providersDiv.innerHTML = providers.map(p => `
+            <div class="provider-item">
+                <img src="https://image.tmdb.org/t/p/original${p.logo_path}" title="${p.provider_name}">
+            </div>
+        `).join('');
+    } else {
+        providersDiv.innerText = "No disponible en plataformas de suscripción.";
+    }
+
+    // 6. Mostrar el modal y bloquear el scroll del fondo
     modal.style.display = 'flex';
     document.body.style.overflow = 'hidden';
 }
 
+// --- FUNCIÓN PARA CERRAR Y LIMPIAR EL MODAL ---
 function closeMovieDetails() {
     const modal = document.getElementById('movieModal');
     modal.style.display = 'none';
-    document.body.style.overflow = 'auto'; // Devuelve el scroll a la web
+    document.body.style.overflow = 'auto'; // Devolvemos el scroll
     
-    // Limpiamos los campos para que la próxima peli no herede los datos de la anterior
+    // Limpieza profunda de los campos HTML para el próximo uso
     document.getElementById('detailTitle').innerText = "";
-    document.getElementById('detailOverview').innerText = "";
     document.getElementById('detailTagline').innerText = "";
-    document.getElementById('detailPoster').src = "";
+    document.getElementById('detailPoster').src = ""; // Evita ver el poster anterior
+    document.getElementById('detailYear').innerText = "";
+    document.getElementById('detailRuntime').innerText = "";
+    document.getElementById('detailRating').innerText = "";
+    document.getElementById('detailOverview').innerText = "";
     document.getElementById('detailTrivia').innerHTML = "";
     document.getElementById('detailProviders').innerHTML = "";
 }
