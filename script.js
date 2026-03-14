@@ -14,14 +14,22 @@ function toggleMenu() {
 }
 
 function showSection(id) {
-    document.querySelectorAll('.content-section').forEach(s => s.style.display = 'none');
-    const target = document.getElementById(id);
-    // Estilo BLIP: Las secciones de staff usan 'block' para mantener el flex horizontal
-    if(target) target.style.display = (id === 'searchSection' || id === 'stats') ? 'flex' : 'block';
-    if (id === 'stats') updateStatistics();
+    document.querySelectorAll('.content-section').forEach(s => {
+        s.style.display = 'none';
+    });
     
-    const menu = document.getElementById("sideMenu");
-    if (menu && menu.style.width === "250px") toggleMenu();
+    const target = document.getElementById(id);
+    if (target) {
+        // Usamos flex para que las estadísticas y buscadores se centren
+        target.style.display = (id === 'stats' || id === 'searchSection') ? 'flex' : 'block';
+    }
+
+    // Si entramos en estadísticas, las calculamos
+    if (id === 'stats') {
+        updateStatistics();
+    }
+    
+    toggleMenu(); // Cierra el menú al clickar
     window.scrollTo(0,0);
 }
 
@@ -161,33 +169,26 @@ function processStaff(list, person, rating) {
     }
 }
 
-// RENDER PEOPLE ACTUALIZADO (ESTILO BLIP: TARJETAS GRANDES)
+// Asegúrate de que renderPeople use onclick="showStaffTimeline"
 function renderPeople(id, arr) {
     const container = document.getElementById(id);
     if (!container) return;
     
-    // Sin .slice() para mostrar todos (91 o más)
-    container.innerHTML = arr.map(p => {
-        return `
+    container.innerHTML = arr.map(p => `
         <div class="person-card">
-            <div class="person-info-block" onclick="showStaffTimeline('${p.name}')">
+            <div class="person-info-block" onclick="showStaffTimeline('${p.name.replace(/'/g, "\\'")}')">
                 <img class="person-photo" src="${p.photo}" alt="${p.name}">
                 <strong>${p.name}</strong>
                 <div class="staff-avg-badge">⭐ ${p.averageRating}</div>
             </div>
             <div class="person-movies-block">
                 ${p.movies.map(mov => {
-                    // Buscamos el ID real para que el clic abra la sinopsis/ganancias
                     const mData = myMovies.find(m => m.title === mov.title);
-                    return `
-                        <img class="mini-poster" 
-                             src="${mov.poster}" 
-                             onclick="openMovieDetails(${mData ? mData.id : 0})">
-                    `;
+                    return `<img class="mini-poster" src="${mov.poster}" onclick="openMovieDetails(${mData ? mData.id : 0})">`;
                 }).join('')}
             </div>
-        </div>`;
-    }).join('');
+        </div>
+    `).join('');
 }
 
 // --- RESTO DE FUNCIONES (Siguen funcionando igual) ---
