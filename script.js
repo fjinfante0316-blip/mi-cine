@@ -210,7 +210,7 @@ function updateStatistics() {
 }
 
 function showStaffTimeline(name) {
-    // Filtrar películas donde aparece el artista
+    // 1. Filtrar películas del artista
     const staffMovies = myMovies.filter(m => {
         const s = m.rawStaff;
         return s.director?.name === name || 
@@ -219,7 +219,7 @@ function showStaffTimeline(name) {
                s.producers?.some(p => p.name === name);
     });
 
-    // Ordenar de más vieja a más nueva
+    // 2. Ordenar cronológicamente (Sin límites)
     staffMovies.sort((a, b) => parseInt(a.year) - parseInt(b.year));
 
     let timelineOverlay = document.getElementById('timelineOverlay');
@@ -229,20 +229,22 @@ function showStaffTimeline(name) {
         document.body.appendChild(timelineOverlay);
     }
 
+    // 3. Renderizar con el tamaño de portada pequeña (mini-poster)
     timelineOverlay.innerHTML = `
         <div class="timeline-header">
             <button class="back-btn" onclick="closeTimeline()">← Volver</button>
-            <h2 class="timeline-title">Trayectoria: ${name}</h2>
+            <h2 class="timeline-title">Trayectoria de ${name}</h2>
+            <p style="color: var(--grey)">${staffMovies.length} títulos encontrados</p>
         </div>
         <div class="timeline-track">
             ${staffMovies.map(m => `
                 <div class="timeline-item">
                     <div class="timeline-year">${m.year}</div>
                     <div class="timeline-dot"></div>
-                    <div class="card" onclick="openMovieDetails(${m.id})">
-                        <div class="rating-badge">⭐ ${m.rating}</div>
-                        <img src="${m.poster}">
-                        <h4>${m.title}</h4>
+                    <div class="mini-card-timeline" onclick="openMovieDetails(${m.id})">
+                        <img src="${m.poster}" class="mini-poster" alt="${m.title}">
+                        <div class="mini-rating">⭐ ${m.rating}</div>
+                        <h4 class="mini-title">${m.title}</h4>
                     </div>
                 </div>
             `).join('')}
@@ -250,7 +252,7 @@ function showStaffTimeline(name) {
     `;
 
     timelineOverlay.style.display = 'block';
-    document.body.style.overflow = 'hidden'; // Bloquea el scroll de la página principal
+    document.body.style.overflow = 'hidden';
 }
 
 function closeTimeline() {
