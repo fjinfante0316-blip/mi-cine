@@ -228,3 +228,25 @@ input[type="text"]:focus { border-color: var(--primary); box-shadow: 0 0 10px rg
         align-self: center;
     }
 }
+
+/* Esto oculta el contenedor completo */
+.movie-detail-modal {
+    display: none; /* Se cambia a 'flex' vía JS al abrir */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 9999; /* El número más alto para que tape todo */
+    backdrop-filter: blur(10px);
+    justify-content: center;
+    align-items: center;
+}
+
+/* Evita que los títulos h3 aparezcan si el modal no está activo */
+.movie-detail-modal h3 {
+    margin-top: 20px;
+    color: var(--gold);
+    font-size: 1.1rem;
+}
