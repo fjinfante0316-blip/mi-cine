@@ -167,36 +167,64 @@ input[type="text"]:focus { border-color: var(--primary); box-shadow: 0 0 10px rg
 
 /* --- RESPONSIVE MÓVIL (STAFF EN 3 COLUMNAS) --- */
 @media (max-width: 700px) {
-    .hero-center h1 { font-size: 2.2rem; }
-    
-    .movie-grid { grid-template-columns: repeat(2, 1fr); gap: 15px; }
-
-    /* Cambio a rejilla de 3 para Staff */
+    /* Cuadrícula de 3 columnas ocupando todo el ancho */
     .people-grid {
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 12px; padding: 15px;
+        grid-template-columns: repeat(3, 1fr); 
+        gap: 8px; 
+        padding: 10px;
     }
 
     .person-card {
-        flex-direction: column; height: auto;
-        padding-bottom: 12px; text-align: center;
+        flex-direction: column; /* Apila info y luego pelis */
+        height: auto; /* Que crezca según el contenido */
+        min-height: 180px;
+        padding-bottom: 8px;
+        align-items: center;
     }
 
     .person-info-block {
-        width: 100%; border-right: none; border-bottom: 1px solid #333;
-        padding: 15px 5px;
+        width: 100%;
+        min-width: 100%;
+        border-right: none;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        padding: 10px 4px;
+        height: auto;
     }
 
-    .person-photo { width: 65px; height: 65px; }
+    .person-photo {
+        width: 55px; 
+        height: 55px;
+        border-width: 2px;
+    }
 
-    .person-movies-block { display: none; } /* Oculto en rejilla de 3 */
+    .person-info-block strong {
+        font-size: 0.7rem;
+        margin-top: 5px;
+        min-height: 30px; /* Espacio para dos líneas de nombre */
+    }
 
-    .card-footer h4 { font-size: 0.75rem; }
-}
+    /* CONTENEDOR DE PELIS DEBAJO (En móvil) */
+    .person-movies-block {
+        display: flex; /* Lo volvemos a activar */
+        flex-wrap: wrap; /* Para que quepan las portadas */
+        justify-content: center;
+        gap: 4px;
+        padding: 8px 4px;
+        width: 100%;
+        overflow: hidden; /* Evita scrolls raros dentro de la cuadrícula */
+    }
 
-/* --- ANIMACIONES --- */
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+    .mini-poster {
+        min-width: 25px; /* Super pequeñas para que quepan varias */
+        width: 30px;
+        height: 45px;
+        border-radius: 3px;
+    }
+
+    .more-movies {
+        font-size: 0.6rem;
+        color: var(--grey);
+        align-self: center;
+    }
 }
