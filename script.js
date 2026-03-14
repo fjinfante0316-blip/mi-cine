@@ -14,22 +14,24 @@ function toggleMenu() {
 }
 
 function showSection(id) {
+    // 1. Ocultar todas las secciones
     document.querySelectorAll('.content-section').forEach(s => {
         s.style.display = 'none';
     });
-    
+
     const target = document.getElementById(id);
     if (target) {
-        // Usamos flex para que las estadísticas y buscadores se centren
+        // 2. Mostrar la sección seleccionada
+        // Importante: stats y searchSection deben ser 'flex' para que el centrado CSS funcione
         target.style.display = (id === 'stats' || id === 'searchSection') ? 'flex' : 'block';
     }
 
-    // Si entramos en estadísticas, las calculamos
+    // 3. Si es la sección de estadísticas, refrescar los datos y el gráfico
     if (id === 'stats') {
-        updateStatistics();
+        setTimeout(() => { updateStatistics(); }, 50); // Pequeño retraso para asegurar que el DOM es visible
     }
-    
-    toggleMenu(); // Cierra el menú al clickar
+
+    if (id === 'sideMenu') toggleMenu();
     window.scrollTo(0,0);
 }
 
@@ -177,7 +179,7 @@ function renderPeople(id, arr) {
     container.innerHTML = arr.map(p => `
         <div class="person-card">
             <div class="person-info-block" onclick="showStaffTimeline('${p.name.replace(/'/g, "\\'")}')">
-                <img class="person-photo" src="${p.photo}" alt="${p.name}">
+                <img class="person-photo" src="${p.photo}">
                 <strong>${p.name}</strong>
                 <div class="staff-avg-badge">⭐ ${p.averageRating}</div>
             </div>
@@ -194,31 +196,43 @@ function renderPeople(id, arr) {
 // --- RESTO DE FUNCIONES (Siguen funcionando igual) ---
 function saveAndRefresh() { localStorage.setItem('myCineData', JSON.stringify(myMovies)); renderAll(); }
 function deleteMovie(id) { if(confirm("¿Eliminar?")) { myMovies = myMovies.filter(m => m.id !== id); saveAndRefresh(); } }
-
 function updateStatistics() {
+    // Calcular minutos totales
     const mins = myMovies.reduce((acc, m) => acc + (parseInt(m.runtime) || 0) * (m.views || 1), 0);
-    document.getElementById('statHours').innerText = `${Math.floor(mins / 60)}h ${mins % 60}m`;
-    document.getElementById('statTotal').innerText = myMovies.length; // Asegúrate de tener este ID
+    
+    // Actualizar textos
+    const statTotal = document.getElementById('statTotal');
+    const statHours = document.getElementById('statHours');
+    
+    if(statTotal) statTotal.innerText = myMovies.length;
+    if(statHours) statHours.innerText = `${Math.floor(mins / 60)}h ${mins % 60}m`;
 
+    // Gráfico de Géneros
     const genData = {};
     myMovies.forEach(mov => genData[mov.genre] = (genData[mov.genre] || 0) + 1);
-    
-    if (genreChart) genreChart.destroy();
-    genreChart = new Chart(document.getElementById('genreChart'), {
-        type: 'doughnut',
-        data: { 
-            labels: Object.keys(genData), 
-            datasets: [{ 
-                data: Object.values(genData), 
-                backgroundColor: ['#e50914', '#564d4d', '#831010', '#b9090b', '#f5f5f1'] 
-            }] 
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false, // CLAVE PARA EL MÓVIL
-            plugins: { legend: { position: 'bottom', labels: { color: 'white' } } }
-        }
-    });
+
+    const ctx = document.getElementById('genreChart');
+    if (ctx) {
+        if (genreChart) genreChart.destroy(); // Evita que se solapen gráficos
+        genreChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: Object.keys(genData),
+                datasets: [{
+                    data: Object.values(genData),
+                    backgroundColor: ['#e50914', '#564d4d', '#831010', '#b9090b', '#f5f5f1'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom', labels: { color: 'white', font: { size: 10 } } }
+                }
+            }
+        });
+    }
 }
 
 function showStaffTimeline(name) {
