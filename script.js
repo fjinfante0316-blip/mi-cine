@@ -165,9 +165,9 @@ function processStaff(list, person, rating) {
 function renderPeople(id, arr) {
     const container = document.getElementById(id);
     if (!container) return;
-    
-    // Mostramos una cantidad generosa (por ejemplo, 60) para que no sientas que faltan
-    container.innerHTML = arr.slice(0, 60).map(p => {
+
+    // Eliminamos el .slice() para que procese el array COMPLETO
+    container.innerHTML = arr.map(p => { 
         return `
         <div class="person-card" onclick="showStaffTimeline('${p.name}')">
             <div class="person-info-block">
@@ -177,10 +177,15 @@ function renderPeople(id, arr) {
             </div>
             
             <div class="person-movies-block">
-                ${p.movies.slice(0, 3).map(mov => `
-                    <img class="mini-poster" src="${mov.poster}" title="${mov.title}">
-                `).join('')}
-                ${p.movies.length > 3 ? `<span class="more-movies">+${p.movies.length - 3}</span>` : ''}
+                ${p.movies.map(mov => {
+                    const movieFull = myMovies.find(m => m.title === mov.title);
+                    return `
+                        <img class="mini-poster" 
+                             src="${mov.poster}" 
+                             title="${mov.title}" 
+                             onclick="event.stopPropagation(); openMovieDetails(${movieFull?.id})">
+                    `;
+                }).join('')}
             </div>
         </div>`;
     }).join('');
