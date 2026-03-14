@@ -287,8 +287,17 @@ async function openMovieDetails(movieId) {
 }
 
 function closeMovieDetails() {
-    document.getElementById('movieModal').style.display = 'none';
-    document.body.style.overflow = 'auto';
+    const modal = document.getElementById('movieModal');
+    modal.style.display = 'none';
+    document.body.style.overflow = 'auto'; // Devuelve el scroll a la web
+    
+    // Limpiamos los campos para que la próxima peli no herede los datos de la anterior
+    document.getElementById('detailTitle').innerText = "";
+    document.getElementById('detailOverview').innerText = "";
+    document.getElementById('detailTagline').innerText = "";
+    document.getElementById('detailPoster').src = "";
+    document.getElementById('detailTrivia').innerHTML = "";
+    document.getElementById('detailProviders').innerHTML = "";
 }
 
 // --- EXPORTAR DATOS ---
