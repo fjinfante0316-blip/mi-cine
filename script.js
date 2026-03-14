@@ -197,44 +197,68 @@ function renderPeople(id, arr) {
 function saveAndRefresh() { localStorage.setItem('myCineData', JSON.stringify(myMovies)); renderAll(); }
 function deleteMovie(id) { if(confirm("¿Eliminar?")) { myMovies = myMovies.filter(m => m.id !== id); saveAndRefresh(); } }
 function updateStatistics() {
-    // Calcular minutos totales
-    const mins = myMovies.reduce((acc, m) => acc + (parseInt(m.runtime) || 0) * (m.views || 1), 0);
-    
-    // Actualizar textos
-    const statTotal = document.getElementById('statTotal');
-    const statHours = document.getElementById('statHours');
-    
-    if(statTotal) statTotal.innerText = myMovies.length;
-    if(statHours) statHours.innerText = `${Math.floor(mins / 60)}h ${mins % 60}m`;
+    if (myMovies.length === 0) return;
 
-    // Gráfico de Géneros
+    // 1. Estadísticas de texto
+    const mins = myMovies.reduce((acc, m) => acc + (parseInt(m.runtime) || 0) * (m.views || 1), 0);
+    document.getElementById('statTotal').innerText = myMovies.length;
+    document.getElementById('statHours').innerText = `${Math.floor(mins / 60)}h ${mins % 60}m`;
+
+    // 2. Gráfico de Géneros
     const genData = {};
     myMovies.forEach(mov => genData[mov.genre] = (genData[mov.genre] || 0) + 1);
 
-    const ctx = document.getElementById('genreChart');
-    if (ctx) {
-        if (genreChart) genreChart.destroy(); // Evita que se solapen gráficos
-        genreChart = new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: Object.keys(genData),
-                datasets: [{
-                    data: Object.values(genData),
-                    backgroundColor: ['#e50914', '#564d4d', '#831010', '#b9090b', '#f5f5f1'],
-                    borderWidth: 0
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { position: 'bottom', labels: { color: 'white', font: { size: 10 } } }
-                }
-            }
-        });
-    }
-}
+    const ctxGenre = document.getElementById('genreChart').getContext('2d');
+    if (genreChart) genreChart.destroy();
+    genreChart = new Chart(ctxGenre, {
+        type: 'doughnut',
+        data: {
+            labels: Object.keys(genData),
+            datasets: [{
+                data: Object.values(genData),
+                backgroundColor: ['#e50914', '#564d4d', '#831010', '#b9090b', '#f5f5f1'],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false, // Hace que respete el contenedor
+            plugins: { legend: { position: 'bottom', labels: { color: 'white' } } }
+        }
+    });
 
+    // 3. Gráfico de Evolución de Notas (CORREGIDO)
+    // Ordenamos películas por año para ver la evolución
+    const sortedMovies = [...myMovies].sort((a, b) => parseInt(a.year) - parseInt(b.year));
+    const labelsRating = sortedMovies.map(m => m.title.substring(0, 10) + "...");
+    const dataRating = sortedMovies.map(m => m.rating);
+
+    const ctxRating = document.getElementById('ratingChart').getContext('2d');
+    if (ratingChart) ratingChart.destroy();
+    ratingChart = new Chart(ctxRating, {
+        type: 'line',
+        data: {
+            labels: labelsRating,
+            datasets: [{
+                label: 'Nota',
+                data: dataRating,
+                borderColor: '#e50914',
+                backgroundColor: 'rgba(229, 9, 20, 0.2)',
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: { min: 0, max: 10, grid: { color: '#333' }, ticks: { color: 'white' } },
+                x: { ticks: { color: 'white', display: false } } // Ocultamos nombres si son muchos
+            },
+            plugins: { legend: { display: false } }
+        }
+    });
+}
 function showStaffTimeline(name) {
     const staffMovies = myMovies.filter(m => {
         const s = m.rawStaff;
