@@ -114,21 +114,36 @@ body {
 .person-card {
     display: flex;
     align-items: center;
-    background: rgba(255,255,255,0.03);
+    background: rgba(255, 255, 255, 0.05);
     border-radius: 12px;
-    height: 140px; /* Altura fija para que las portadas no se salgan */
-    overflow: hidden; 
+    height: 150px; /* Altura fija para todos */
+    border: 1px solid #333;
+    overflow: hidden;
+    margin-bottom: 10px;
 }
 
 .person-info-block {
-    min-width: 120px;
+    flex: 0 0 120px; /* NO crece, NO se encoge, siempre mide 120px */
     height: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background: rgba(0,0,0,0.2);
+    background: rgba(0, 0, 0, 0.3);
+    border-right: 1px solid #222;
     padding: 10px;
+    text-align: center;
+}
+
+.person-info-block strong {
+    font-size: 0.8rem;
+    line-height: 1.1;
+    margin-top: 8px;
+    word-wrap: break-word; /* Rompe el nombre si es muy largo */
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* Máximo 2 líneas de nombre */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 .person-photo {
@@ -137,13 +152,14 @@ body {
 }
 
 .person-movies-block {
-    flex: 1;
+    flex: 1; /* Ocupa todo el espacio restante de forma igualitaria */
     display: flex;
-    overflow-x: auto; /* Permite scroll horizontal si hay muchas películas */
-    gap: 10px;
-    padding: 10px 15px;
+    overflow-x: auto;
     align-items: center;
-}
+    gap: 12px;
+    padding: 0 15px;
+} 
+
 .person-movies-block::-webkit-scrollbar { display: none; }
 
 .mini-poster {
@@ -157,30 +173,34 @@ body {
 /* --- ESTADÍSTICAS REPARADAS --- */
 .stats-center-container {
     display: grid;
-    grid-template-columns: repeat(2, 1fr); /* 2 tarjetas por fila */
-    gap: 15px;
+    grid-template-columns: repeat(2, 1fr); /* 2 columnas fijas en móvil */
+    gap: 10px;
     width: 100%;
-    max-width: 900px;
-    margin-bottom: 30px;
+    padding: 10px;
+    box-sizing: border-box;
 }
 
 .stat-card-large {
     background: var(--card);
-    padding: 20px;
-    border-radius: 15px;
+    padding: 15px;
+    border-radius: 12px;
     border: 1px solid #333;
     text-align: center;
 }
 
-.stat-value { font-size: 2rem; font-weight: bold; color: var(--primary); }
+.stat-value {
+    font-size: 1.8rem; /* Tamaño adaptado a móvil */
+    font-weight: bold;
+    color: var(--primary);
+}
 
-/* --- GRÁFICOS (CHART.JS SAFE) --- */
 .charts-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
     width: 100%;
-    max-width: 900px;
+    padding: 10px;
+    box-sizing: border-box;
 }
 
 @media (min-width: 768px) {
@@ -188,13 +208,13 @@ body {
 }
 
 .charts {
+    width: 100%;
     background: var(--card);
-    padding: 20px;
     border-radius: 15px;
-    border: 1px solid #333;
-    height: 380px; /* Altura fija para estabilidad */
-    display: flex;
-    flex-direction: column;
+    padding: 15px;
+    height: 300px; /* Altura fija para que el gráfico se dibuje bien */
+    position: relative;
+    box-sizing: border-box;
 }
 
 .chart-container {
