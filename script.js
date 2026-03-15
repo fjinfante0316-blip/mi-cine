@@ -11,6 +11,37 @@ window.onload = () => {
     showSection('searchSection'); 
 };
 
+function renderStats() {
+    const ctx = document.getElementById('genreChart');
+    if (!ctx) return;
+
+    // Si ya existe un gráfico, lo borramos para que no de error
+    if (genreChart) {
+        genreChart.destroy();
+    }
+
+    // Datos de ejemplo (sustituir por tus datos reales de la biblioteca)
+    const data = {
+        labels: ['Acción', 'Drama', 'Comedia', 'Terror'],
+        datasets: [{
+            data: [10, 5, 8, 3],
+            backgroundColor: ['#e50914', '#ffffff', '#818181', '#ffcc00']
+        }]
+    };
+
+    genreChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: data,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'bottom', labels: { color: 'white' } }
+            }
+        }
+    });
+}
+
 // --- NAVEGACIÓN ---
 function toggleMenu() {
     const menu = document.getElementById("sideMenu");
@@ -18,26 +49,20 @@ function toggleMenu() {
 }
 
 function showSection(id) {
-    // Ocultar todas las secciones
-    document.querySelectorAll('.content-section').forEach(s => s.style.display = 'none');
+    // Ocultamos todas
+    const sections = document.querySelectorAll('.content-section');
+    sections.forEach(s => s.style.display = 'none');
 
+    // Mostramos la elegida
     const target = document.getElementById(id);
     if (target) {
-        // Usamos flex para que los elementos hijos se centren
-        target.style.display = 'flex';
-        target.style.flexDirection = 'column';
+        target.style.display = (id === 'searchSection' || id === 'stats') ? 'flex' : 'block';
     }
 
-    // SI LA SECCIÓN ES STATS, DIBUJAMOS LOS GRÁFICOS
+    // Si es estadísticas, forzamos dibujo
     if (id === 'stats') {
-        // Un pequeño retraso para que el CSS de 'display: flex' se aplique primero
-        setTimeout(() => {
-            updateStatistics(); 
-        }, 100);
+        setTimeout(renderStats, 300);
     }
-
-    if (id === 'sideMenu') toggleMenu();
-    window.scrollTo(0,0);
 }
 
 // --- BUSCADORES ---
@@ -301,6 +326,29 @@ function showStaffTimeline(name) {
 function openMovieDetailsByName(title) {
     const movie = myMovies.find(m => m.title === title);
     if (movie) openMovieDetails(movie.id);
+}
+
+// BUSCAR PELÍCULAS (Asegúrate de poner tu API KEY real)
+async function searchMovie() {
+    const query = document.getElementById('searchInput').value;
+    const results = document.getElementById('results');
+    if (!query) return;
+
+    results.innerHTML = '<p>Buscando...</p>';
+    
+    const resp = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=TU_API_KEY_AQUI&query=${query}&language=es-ES`);
+    const data = await resp.json();
+
+    results.innerHTML = data.results.map(m => `
+        <div class="card">
+            <img src="https://image.tmdb.org/t/p/w500${m.poster_path}" alt="${m.title}">
+            <div style="padding:10px;">
+                <button onclick="saveToLibrary(${m.id}, '${m.title.replace(/'/g, "")}')" class="main-btn">
+                    Añadir a mi Cine
+                </button>
+            </div>
+        </div>
+    `).join('');
 }
 
 // --- FUNCIÓN UNIFICADA PARA ABRIR DETALLES (CENTRADO) ---
