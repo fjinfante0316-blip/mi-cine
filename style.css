@@ -33,7 +33,7 @@ body {
     position: fixed;
     top: 20px;
     left: 20px;
-    z-index: 9999; /* Máxima prioridad */
+    z-index: 9999; 
     background: rgba(229, 9, 20, 0.9);
     padding: 12px;
     border-radius: 50%;
@@ -47,9 +47,14 @@ body {
     max-width: 1400px;
     padding: 100px 20px 40px;
     box-sizing: border-box;
-    display: none; /* Controlado por JS */
+    display: none; /* Se activa con .active */
     flex-direction: column;
     align-items: center;
+}
+
+/* CLASE ACTIVA PARA MOSTRAR SECCIONES */
+.content-section.active {
+    display: flex !important;
 }
 
 .section-title {
@@ -60,30 +65,19 @@ body {
     border-left: 5px solid var(--primary);
 }
 
-/* --- SECCIÓN INICIO (HERO) VISIBLE --- */
+/* --- SECCIÓN INICIO (HERO) CORREGIDA --- */
 #searchSection {
     min-height: 100vh;
-    width: 100%; 
-    display: none; /* Se activa con la clase .active */
-    flex-direction: column;
+    width: 100%;
     justify-content: center;
     align-items: center;
     background: linear-gradient(rgba(0,0,0,0.7), var(--bg)), 
                 url('https://assets.nflxext.com/ffe/siteui/vlv3/f841d4c7-10e1-40af-bcae-07a3f8dc141a/f6ed7c9a-4100-410d-b108-757917e94e77/ES-es-20220502-popsignuptwoweeks-perspective_alpha_website_medium.jpg');
     background-size: cover;
     background-position: center;
-    margin: 0;
+    text-align: center;
     padding: 20px;
     box-sizing: border-box;
-}
-
-/* Fuerza a que sea visible cuando está activa */
-#searchSection.active {
-    display: flex !important;
-}
-
-.content-section.active {
-    display: flex !important;
 }
 
 #searchSection input[type="text"] {
@@ -115,10 +109,11 @@ body {
     font-weight: 800;
     letter-spacing: -1px;
 }
+
 /* --- HEMEROTECA (MOVIE GRID) --- */
 .movie-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 3 columnas en móvil por defecto */
+    grid-template-columns: repeat(3, 1fr);
     gap: 15px;
     width: 100%;
     padding: 20px 0;
@@ -139,7 +134,7 @@ body {
 .card:hover { transform: translateY(-10px); border-color: #444; }
 .card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; }
 
-/* --- STAFF / PERSONS --- */
+/* --- STAFF / PERSONS (UNIFICADO) --- */
 .people-grid {
     display: flex;
     flex-direction: column;
@@ -152,14 +147,13 @@ body {
     align-items: center;
     background: rgba(255, 255, 255, 0.05);
     border-radius: 12px;
-    height: 150px; /* Altura fija para todos */
+    height: 150px; 
     border: 1px solid #333;
     overflow: hidden;
-    margin-bottom: 10px;
 }
 
 .person-info-block {
-    flex: 0 0 120px; /* NO crece, NO se encoge, siempre mide 120px */
+    flex: 0 0 120px; /* Ancho fijo para nombres */
     height: 100%;
     display: flex;
     flex-direction: column;
@@ -175,9 +169,8 @@ body {
     font-size: 0.8rem;
     line-height: 1.1;
     margin-top: 8px;
-    word-wrap: break-word; /* Rompe el nombre si es muy largo */
     display: -webkit-box;
-    -webkit-line-clamp: 2; /* Máximo 2 líneas de nombre */
+    -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
@@ -188,7 +181,7 @@ body {
 }
 
 .person-movies-block {
-    flex: 1; /* Ocupa todo el espacio restante de forma igualitaria */
+    flex: 1;
     display: flex;
     overflow-x: auto;
     align-items: center;
@@ -199,17 +192,17 @@ body {
 .person-movies-block::-webkit-scrollbar { display: none; }
 
 .mini-poster {
-    min-width: 70px; /* Tamaño mínimo para que no se compriman */
+    min-width: 70px;
     height: 100px;
     object-fit: cover;
     border-radius: 4px;
     cursor: pointer;
 }
 
-/* --- ESTADÍSTICAS REPARADAS --- */
+/* --- ESTADÍSTICAS REPARADAS (UNA BAJO OTRA) --- */
 .stats-center-container {
     display: flex;
-    flex-direction: column; /* También uno debajo de otro */
+    flex-direction: column; 
     gap: 15px;
     width: 100%;
     max-width: 600px;
@@ -217,31 +210,25 @@ body {
 
 .stat-card-large {
     background: var(--card);
-    padding: 15px;
+    padding: 20px;
     border-radius: 12px;
     border: 1px solid #333;
     text-align: center;
 }
 
 .stat-value {
-    font-size: 1.8rem; /* Tamaño adaptado a móvil */
+    font-size: 2.2rem;
     font-weight: bold;
     color: var(--primary);
 }
 
 .charts-grid {
     display: flex;
-    flex-direction: column; /* Fuerza la columna */
+    flex-direction: column;
     gap: 30px;
     width: 100%;
-    max-width: 600px; /* Evita que en PC sean gigantes */
-    padding: 20px;
-    box-sizing: border-box;
-    align-items: center;
-}
-
-@media (min-width: 768px) {
-    .charts-grid { grid-template-columns: 1fr 1fr; }
+    max-width: 600px;
+    padding: 20px 0;
 }
 
 .charts {
@@ -250,22 +237,38 @@ body {
     border-radius: 15px;
     border: 1px solid #333;
     width: 100%;
-    height: 400px; /* ALTURA FIJA: Crucial para que el gráfico no se salga */
-    position: relative; /* Necesario para que el canvas se ajuste */
-    display: flex;
-    flex-direction: column;
-}
-
-canvas {
-    width: 100% !important;
-    height: 100% !important;
+    height: 350px; /* Altura fija para el gráfico */
+    position: relative;
+    box-sizing: border-box;
 }
 
 .chart-container {
     flex: 1;
     position: relative;
     width: 100%;
-    min-height: 0; /* Evita desbordamientos en flex boxes */
+    height: 250px; /* Espacio para el canvas */
+}
+
+/* --- MENÚ LATERAL --- */
+.sidenav {
+    height: 100%; 
+    width: 0; /* JS debe cambiar esto a 250px */
+    position: fixed; 
+    z-index: 10000;
+    top: 0; left: 0; 
+    background: rgba(10,10,10,0.98); 
+    overflow-x: hidden; 
+    transition: 0.5s; 
+    padding-top: 60px;
+}
+
+.sidenav a { 
+    padding: 15px 32px; 
+    text-decoration: none; 
+    font-size: 1.1rem; 
+    color: white; 
+    display: block; 
+    transition: var(--transition); 
 }
 
 /* --- MODAL DETALLES --- */
@@ -291,38 +294,10 @@ canvas {
     border: 1px solid #333;
 }
 
-/* --- MENÚ LATERAL --- */
-.sidenav {
-    height: 100%;
-    width: 0; /* Empieza cerrado */
-    position: fixed;
-    z-index: 10000; /* Por encima de todo */
-    top: 0;
-    left: 0;
-    background: #111;
-    overflow-x: hidden;
-    transition: 0.5s; /* Animación de apertura */
-    padding-top: 60px;
-}
-
-.sidenav a { 
-    padding: 15px 32px; text-decoration: none; font-size: 1.1rem; 
-    color: var(--grey); display: block; transition: var(--transition); 
-}
-
-/* --- RESPONSIVE EXTRA --- */
-@media (max-width: 600px) {
-    .section-title { font-size: 1.5rem; }
-    .stat-value { font-size: 1.5rem; }
-    .hero-center h1 { font-size: 2.2rem; }
-}
-
-/* --- CENTRADO DE PORTADA EN MODAL --- */
 .detail-poster-container {
     width: 100%;
     display: flex;
-    justify-content: center; /* Centra la imagen horizontalmente */
-    align-items: center;
+    justify-content: center;
     padding: 20px;
 }
 
@@ -330,5 +305,4 @@ canvas {
     max-width: 250px;
     height: auto;
     border-radius: 12px;
-    display: block; /* Elimina espacios residuales */
 }
