@@ -7,7 +7,7 @@ let myMovies = JSON.parse(localStorage.getItem('myCineData')) || [];
 let genreChart = null;
 let ratingChart = null;
 
-window.onload = () => {
+window.onload = function() {
     showSection('searchSection'); 
 };
 
@@ -63,6 +63,7 @@ function showSection(id) {
     if (id === 'stats') {
         setTimeout(renderStats, 300);
     }
+    closeNav(); // Cerrar menú al elegir sección
 }
 
 // --- BUSCADORES ---
@@ -529,6 +530,14 @@ function importData(event) {
     
     // Resetear el input para permitir importar el mismo archivo de nuevo si fuera necesario
     event.target.value = '';
+}
+
+function openNav() {
+    document.getElementById("mySidenav").style.width = "250px";
+}
+
+function closeNav() {
+    document.getElementById("mySidenav").style.width = "0";
 }
 
 renderAll();
