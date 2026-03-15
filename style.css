@@ -63,8 +63,8 @@ body {
 /* --- SECCIÓN INICIO (HERO) VISIBLE --- */
 #searchSection {
     min-height: 100vh;
-    width: 100%; /* Asegura el ancho total */
-    display: none; 
+    width: 100%; 
+    display: none; /* Se activa con la clase .active */
     flex-direction: column;
     justify-content: center;
     align-items: center;
@@ -72,13 +72,14 @@ body {
                 url('https://assets.nflxext.com/ffe/siteui/vlv3/f841d4c7-10e1-40af-bcae-07a3f8dc141a/f6ed7c9a-4100-410d-b108-757917e94e77/ES-es-20220502-popsignuptwoweeks-perspective_alpha_website_medium.jpg');
     background-size: cover;
     background-position: center;
-    text-align: center;
-    padding: 20px;
     margin: 0;
-    position: relative;
-    top: 0;
-    left: 0;
+    padding: 20px;
     box-sizing: border-box;
+}
+
+/* Fuerza a que sea visible cuando está activa */
+#searchSection.active {
+    display: flex !important;
 }
 
 .content-section.active {
@@ -292,9 +293,16 @@ canvas {
 
 /* --- MENÚ LATERAL --- */
 .sidenav {
-    height: 100%; width: 0; position: fixed; z-index: 3000;
-    top: 0; left: 0; background: rgba(17,17,17,0.98); 
-    overflow-x: hidden; transition: var(--transition); padding-top: 60px;
+    height: 100%;
+    width: 0; /* Empieza cerrado */
+    position: fixed;
+    z-index: 10000; /* Por encima de todo */
+    top: 0;
+    left: 0;
+    background: #111;
+    overflow-x: hidden;
+    transition: 0.5s; /* Animación de apertura */
+    padding-top: 60px;
 }
 
 .sidenav a { 
