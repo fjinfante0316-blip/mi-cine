@@ -63,8 +63,8 @@ body {
 /* --- SECCIÓN INICIO (HERO) VISIBLE --- */
 #searchSection {
     min-height: 100vh;
-    width: 100vw; /* Asegura el ancho total */
-    display: flex !important; 
+    width: 100%; /* Asegura el ancho total */
+    display: none; 
     flex-direction: column;
     justify-content: center;
     align-items: center;
@@ -79,6 +79,10 @@ body {
     top: 0;
     left: 0;
     box-sizing: border-box;
+}
+
+.content-section.active {
+    display: flex !important;
 }
 
 #searchSection input[type="text"] {
