@@ -73,6 +73,7 @@ function renderAll() {
         }
     });
 
+    // Renderizar Hemeroteca por años
     const sortedYears = Object.keys(groups).sort((a, b) => b - a);
     let html = '';
     sortedYears.forEach(year => {
@@ -82,7 +83,9 @@ function renderAll() {
     });
     container.innerHTML = html;
 
+    // Renderizar todas las listas de personas
     const sortByRating = (a, b) => b.averageRating - a.averageRating || b.movies.length - a.movies.length;
+    
     renderPeople('directorList', directors.sort(sortByRating));
     renderPeople('actorList', actors.sort(sortByRating));
     renderPeople('writerList', writers.sort(sortByRating));
@@ -204,18 +207,35 @@ async function addMovie(id, title, posterPath) {
     const nota = parseFloat(prompt(`¿Nota para "${title}"? (0-10)`, "5"));
     if (isNaN(nota) || nota < 0 || nota > 10) return alert("Nota no válida");
 
+    // Consultas a la API
     const d = await (await fetch(`${BASE_URL}/movie/${id}?api_key=${API_KEY}&language=es-ES`)).json();
     const c = await (await fetch(`${BASE_URL}/movie/${id}/credits?api_key=${API_KEY}`)).json();
     
     const year = d.release_date ? d.release_date.split('-')[0] : "----";
     const getSPhoto = (path) => path ? IMG_BIG + path : 'https://via.placeholder.com/500x500?text=Sin+Foto';
+    const posterFull = IMG_URL + posterPath;
 
     myMovies.push({
         id, title, year, rating: nota, runtime: d.runtime, genre: d.genres[0]?.name || "Otros",
-        poster: IMG_URL + posterPath,
+        poster: posterFull,
         rawStaff: {
-            director: { name: c.crew.find(x => x.job === 'Director')?.name, photo: getSPhoto(c.crew.find(x => x.job === 'Director')?.profile_path), movie: title, poster: IMG_URL + posterPath },
-            actors: c.cast.slice(0, 5).map(a => ({ name: a.name, photo: getSPhoto(a.profile_path), movie: title, poster: IMG_URL + posterPath }))
+            director: { 
+                name: c.crew.find(x => x.job === 'Director')?.name, 
+                photo: getSPhoto(c.crew.find(x => x.job === 'Director')?.profile_path), 
+                movie: title, poster: posterFull 
+            },
+            // SIN LÍMITE: Tomamos todo el cast disponible
+            actors: c.cast.map(a => ({ 
+                name: a.name, photo: getSPhoto(a.profile_path), movie: title, poster: posterFull 
+            })),
+            // GUIONISTAS: Filtrados por departamento Writing
+            writers: c.crew.filter(x => x.department === 'Writing').map(w => ({ 
+                name: w.name, photo: getSPhoto(w.profile_path), movie: title, poster: posterFull 
+            })),
+            // PRODUCTORES: Filtrados por departamento Production
+            producers: c.crew.filter(x => x.department === 'Production').map(p => ({ 
+                name: p.name, photo: getSPhoto(p.profile_path), movie: title, poster: posterFull 
+            }))
         }
     });
 
