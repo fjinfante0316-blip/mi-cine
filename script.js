@@ -226,43 +226,33 @@ function renderPeople(id, arr) {
 function saveAndRefresh() { localStorage.setItem('myCineData', JSON.stringify(myMovies)); renderAll(); }
 function deleteMovie(id) { if(confirm("¿Eliminar?")) { myMovies = myMovies.filter(m => m.id !== id); saveAndRefresh(); } }
 function updateStatistics() {
-    if (myMovies.length === 0) return;
-
-    // 1. Estadísticas de texto
-    const mins = myMovies.reduce((acc, m) => acc + (parseInt(m.runtime) || 0) * (m.views || 1), 0);
-    document.getElementById('statTotal').innerText = myMovies.length;
-    document.getElementById('statHours').innerText = `${Math.floor(mins / 60)}h ${mins % 60}m`;
-
-    // 2. Gráfico de Géneros
-    const genData = {};
-    myMovies.forEach(mov => genData[mov.genre] = (genData[mov.genre] || 0) + 1);
-
-    const ctxGenre = document.getElementById('genreChart').getContext('2d');
-    if (genreChart) genreChart.destroy();
-    genreChart = new Chart(ctxGenre, {
-        type: 'doughnut',
-        data: {
-            labels: Object.keys(genData),
-            datasets: [{
-                data: Object.values(genData),
-                backgroundColor: ['#e50914', '#564d4d', '#831010', '#b9090b', '#f5f5f1'],
-                borderWidth: 0
-            }]
-        },
-        options: {
-    responsive: true,
-    maintainAspectRatio: false, // Esto es lo más importante
-    plugins: {
-        legend: {
-            position: 'bottom',
-            labels: {
-                color: 'white',
-                font: { size: 10 } // Letra pequeña para que quepa en móvil
-            }
-        }
+    // 1. Verificar que hay películas
+    if (!myMovies || myMovies.length === 0) {
+        console.log("No hay películas para calcular estadísticas");
+        return;
     }
+
+    // 2. Cálculo de tiempo total
+    const totalMinutes = myMovies.reduce((acc, m) => acc + (parseInt(m.runtime) || 0), 0);
+    const hours = Math.floor(totalMinutes / 60);
+    const mins = totalMinutes % 60;
+
+    // Insertar en el HTML (Asegúrate de que estos IDs existen)
+    const statTotal = document.getElementById('statTotal');
+    const statHours = document.getElementById('statHours');
+    
+    if (statTotal) statTotal.innerText = myMovies.length;
+    if (statHours) statHours.innerText = `${hours}h ${mins}m`;
+
+    // 3. Gráfico de Géneros
+    const genData = {};
+    myMovies.forEach(m => { genData[m.genre] = (genData[m.genre] || 0) + 1; });
+
+    renderGenreChart(genData);
+
+    // 4. Gráfico de Evolución de Notas (Asegúrate de tener un <canvas id="ratingChart">)
+    renderRatingChart();
 }
-    });
 
     // 3. Gráfico de Evolución de Notas (CORREGIDO)
     // Ordenamos películas por año para ver la evolución
@@ -320,6 +310,38 @@ function showStaffTimeline(name) {
         </div>
     `;
     overlay.style.display = 'block';
+}
+
+function renderRatingChart() {
+    const ctx = document.getElementById('ratingChart');
+    if (!ctx) return;
+
+    // Ordenar películas por fecha/año para ver la evolución
+    const sortedMovies = [...myMovies].sort((a, b) => a.year - b.year);
+    
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: sortedMovies.map(m => m.title.substring(0, 10)),
+            datasets: [{
+                label: 'Evolución de Notas',
+                data: sortedMovies.map(m => m.rating),
+                borderColor: '#e50914',
+                backgroundColor: 'rgba(229, 9, 20, 0.2)',
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false, // CLAVE para que no se salga
+            scales: {
+                y: { beginAtZero: true, max: 10, ticks: { color: '#fff' } },
+                x: { ticks: { color: '#fff', display: false } }
+            },
+            plugins: { legend: { display: false } }
+        }
+    });
 }
 
 // 3. Función para abrir detalles por nombre (usada en mini-posters)
