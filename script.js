@@ -1,135 +1,55 @@
+/* --- CONFIGURACIÓN API --- */
 const API_KEY = 'e8b61af0cf42a633e3aa581bb73127f8'; 
 const BASE_URL = 'https://api.themoviedb.org/3';
 const IMG_URL = 'https://image.tmdb.org/t/p/w300';
-const IMG_BIG = 'https://image.tmdb.org/t/p/w500'; // Para fotos de staff más nítidas
+const IMG_BIG = 'https://image.tmdb.org/t/p/w500';
 
+/* --- ESTADO GLOBAL --- */
 let myMovies = JSON.parse(localStorage.getItem('myCineData')) || [];
 let genreChart = null;
 let ratingChart = null;
 
+/* --- INICIO Y NAVEGACIÓN --- */
 window.onload = function() {
-    showSection('searchSection'); 
+    showSection('searchSection'); // Forzamos portada al inicio
+    renderAll();
 };
 
-function renderStats() {
-    const ctx = document.getElementById('genreChart');
-    if (!ctx) return;
-
-    // Si ya existe un gráfico, lo borramos para que no de error
-    if (genreChart) {
-        genreChart.destroy();
-    }
-
-    // Datos de ejemplo (sustituir por tus datos reales de la biblioteca)
-    const data = {
-        labels: ['Acción', 'Drama', 'Comedia', 'Terror'],
-        datasets: [{
-            data: [10, 5, 8, 3],
-            backgroundColor: ['#e50914', '#ffffff', '#818181', '#ffcc00']
-        }]
-    };
-
-    genreChart = new Chart(ctx, {
-        type: 'doughnut',
-        data: data,
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { position: 'bottom', labels: { color: 'white' } }
-            }
-        }
-    });
+function openNav() {
+    document.getElementById("mySidenav").style.width = "250px";
 }
 
-// --- NAVEGACIÓN ---
-function toggleMenu() {
-    const menu = document.getElementById("sideMenu");
-    menu.style.width = (menu.style.width === "250px") ? "0" : "250px";
+function closeNav() {
+    const nav = document.getElementById("mySidenav");
+    if (nav) nav.style.width = "0";
 }
 
 function showSection(id) {
-    // Ocultamos todas
+    // 1. Ocultar todas las secciones con clase .active
     const sections = document.querySelectorAll('.content-section');
-    sections.forEach(s => s.style.display = 'none');
+    sections.forEach(s => {
+        s.classList.remove('active');
+        s.style.display = 'none'; // Refuerzo para evitar fallos de renderizado
+    });
 
-    // Mostramos la elegida
+    // 2. Activar la sección elegida
     const target = document.getElementById(id);
     if (target) {
+        target.classList.add('active');
+        // Usamos flex para portada y stats para mantener el centrado del CSS
         target.style.display = (id === 'searchSection' || id === 'stats') ? 'flex' : 'block';
     }
 
-    // Si es estadísticas, forzamos dibujo
+    // 3. Si entramos en estadísticas, calculamos y dibujamos
     if (id === 'stats') {
-        setTimeout(renderStats, 300);
+        setTimeout(updateStatistics, 300);
     }
-    closeNav(); // Cerrar menú al elegir sección
+
+    closeNav(); 
+    window.scrollTo(0,0);
 }
 
-// --- BUSCADORES ---
-document.getElementById('searchBtn').addEventListener('click', async () => {
-    const query = document.getElementById('searchInput').value;
-    if (!query) return;
-    const res = await fetch(`${BASE_URL}/search/movie?api_key=${API_KEY}&query=${query}&language=es-ES`);
-    const data = await res.json();
-    document.getElementById('results').innerHTML = data.results.slice(0, 8).map(m => `
-        <div class="card">
-            <img src="${m.poster_path ? IMG_URL + m.poster_path : 'https://via.placeholder.com/300x450'}">
-            <h4>${m.title}</h4>
-            <button onclick="addMovie(${m.id}, '${m.title.replace(/'/g, "")}', '${m.poster_path}')">Añadir</button>
-        </div>
-    `).join('');
-});
-
-function filterMyMovies() {
-    const term = document.getElementById('internalSearch').value.toLowerCase();
-    // Filtro de películas
-    document.querySelectorAll('.movie-grid .card').forEach(card => {
-        const title = card.querySelector('h4')?.innerText.toLowerCase() || "";
-        card.style.display = title.includes(term) ? "flex" : "none";
-    });
-    // Filtro de Staff (Estilo BLIP)
-    document.querySelectorAll('.person-card').forEach(card => {
-        const name = card.querySelector('strong')?.innerText.toLowerCase() || "";
-        card.style.display = name.includes(term) ? "flex" : "none";
-    });
-}
-
-// --- AÑADIR PELÍCULA ---
-async function addMovie(id, title, posterPath) {
-    if (myMovies.find(m => m.id === id)) return alert("Ya guardada");
-    
-    const nota = parseFloat(prompt(`¿Qué nota le das a "${title}"? (0-10)`, "5"));
-    if (isNaN(nota) || nota < 0 || nota > 10) return alert("Pon una nota válida");
-
-    const dRes = await fetch(`${BASE_URL}/movie/${id}?api_key=${API_KEY}&language=es-ES`);
-    const d = await dRes.json();
-    const cRes = await fetch(`${BASE_URL}/movie/${id}/credits?api_key=${API_KEY}`);
-    const c = await cRes.json();
-    
-    const year = d.release_date ? d.release_date.split('-')[0] : "Sin Año";
-    const posterFull = IMG_URL + posterPath;
-
-    myMovies.push({
-        id, title, status: 'watched', views: 1, year: year,
-        rating: nota,
-        poster: posterFull,
-        runtime: d.runtime || 0,
-        genre: d.genres[0]?.name || "Otros",
-        rawStaff: {
-            director: { name: c.crew.find(x => x.job === 'Director')?.name, photo: getPhoto(c.crew.find(x => x.job === 'Director')?.profile_path), movie: title, poster: posterFull },
-            actors: c.cast.slice(0, 5).map(a => ({ name: a.name, photo: getPhoto(a.profile_path), movie: title, poster: posterFull })),
-            writers: c.crew.filter(x => x.department === 'Writing').slice(0, 2).map(w => ({ name: w.name, photo: getPhoto(w.profile_path), movie: title, poster: posterFull })),
-            producers: c.crew.filter(x => x.department === 'Production').slice(0, 2).map(p => ({ name: p.name, photo: getPhoto(p.profile_path), movie: title, poster: posterFull }))
-        }
-    });
-
-    saveAndRefresh();
-}
-
-function getPhoto(path) { return path ? IMG_BIG + path : 'https://via.placeholder.com/500x500?text=Sin+Foto'; }
-
-// --- RENDERIZADO ESTILO BLIP ---
+/* --- RENDERIZADO PRINCIPAL (HEMEROTECA Y STAFF) --- */
 function renderAll() {
     const container = document.getElementById('watchedMovies');
     if (!container) return;
@@ -153,17 +73,15 @@ function renderAll() {
         }
     });
 
-    // Renderizar películas por años
     const sortedYears = Object.keys(groups).sort((a, b) => b - a);
     let html = '';
     sortedYears.forEach(year => {
-        html += `<div class="year-divider">${year}</div><div class="movie-grid">`;
+        html += `<div class="section-title">${year}</div><div class="movie-grid">`;
         html += groups[year].map(m => movieCardTemplate(m)).join('');
         html += `</div>`;
     });
     container.innerHTML = html;
 
-    // Renderizar Staff (Ordenados por nota media)
     const sortByRating = (a, b) => b.averageRating - a.averageRating || b.movies.length - a.movies.length;
     renderPeople('directorList', directors.sort(sortByRating));
     renderPeople('actorList', actors.sort(sortByRating));
@@ -174,12 +92,11 @@ function renderAll() {
 function movieCardTemplate(m) {
     return `
         <div class="card" onclick="openMovieDetails(${m.id})">
-            <div class="view-count-badge">👁️ ${m.views || 1}</div>
-            <div class="rating-badge">⭐ ${m.rating || 0}</div>
             <img src="${m.poster}">
-            <div class="card-footer">
+            <div style="padding:10px;">
                 <h4>${m.title}</h4>
-                <button class="delete-btn-new" onclick="event.stopPropagation(); deleteMovie(${m.id})">×</button>
+                <p>⭐ ${m.rating} | 👁️ ${m.views || 1}</p>
+                <button class="delete-btn-new" onclick="event.stopPropagation(); deleteMovie(${m.id})">Eliminar</button>
             </div>
         </div>`;
 }
@@ -190,7 +107,7 @@ function processStaff(list, person, rating) {
     if (existing) {
         existing.totalRating += rating;
         if (!existing.movies.find(mov => mov.title === person.movie)) {
-            existing.movies.push({ title: person.movie, poster: person.poster, id: person.id });
+            existing.movies.push({ title: person.movie, poster: person.poster });
             existing.averageRating = (existing.totalRating / existing.movies.length).toFixed(1);
         }
     } else {
@@ -202,342 +119,143 @@ function processStaff(list, person, rating) {
     }
 }
 
-// Asegúrate de que renderPeople use onclick="showStaffTimeline"
 function renderPeople(id, arr) {
     const container = document.getElementById(id);
     if (!container) return;
-    
     container.innerHTML = arr.map(p => `
         <div class="person-card">
-            <div class="person-info-block" style="cursor:pointer;" onclick="showStaffTimeline('${p.name.replace(/'/g, "\\'")}')">
+            <div class="person-info-block">
                 <img class="person-photo" src="${p.photo}">
                 <strong>${p.name}</strong>
-                <div class="staff-avg-badge">⭐ ${p.averageRating}</div>
+                <span style="color:var(--gold); font-size:0.8rem;">⭐ ${p.averageRating}</span>
             </div>
             <div class="person-movies-block">
-                ${p.movies.map(mov => `
-                    <img class="mini-poster" src="${mov.poster}" onclick="openMovieDetailsByName('${mov.title.replace(/'/g, "\\'")}')">
-                `).join('')}
+                ${p.movies.map(mov => `<img class="mini-poster" src="${mov.poster}" onclick="openMovieDetailsByName('${mov.title.replace(/'/g, "\\'")}')">`).join('')}
             </div>
         </div>
     `).join('');
 }
 
-// --- RESTO DE FUNCIONES (Siguen funcionando igual) ---
-function saveAndRefresh() { localStorage.setItem('myCineData', JSON.stringify(myMovies)); renderAll(); }
-function deleteMovie(id) { if(confirm("¿Eliminar?")) { myMovies = myMovies.filter(m => m.id !== id); saveAndRefresh(); } }
+/* --- ESTADÍSTICAS (CORREGIDAS) --- */
 function updateStatistics() {
-    // 1. Verificar que hay películas
-    if (!myMovies || myMovies.length === 0) {
-        console.log("No hay películas para calcular estadísticas");
-        return;
-    }
+    if (!myMovies.length) return;
 
-    // 2. Cálculo de tiempo total
+    // 1. Cálculos base
     const totalMinutes = myMovies.reduce((acc, m) => acc + (parseInt(m.runtime) || 0), 0);
     const hours = Math.floor(totalMinutes / 60);
     const mins = totalMinutes % 60;
 
-    // Insertar en el HTML (Asegúrate de que estos IDs existen)
-    const statTotal = document.getElementById('statTotal');
-    const statHours = document.getElementById('statHours');
-    
-    if (statTotal) statTotal.innerText = myMovies.length;
-    if (statHours) statHours.innerText = `${hours}h ${mins}m`;
+    document.getElementById('statTotal').innerText = myMovies.length;
+    document.getElementById('statHours').innerText = `${hours}h ${mins}m`;
 
-    // 3. Gráfico de Géneros
-    const genData = {};
-    myMovies.forEach(m => { genData[m.genre] = (genData[m.genre] || 0) + 1; });
+    // 2. Gráfico de Géneros
+    const genMap = {};
+    myMovies.forEach(m => genMap[m.genre] = (genMap[m.genre] || 0) + 1);
 
-    renderGenreChart(genData);
+    const ctxGen = document.getElementById('genreChart');
+    if (genreChart) genreChart.destroy();
+    genreChart = new Chart(ctxGen, {
+        type: 'doughnut',
+        data: {
+            labels: Object.keys(genMap),
+            datasets: [{ data: Object.values(genMap), backgroundColor: ['#e50914', '#ffffff', '#818181', '#ffcc00', '#444'] }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: 'white' } } } }
+    });
 
-    // 4. Gráfico de Evolución de Notas (Asegúrate de tener un <canvas id="ratingChart">)
-    renderRatingChart();
-}
-
-    // 3. Gráfico de Evolución de Notas (CORREGIDO)
-    // Ordenamos películas por año para ver la evolución
-    const sortedMovies = [...myMovies].sort((a, b) => parseInt(a.year) - parseInt(b.year));
-    const labelsRating = sortedMovies.map(m => m.title.substring(0, 10) + "...");
-    const dataRating = sortedMovies.map(m => m.rating);
-
-    const ctxRating = document.getElementById('ratingChart').getContext('2d');
+    // 3. Gráfico de Evolución
+    const sorted = [...myMovies].sort((a, b) => parseInt(a.year) - parseInt(b.year));
+    const ctxRate = document.getElementById('ratingChart');
     if (ratingChart) ratingChart.destroy();
-    ratingChart = new Chart(ctxRating, {
+    ratingChart = new Chart(ctxRate, {
         type: 'line',
         data: {
-            labels: labelsRating,
-            datasets: [{
-                label: 'Nota',
-                data: dataRating,
-                borderColor: '#e50914',
-                backgroundColor: 'rgba(229, 9, 20, 0.2)',
-                fill: true,
-                tension: 0.4
-            }]
+            labels: sorted.map(m => m.title.substring(0, 8)),
+            datasets: [{ label: 'Nota', data: sorted.map(m => m.rating), borderColor: '#e50914', fill: true, backgroundColor: 'rgba(229, 9, 20, 0.2)' }]
         },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                y: { min: 0, max: 10, grid: { color: '#333' }, ticks: { color: 'white' } },
-                x: { ticks: { color: 'white', display: false } } // Ocultamos nombres si son muchos
-            },
-            plugins: { legend: { display: false } }
-        }
-    });
-}
-function showStaffTimeline(name) {
-    const staffMovies = myMovies.filter(m => {
-        const s = m.rawStaff;
-        return s.director?.name === name || s.actors?.some(a => a.name === name);
-    }).sort((a, b) => parseInt(a.year) - parseInt(b.year));
-
-    const overlay = document.getElementById('timelineOverlay');
-    overlay.innerHTML = `
-        <div class="timeline-header">
-            <button class="back-btn" onclick="closeTimeline()">← Volver</button>
-            <h2 style="margin-top:20px;">Trayectoria: ${name}</h2>
-        </div>
-        <div class="timeline-track">
-            ${staffMovies.map(m => `
-                <div class="timeline-item" onclick="openMovieDetails(${m.id})">
-                    <div class="timeline-year">${m.year}</div>
-                    <div class="timeline-dot"></div>
-                    <img src="${m.poster}" class="mini-poster" style="width:90px; height:130px;">
-                    <p style="font-size:0.7rem; margin-top:5px; max-width:90px;">${m.title}</p>
-                </div>
-            `).join('')}
-        </div>
-    `;
-    overlay.style.display = 'block';
-}
-
-function renderRatingChart() {
-    const ctx = document.getElementById('ratingChart');
-    if (!ctx) return;
-
-    // Ordenar películas por fecha/año para ver la evolución
-    const sortedMovies = [...myMovies].sort((a, b) => a.year - b.year);
-    
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: sortedMovies.map(m => m.title.substring(0, 10)),
-            datasets: [{
-                label: 'Evolución de Notas',
-                data: sortedMovies.map(m => m.rating),
-                borderColor: '#e50914',
-                backgroundColor: 'rgba(229, 9, 20, 0.2)',
-                fill: true,
-                tension: 0.4
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false, // CLAVE para que no se salga
-            scales: {
-                y: { beginAtZero: true, max: 10, ticks: { color: '#fff' } },
-                x: { ticks: { color: '#fff', display: false } }
-            },
-            plugins: { legend: { display: false } }
-        }
+        options: { responsive: true, maintainAspectRatio: false, scales: { y: { min: 0, max: 10, ticks: { color: 'white' } }, x: { ticks: { display: false } } } }
     });
 }
 
-// 3. Función para abrir detalles por nombre (usada en mini-posters)
-function openMovieDetailsByName(title) {
-    const movie = myMovies.find(m => m.title === title);
-    if (movie) openMovieDetails(movie.id);
-}
-
-// BUSCAR PELÍCULAS (Asegúrate de poner tu API KEY real)
+/* --- BUSCAR Y GUARDAR --- */
 async function searchMovie() {
     const query = document.getElementById('searchInput').value;
     const results = document.getElementById('results');
     if (!query) return;
 
     results.innerHTML = '<p>Buscando...</p>';
-    
-    const resp = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=TU_API_KEY_AQUI&query=${query}&language=es-ES`);
+    const resp = await fetch(`${BASE_URL}/search/movie?api_key=${API_KEY}&query=${query}&language=es-ES`);
     const data = await resp.json();
 
-    results.innerHTML = data.results.map(m => `
+    results.innerHTML = data.results.slice(0, 8).map(m => `
         <div class="card">
-            <img src="https://image.tmdb.org/t/p/w500${m.poster_path}" alt="${m.title}">
+            <img src="${m.poster_path ? IMG_URL + m.poster_path : 'https://via.placeholder.com/300x450'}">
             <div style="padding:10px;">
-                <button onclick="saveToLibrary(${m.id}, '${m.title.replace(/'/g, "")}')" class="main-btn">
-                    Añadir a mi Cine
-                </button>
+                <h4>${m.title}</h4>
+                <button onclick="addMovie(${m.id}, '${m.title.replace(/'/g, "")}', '${m.poster_path}')">Añadir</button>
             </div>
         </div>
     `).join('');
 }
 
-// --- FUNCIÓN UNIFICADA PARA ABRIR DETALLES (CENTRADO) ---
-async function openMovieDetails(movieId) {
-    if (!movieId) return;
-    const modal = document.getElementById('movieModal');
+async function addMovie(id, title, posterPath) {
+    if (myMovies.find(m => m.id === id)) return alert("Ya está en tu cine");
     
-    // 1. Limpieza previa para evitar "parpadeos" de datos antiguos
-    closeMovieDetails(); // Cerramos y limpiamos antes de cargar
+    const nota = parseFloat(prompt(`¿Nota para "${title}"? (0-10)`, "5"));
+    if (isNaN(nota) || nota < 0 || nota > 10) return alert("Nota no válida");
 
-    // Buscamos la película en nuestra biblioteca local (myMovies)
+    const d = await (await fetch(`${BASE_URL}/movie/${id}?api_key=${API_KEY}&language=es-ES`)).json();
+    const c = await (await fetch(`${BASE_URL}/movie/${id}/credits?api_key=${API_KEY}`)).json();
+    
+    const year = d.release_date ? d.release_date.split('-')[0] : "----";
+    const getSPhoto = (path) => path ? IMG_BIG + path : 'https://via.placeholder.com/500x500?text=Sin+Foto';
+
+    myMovies.push({
+        id, title, year, rating: nota, runtime: d.runtime, genre: d.genres[0]?.name || "Otros",
+        poster: IMG_URL + posterPath,
+        rawStaff: {
+            director: { name: c.crew.find(x => x.job === 'Director')?.name, photo: getSPhoto(c.crew.find(x => x.job === 'Director')?.profile_path), movie: title, poster: IMG_URL + posterPath },
+            actors: c.cast.slice(0, 5).map(a => ({ name: a.name, photo: getSPhoto(a.profile_path), movie: title, poster: IMG_URL + posterPath }))
+        }
+    });
+
+    saveAndRefresh();
+}
+
+/* --- UTILIDADES --- */
+function saveAndRefresh() { 
+    localStorage.setItem('myCineData', JSON.stringify(myMovies)); 
+    renderAll(); 
+}
+
+function deleteMovie(id) { 
+    if(confirm("¿Eliminar película?")) { 
+        myMovies = myMovies.filter(m => m.id !== id); 
+        saveAndRefresh(); 
+    } 
+}
+
+function openMovieDetailsByName(title) {
+    const movie = myMovies.find(m => m.title === title);
+    if (movie) openMovieDetails(movie.id);
+}
+
+/* --- MODAL DETALLES --- */
+async function openMovieDetails(movieId) {
     const movie = myMovies.find(m => m.id === movieId);
     if (!movie) return;
 
-    // 2. Cargar datos básicos de nuestra biblioteca local
     document.getElementById('detailPoster').src = movie.poster;
     document.getElementById('detailTitle').innerText = movie.title;
-    document.getElementById('detailYear').innerText = movie.year;
     document.getElementById('detailRating').innerText = `⭐ ${movie.rating}/10`;
-    
-    // Calculamos la duración (runtime) si la tenemos
-    const runtimeSpan = document.getElementById('detailRuntime');
-    if (movie.runtime) {
-        runtimeSpan.innerText = `${Math.floor(movie.runtime / 60)}h ${movie.runtime % 60}m`;
-    } else {
-        runtimeSpan.innerText = "Duración desconocida";
-    }
 
-    // 3. Pedir datos extras a TMDB (Sinopsis, Finanzas, Proveedores)
-    // Usamos append_to_response para traer proveedores en la misma llamada
-    const res = await fetch(`${BASE_URL}/movie/${movieId}?api_key=${API_KEY}&language=es-ES&append_to_response=watch/providers`);
+    const res = await fetch(`${BASE_URL}/movie/${movieId}?api_key=${API_KEY}&language=es-ES`);
     const data = await res.json();
+    document.getElementById('detailOverview').innerText = data.overview || "Sin sinopsis.";
 
-    // 4. Rellenar datos dinámicos de TMDB
-    document.getElementById('detailOverview').innerText = data.overview || "No hay sinopsis disponible.";
-    document.getElementById('detailTagline').innerText = data.tagline ? `"${data.tagline}"` : "";
-
-    // --- SECCIÓN DE FINANZAS ---
-    const triviaSection = document.getElementById('detailTrivia');
-    triviaSection.innerHTML = ""; // Limpiamos trivia anterior
-
-    if (data.budget > 0 || data.revenue > 0) {
-        const profit = data.revenue - data.budget;
-        // Color de la barra: verde si hay beneficio, rojo si hay pérdida
-        const barColor = profit >= 0 ? '#4CAF50' : '#e50914';
-        
-        triviaSection.innerHTML = `
-            <h3>Finanzas</h3>
-            <div class="finance-container">
-                <div class="finance-item">
-                    <span>Presupuesto:</span>
-                    <strong>$${data.budget.toLocaleString()}</strong>
-                </div>
-                <div class="finance-item">
-                    <span>Recaudación:</span>
-                    <strong>$${data.revenue.toLocaleString()}</strong>
-                </div>
-                <div class="profit-bar-wrapper">
-                    <div class="profit-bar" style="width: 100%; background: ${barColor};"></div>
-                </div>
-                <p class="profit-text" style="color: ${barColor}">
-                    ${profit >= 0 ? 'Ganancia estimada' : 'Pérdida estimada'}: $${Math.abs(profit).toLocaleString()}
-                </p>
-            </div>
-        `;
-    }
-
-    // 5. Procesar proveedores (ES = España)
-    const providersDiv = document.getElementById('detailProviders');
-    providersDiv.innerHTML = ""; // Limpiamos proveedores anteriores
-    const providers = data['watch/providers']?.results?.ES?.flatrate;
-
-    if (providers && providers.length > 0) {
-        providersDiv.innerHTML = providers.map(p => `
-            <div class="provider-item">
-                <img src="https://image.tmdb.org/t/p/original${p.logo_path}" title="${p.provider_name}">
-            </div>
-        `).join('');
-    } else {
-        providersDiv.innerText = "No disponible en plataformas de suscripción.";
-    }
-
-    // 6. Mostrar el modal y bloquear el scroll del fondo
-    modal.style.display = 'flex';
-    document.body.style.overflow = 'hidden';
+    document.getElementById('movieModal').style.display = 'flex';
 }
 
-// --- FUNCIÓN PARA CERRAR Y LIMPIAR EL MODAL ---
 function closeMovieDetails() {
-    const modal = document.getElementById('movieModal');
-    modal.style.display = 'none';
-    document.body.style.overflow = 'auto'; // Devolvemos el scroll
-    
-    // Limpieza profunda de los campos HTML para el próximo uso
-    document.getElementById('detailTitle').innerText = "";
-    document.getElementById('detailTagline').innerText = "";
-    document.getElementById('detailPoster').src = ""; // Evita ver el poster anterior
-    document.getElementById('detailYear').innerText = "";
-    document.getElementById('detailRuntime').innerText = "";
-    document.getElementById('detailRating').innerText = "";
-    document.getElementById('detailOverview').innerText = "";
-    document.getElementById('detailTrivia').innerHTML = "";
-    document.getElementById('detailProviders').innerHTML = "";
+    document.getElementById('movieModal').style.display = 'none';
 }
-
-// --- EXPORTAR DATOS ---
-function exportData() {
-    if (myMovies.length === 0) {
-        alert("No hay películas en tu biblioteca para exportar.");
-        return;
-    }
-
-    // Convertimos el array de películas a un string JSON con formato
-    const dataStr = JSON.stringify(myMovies, null, 2);
-    const blob = new Blob([dataStr], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    
-    // Creamos un link temporal para la descarga
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `mi_cine_backup_${new Date().toISOString().split('T')[0]}.json`;
-    document.body.appendChild(link);
-    link.click();
-    
-    // Limpieza
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-}
-
-// --- IMPORTAR DATOS ---
-function importData(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        try {
-            const importedData = JSON.parse(e.target.result);
-            
-            // Validación básica: comprobamos si es un array
-            if (Array.isArray(importedData)) {
-                if (confirm(`Se han encontrado ${importedData.length} películas. ¿Deseas sobreescribir tu biblioteca actual?`)) {
-                    myMovies = importedData;
-                    saveAndRefresh(); // Esta función ya guarda en LocalStorage y refresca el render
-                    alert("¡Biblioteca importada con éxito!");
-                }
-            } else {
-                alert("El archivo no tiene el formato correcto.");
-            }
-        } catch (err) {
-            console.error("Error al importar:", err);
-            alert("Hubo un error al leer el archivo. Asegúrate de que sea un JSON válido.");
-        }
-    };
-    reader.readAsText(file);
-    
-    // Resetear el input para permitir importar el mismo archivo de nuevo si fuera necesario
-    event.target.value = '';
-}
-
-function openNav() {
-    document.getElementById("mySidenav").style.width = "250px";
-}
-
-function closeNav() {
-    document.getElementById("mySidenav").style.width = "0";
-}
-
-renderAll();
