@@ -207,12 +207,11 @@ body {
 
 /* --- ESTADÍSTICAS REPARADAS --- */
 .stats-center-container {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr); /* 2 columnas fijas en móvil */
-    gap: 10px;
+    display: flex;
+    flex-direction: column; /* También uno debajo de otro */
+    gap: 15px;
     width: 100%;
-    padding: 10px;
-    box-sizing: border-box;
+    max-width: 600px;
 }
 
 .stat-card-large {
@@ -231,11 +230,13 @@ body {
 
 .charts-grid {
     display: flex;
-    flex-direction: column;
-    gap: 20px;
+    flex-direction: column; /* Fuerza la columna */
+    gap: 30px;
     width: 100%;
-    padding: 10px;
+    max-width: 600px; /* Evita que en PC sean gigantes */
+    padding: 20px;
     box-sizing: border-box;
+    align-items: center;
 }
 
 @media (min-width: 768px) {
@@ -243,19 +244,27 @@ body {
 }
 
 .charts {
-    width: 100%;
     background: var(--card);
+    padding: 20px;
     border-radius: 15px;
-    padding: 15px;
-    height: 300px; /* Altura fija para que el gráfico se dibuje bien */
-    position: relative;
-    box-sizing: border-box;
+    border: 1px solid #333;
+    width: 100%;
+    height: 400px; /* ALTURA FIJA: Crucial para que el gráfico no se salga */
+    position: relative; /* Necesario para que el canvas se ajuste */
+    display: flex;
+    flex-direction: column;
+}
+
+canvas {
+    width: 100% !important;
+    height: 100% !important;
 }
 
 .chart-container {
     flex: 1;
-    position: relative; /* REQUERIDO para Chart.js maintainAspectRatio: false */
+    position: relative;
     width: 100%;
+    min-height: 0; /* Evita desbordamientos en flex boxes */
 }
 
 /* --- MODAL DETALLES --- */
