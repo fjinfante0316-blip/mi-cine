@@ -18,21 +18,22 @@ function toggleMenu() {
 }
 
 function showSection(id) {
-    // 1. Ocultar todas las secciones
-    document.querySelectorAll('.content-section').forEach(s => {
-        s.style.display = 'none';
-    });
+    // Ocultar todas las secciones
+    document.querySelectorAll('.content-section').forEach(s => s.style.display = 'none');
 
     const target = document.getElementById(id);
     if (target) {
-        // 2. Mostrar la sección seleccionada
-        // Importante: stats y searchSection deben ser 'flex' para que el centrado CSS funcione
-        target.style.display = (id === 'stats' || id === 'searchSection') ? 'flex' : 'block';
+        // Usamos flex para que los elementos hijos se centren
+        target.style.display = 'flex';
+        target.style.flexDirection = 'column';
     }
 
-    // 3. Si es la sección de estadísticas, refrescar los datos y el gráfico
+    // SI LA SECCIÓN ES STATS, DIBUJAMOS LOS GRÁFICOS
     if (id === 'stats') {
-        setTimeout(() => { updateStatistics(); }, 50); // Pequeño retraso para asegurar que el DOM es visible
+        // Un pequeño retraso para que el CSS de 'display: flex' se aplique primero
+        setTimeout(() => {
+            updateStatistics(); 
+        }, 100);
     }
 
     if (id === 'sideMenu') toggleMenu();
@@ -224,10 +225,18 @@ function updateStatistics() {
             }]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false, // Hace que respete el contenedor
-            plugins: { legend: { position: 'bottom', labels: { color: 'white' } } }
+    responsive: true,
+    maintainAspectRatio: false, // Esto es lo más importante
+    plugins: {
+        legend: {
+            position: 'bottom',
+            labels: {
+                color: 'white',
+                font: { size: 10 } // Letra pequeña para que quepa en móvil
+            }
         }
+    }
+}
     });
 
     // 3. Gráfico de Evolución de Notas (CORREGIDO)
