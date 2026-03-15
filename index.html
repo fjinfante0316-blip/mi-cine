@@ -9,27 +9,27 @@
 </head>
 <body>
 
-    <div id="sideMenu" class="sidenav">
-        <a href="javascript:void(0)" class="closebtn" onclick="toggleMenu()">&times;</a>
+    <div id="mySidenav" class="sidenav">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
         
         <div class="data-actions" style="padding: 20px; display: flex; flex-direction: column; gap: 10px;">
-    <button class="menu-btn" onclick="exportData()" style="background: #222; color: white; border: 1px solid #444; padding: 10px; border-radius: 5px; cursor: pointer;">
-        📤 Exportar Biblioteca (JSON)
-    </button>
-    
-    <button class="menu-btn" onclick="document.getElementById('importFile').click()" style="background: #222; color: white; border: 1px solid #444; padding: 10px; border-radius: 5px; cursor: pointer;">
-        📥 Importar Biblioteca (JSON)
-    </button>
-    <input type="file" id="importFile" style="display: none" onchange="importData(event)" accept=".json">
-</div>
+            <button class="menu-btn" onclick="exportData()" style="background: #222; color: white; border: 1px solid #444; padding: 10px; border-radius: 5px; cursor: pointer;">
+                📤 Exportar Biblioteca (JSON)
+            </button>
+            
+            <button class="menu-btn" onclick="document.getElementById('importFile').click()" style="background: #222; color: white; border: 1px solid #444; padding: 10px; border-radius: 5px; cursor: pointer;">
+                📥 Importar Biblioteca (JSON)
+            </button>
+            <input type="file" id="importFile" style="display: none" onchange="importData(event)" accept=".json">
+        </div>
 
-        <hr class="menu-divider">
+        <hr class="menu-divider" style="border: 0; border-top: 1px solid #333; margin: 10px 0;">
         
         <a href="#" onclick="showSection('searchSection')">🏠 Portada</a>
         <a href="#" onclick="showSection('myLibrary')">🍿 Mi Hemeroteca</a>
         <a href="#" onclick="showSection('stats')">📊 Estadísticas</a>
         
-        <hr class="menu-divider">
+        <hr class="menu-divider" style="border: 0; border-top: 1px solid #333; margin: 10px 0;">
         
         <a href="#" onclick="showSection('directors')">🎥 Directores</a>
         <a href="#" onclick="showSection('actors')">🌟 Reparto</a>
@@ -38,7 +38,7 @@
     </div>
 
     <header>
-        <div class="menu-container" onclick="toggleMenu()">
+        <div class="menu-container" onclick="openNav()">
             <span class="menu-icon">☰</span>
             <span class="menu-text">MENÚ</span>
         </div>
@@ -50,98 +50,102 @@
                 <h1>🎬 MI CINE</h1>
                 <div class="search-box">
                     <input type="text" id="searchInput" placeholder="Busca una película para añadir...">
-                    <button id="searchBtn">Añadir</button>
+                    <button id="searchBtn" onclick="searchMovie()">Añadir</button>
                 </div>
             </div>
             <div id="results" class="movie-grid"></div>
         </section>
 
-        <section id="myLibrary" class="content-section" style="display:none;">
-            <div class="internal-search-container">
-                <input type="text" id="internalSearch" placeholder="🔍 Buscar título en mi colección..." onkeyup="filterMyMovies()">
+        <section id="myLibrary" class="content-section">
+            <div class="internal-search-container" style="width: 100%; max-width: 600px; margin-bottom: 20px;">
+                <input type="text" id="internalSearch" placeholder="🔍 Buscar título en mi colección..." onkeyup="filterMyMovies()" style="width: 100%; padding: 12px; border-radius: 25px; border: 1px solid #333; background: #222; color: white;">
             </div>
             <h2 class="section-title">🍿 Mi Hemeroteca</h2>
             <div id="watchedMovies"></div>
         </section>
 
-        <section id="stats" class="content-section" style="display:none;">
+        <section id="stats" class="content-section">
             <h2 class="section-title">📊 Estadísticas Personales</h2>
             <div class="stats-center-container">
-                <div class="stat-card-large">
-                    <span class="stat-emoji">⏳</span>
-                    <div class="stat-value" id="statHours">0h 0m</div>
-                    <p class="stat-label">Tiempo total de cine</p>
+                <div style="display: flex; gap: 15px; width: 100%;">
+                    <div class="stat-card-large" style="flex: 1;">
+                        <div class="stat-value" id="statTotal">0</div>
+                        <p class="stat-label">Películas guardadas</p>
+                    </div>
+                    <div class="stat-card-large" style="flex: 1;">
+                        <div class="stat-value" id="statHours">0h 0m</div>
+                        <p class="stat-label">Tiempo total de cine</p>
+                    </div>
                 </div>
                 
                 <div class="charts">
-        <h3>Películas por Género</h3>
-<div class="chart-container">    
-    <canvas id="genreChart"></canvas>
-        </div>
-    </div>
-    
-    <div class="charts">
-        <h3>Evolución de Notas</h3>
-        <div class="chart-container">
-            <canvas id="ratingChart"></canvas>
-        </div>
-    </div>
+                    <h3>Películas por Género</h3>
+                    <div class="chart-container"> 
+                        <canvas id="genreChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="charts">
+                    <h3>Evolución de Notas</h3>
+                    <div class="chart-container">
+                        <canvas id="ratingChart"></canvas>
+                    </div>
+                </div>
             </div>
         </section>
 
-        <section id="directors" class="content-section" style="display:none;">
+        <section id="directors" class="content-section">
             <h2 class="section-title">🎥 Directores Favoritos</h2>
             <div id="directorList" class="people-grid"></div>
         </section>
 
-        <section id="actors" class="content-section" style="display:none;">
+        <section id="actors" class="content-section">
             <h2 class="section-title">🌟 Reparto Completo</h2>
             <div id="actorList" class="people-grid"></div>
         </section>
 
-        <section id="writers" class="content-section" style="display:none;">
+        <section id="writers" class="content-section">
             <h2 class="section-title">✍️ Guionistas</h2>
             <div id="writerList" class="people-grid"></div>
         </section>
 
-        <section id="producers" class="content-section" style="display:none;">
+        <section id="producers" class="content-section">
             <h2 class="section-title">💼 Productores</h2>
             <div id="producerList" class="people-grid"></div>
         </section>
     </div>
 
-<div id="movieModal" class="movie-detail-modal" style="display: none;">
-    <div class="movie-detail-wrapper">
-        <button class="close-detail-btn" onclick="closeMovieDetails()">×</button>
-        
-        <div class="movie-detail-content">
-            <div class="detail-poster-container">
-                <img id="detailPoster" src="" alt="Poster de la película">
-                <div class="detail-rating-badge" id="detailRating"></div>
-            </div>
-
-            <div class="detail-info-container">
-                <h2 id="detailTitle"></h2>
-                <p id="detailTagline"></p>
-                
-                <div class="detail-meta">
-                    <span id="detailYear"></span> | 
-                    <span id="detailRuntime"></span>
+    <div id="movieModal" class="movie-detail-modal">
+        <div class="movie-detail-wrapper">
+            <button class="close-detail-btn" onclick="closeMovieDetails()" style="position: absolute; right: 20px; top: 15px; background: none; border: none; color: white; font-size: 30px; cursor: pointer; z-index: 10;">&times;</button>
+            
+            <div class="movie-detail-content">
+                <div class="detail-poster-container">
+                    <img id="detailPoster" src="" alt="Poster">
                 </div>
-                
-                <div class="detail-sep"></div>
 
-                <h3>Sinopsis</h3>
-                <p id="detailOverview"></p>
+                <div class="detail-info-container" style="padding: 20px;">
+                    <h2 id="detailTitle" style="color: var(--primary); margin-bottom: 5px;"></h2>
+                    <p id="detailTagline" style="font-style: italic; color: #888; margin-bottom: 15px;"></p>
+                    
+                    <div class="detail-meta">
+                        <span id="detailRating"></span> | 
+                        <span id="detailYear"></span> | 
+                        <span id="detailRuntime"></span>
+                    </div>
+                    
+                    <div style="height: 1px; background: #333; margin: 20px 0;"></div>
 
-                <div id="detailTrivia"></div> 
+                    <h3>Sinopsis</h3>
+                    <p id="detailOverview" style="line-height: 1.6; color: #ccc;"></p>
 
-                <h3>¿Dónde ver?</h3>
-                <div id="detailProviders" class="providers-list"></div>
+                    <div id="detailTrivia"></div> 
+
+                    <h3 style="margin-top: 25px;">¿Dónde ver?</h3>
+                    <div id="detailProviders" class="providers-list" style="display: flex; gap: 10px; margin-top: 10px;"></div>
+                </div>
             </div>
         </div>
-    </div>
-</div>
     </div>
 
     <script src="script.js"></script>
