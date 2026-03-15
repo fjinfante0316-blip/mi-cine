@@ -30,16 +30,15 @@ body {
 
 /* --- BOTÓN MENÚ (ARRIBA A LA IZQUIERDA) --- */
 .menu-container {
-    position: fixed; 
-    top: 20px; 
-    left: 20px; /* Asegura que esté a la izquierda */
-    display: flex; 
-    align-items: center; 
-    gap: 10px;
-    z-index: 2000;
-    background: rgba(20, 20, 20, 0.8);
-    padding: 10px 20px; 
-    border-radius: 40px;
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 9999; /* Máxima prioridad */
+    background: rgba(229, 9, 20, 0.9);
+    padding: 12px;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
 }
 
 /* --- SECCIONES GENERALES --- */
@@ -63,13 +62,17 @@ body {
 
 /* --- SECCIÓN INICIO (HERO) VISIBLE --- */
 #searchSection {
-    display: flex; /* Cambiado de 'none' a 'flex' para que se vea al cargar */
+    min-height: 100vh;
+    display: flex !important; /* Forzamos visibilidad */
     flex-direction: column;
-    align-items: center;
     justify-content: center;
-    min-height: 80vh;
-    width: 100%;
+    align-items: center;
+    background: linear-gradient(rgba(0,0,0,0.6), #141414), 
+                url('https://assets.nflxext.com/ffe/siteui/vlv3/f841d4c7-10e1-40af-bcae-07a3f8dc141a/f6ed7c9a-4100-410d-b108-757917e94e77/ES-es-20220502-popsignuptwoweeks-perspective_alpha_website_medium.jpg');
+    background-size: cover;
+    background-position: center;
     text-align: center;
+    padding: 20px;
 }
 
 .hero-center h1 {
