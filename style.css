@@ -63,25 +63,53 @@ body {
 /* --- SECCIÓN INICIO (HERO) VISIBLE --- */
 #searchSection {
     min-height: 100vh;
-    display: flex !important; /* Forzamos visibilidad */
+    width: 100vw; /* Asegura el ancho total */
+    display: flex !important; 
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    background: linear-gradient(rgba(0,0,0,0.6), #141414), 
+    background: linear-gradient(rgba(0,0,0,0.7), var(--bg)), 
                 url('https://assets.nflxext.com/ffe/siteui/vlv3/f841d4c7-10e1-40af-bcae-07a3f8dc141a/f6ed7c9a-4100-410d-b108-757917e94e77/ES-es-20220502-popsignuptwoweeks-perspective_alpha_website_medium.jpg');
     background-size: cover;
     background-position: center;
     text-align: center;
     padding: 20px;
+    margin: 0;
+    position: relative;
+    top: 0;
+    left: 0;
+    box-sizing: border-box;
+}
+
+#searchSection input[type="text"] {
+    width: 100%;
+    max-width: 400px;
+    padding: 15px 25px;
+    border-radius: 30px;
+    border: 1px solid rgba(255,255,255,0.2);
+    background: rgba(0,0,0,0.5);
+    color: white;
+    backdrop-filter: blur(5px);
+    font-size: 1rem;
+}
+
+.hero-center {
+    width: 100%;
+    max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
 }
 
 .hero-center h1 {
-    font-size: clamp(2.5rem, 8vw, 4rem);
+    font-size: clamp(2.5rem, 10vw, 5rem);
     color: var(--primary);
     margin: 0;
-    text-shadow: 2px 2px 15px rgba(0,0,0,0.5);
+    text-shadow: 2px 2px 20px rgba(0,0,0,0.8);
+    font-weight: 800;
+    letter-spacing: -1px;
 }
-
 /* --- HEMEROTECA (MOVIE GRID) --- */
 .movie-grid {
     display: grid;
