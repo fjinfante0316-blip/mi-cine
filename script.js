@@ -49,7 +49,7 @@ function showSection(id) {
     window.scrollTo(0,0);
 }
 
-/* --- RENDERIZADO PRINCIPAL (HEMEROTECA Y STAFF) --- */
+// --- RENDERIZADO CON NUEVA ORDENACIÓN ---
 function renderAll() {
     const container = document.getElementById('watchedMovies');
     if (!container) return;
@@ -58,6 +58,7 @@ function renderAll() {
     const groups = {};
     let directors = [], actors = [], writers = [], producers = [];
 
+    // 1. Agrupar películas por año y procesar Staff
     myMovies.forEach(m => {
         const y = m.year || "Sin Año";
         if (!groups[y]) groups[y] = [];
@@ -73,7 +74,7 @@ function renderAll() {
         }
     });
 
-    // Renderizar Hemeroteca por años
+    // 2. Renderizar Hemeroteca (Años descendentes)
     const sortedYears = Object.keys(groups).sort((a, b) => b - a);
     let html = '';
     sortedYears.forEach(year => {
@@ -83,13 +84,19 @@ function renderAll() {
     });
     container.innerHTML = html;
 
-    // Renderizar todas las listas de personas
-    const sortByRating = (a, b) => b.averageRating - a.averageRating || b.movies.length - a.movies.length;
-    
-    renderPeople('directorList', directors.sort(sortByRating));
-    renderPeople('actorList', actors.sort(sortByRating));
-    renderPeople('writerList', writers.sort(sortByRating));
-    renderPeople('producerList', producers.sort(sortByRating));
+    // 3. LÓGICA DE ORDENACIÓN: Cantidad de películas (Desc) > Nota Media (Desc)
+    const sortByQtyThenRating = (a, b) => {
+        if (b.movies.length !== a.movies.length) {
+            return b.movies.length - a.movies.length; // Primero por cantidad
+        }
+        return b.averageRating - a.averageRating; // Si empatan, por nota
+    };
+
+    // 4. Renderizar cada lista con el nuevo orden
+    renderPeople('directorList', directors.sort(sortByQtyThenRating));
+    renderPeople('actorList', actors.sort(sortByQtyThenRating));
+    renderPeople('writerList', writers.sort(sortByQtyThenRating));
+    renderPeople('producerList', producers.sort(sortByQtyThenRating));
 }
 
 function movieCardTemplate(m) {
@@ -122,18 +129,28 @@ function processStaff(list, person, rating) {
     }
 }
 
+// --- ACTUALIZACIÓN DE PLANTILLA DE PERSONA ---
+// Añadimos un pequeño contador visual para que veas cuántas películas tienen
 function renderPeople(id, arr) {
     const container = document.getElementById(id);
     if (!container) return;
+    
     container.innerHTML = arr.map(p => `
         <div class="person-card">
             <div class="person-info-block">
                 <img class="person-photo" src="${p.photo}">
                 <strong>${p.name}</strong>
-                <span style="color:var(--gold); font-size:0.8rem;">⭐ ${p.averageRating}</span>
+                <div class="staff-badges" style="display:flex; flex-direction:column; gap:2px; margin-top:5px;">
+                    <span style="color:var(--primary); font-weight:bold; font-size:0.75rem;">🎬 ${p.movies.length} Pelis</span>
+                    <span style="color:var(--gold); font-size:0.75rem;">⭐ ${p.averageRating}</span>
+                </div>
             </div>
             <div class="person-movies-block">
-                ${p.movies.map(mov => `<img class="mini-poster" src="${mov.poster}" onclick="openMovieDetailsByName('${mov.title.replace(/'/g, "\\'")}')">`).join('')}
+                ${p.movies.map(mov => `
+                    <img class="mini-poster" src="${mov.poster}" 
+                         title="${mov.title}" 
+                         onclick="openMovieDetailsByName('${mov.title.replace(/'/g, "\\'")}')">
+                `).join('')}
             </div>
         </div>
     `).join('');
