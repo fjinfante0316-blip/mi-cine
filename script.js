@@ -129,27 +129,69 @@ function processStaff(list, person, rating) {
     }
 }
 
-// --- ACTUALIZACIÓN DE PLANTILLA DE PERSONA ---
-// Añadimos un pequeño contador visual para que veas cuántas películas tienen
+// --- FUNCIÓN PARA MOSTRAR LA TRAYECTORIA ---
+function showStaffTimeline(name) {
+    // 1. Filtrar todas las películas donde participa esta persona
+    const staffMovies = myMovies.filter(m => {
+        const s = m.rawStaff;
+        return s.director?.name === name || 
+               s.actors?.some(a => a.name === name) ||
+               s.writers?.some(w => w.name === name) ||
+               s.producers?.some(p => p.name === name);
+    }).sort((a, b) => parseInt(a.year) - parseInt(b.year)); // Orden cronológico
+
+    const overlay = document.getElementById('timelineOverlay');
+    
+    // 2. Construir el HTML
+    overlay.innerHTML = `
+        <button class="back-btn" onclick="closeTimeline()">← Volver</button>
+        <h2 style="font-size: 2rem; margin-bottom: 10px;">Trayectoria de:</h2>
+        <h1 style="color: var(--primary); margin-bottom: 30px;">${name}</h1>
+        
+        <div class="timeline-track">
+            ${staffMovies.map(m => `
+                <div class="timeline-item" onclick="openMovieDetails(${m.id})">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-year">${m.year}</div>
+                    <img src="${m.poster}" alt="${m.title}">
+                    <p style="font-size: 0.8rem; margin-top: 10px; text-align: center; max-width: 100px;">
+                        ${m.title}<br>
+                        <span style="color:var(--gold)">⭐ ${m.rating}</span>
+                    </p>
+                </div>
+            `).join('')}
+        </div>
+    `;
+
+    // 3. Mostrar y bloquear scroll
+    overlay.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+
+function closeTimeline() {
+    document.getElementById('timelineOverlay').style.display = 'none';
+    document.body.style.overflow = 'auto';
+}
+
+// --- ACTUALIZAR RENDERPEOPLE ---
+// Asegúrate de que tu función renderPeople use el onclick en el bloque de info:
 function renderPeople(id, arr) {
     const container = document.getElementById(id);
     if (!container) return;
     
     container.innerHTML = arr.map(p => `
         <div class="person-card">
-            <div class="person-info-block">
+            <div class="person-info-block" onclick="showStaffTimeline('${p.name.replace(/'/g, "\\'")}')" style="cursor:pointer">
                 <img class="person-photo" src="${p.photo}">
                 <strong>${p.name}</strong>
-                <div class="staff-badges" style="display:flex; flex-direction:column; gap:2px; margin-top:5px;">
-                    <span style="color:var(--primary); font-weight:bold; font-size:0.75rem;">🎬 ${p.movies.length} Pelis</span>
+                <div class="staff-badges">
+                    <span style="color:var(--primary); font-size:0.75rem;">🎬 ${p.movies.length} Pelis</span>
                     <span style="color:var(--gold); font-size:0.75rem;">⭐ ${p.averageRating}</span>
                 </div>
             </div>
             <div class="person-movies-block">
                 ${p.movies.map(mov => `
-                    <img class="mini-poster" src="${mov.poster}" 
-                         title="${mov.title}" 
-                         onclick="openMovieDetailsByName('${mov.title.replace(/'/g, "\\'")}')">
+                    <img class="mini-poster" src="${mov.poster}" onclick="openMovieDetailsByName('${mov.title.replace(/'/g, "\\'")}')">
                 `).join('')}
             </div>
         </div>
