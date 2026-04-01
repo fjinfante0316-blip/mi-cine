@@ -306,3 +306,76 @@ body {
     height: auto;
     border-radius: 12px;
 }
+
+/* --- OVERLAY LÍNEA DE TIEMPO --- */
+#timelineOverlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(10, 10, 10, 0.98);
+    z-index: 11000;
+    flex-direction: column;
+    padding: 40px 20px;
+    overflow-y: auto;
+}
+
+.timeline-track {
+    display: flex;
+    align-items: flex-start;
+    gap: 40px;
+    padding: 50px 0;
+    overflow-x: auto;
+    width: 100%;
+    position: relative;
+    border-top: 2px solid var(--primary); /* La línea del tiempo */
+    margin-top: 60px;
+}
+
+.timeline-item {
+    position: relative;
+    min-width: 120px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.timeline-item:hover { transform: translateY(-10px); }
+
+.timeline-dot {
+    width: 16px;
+    height: 16px;
+    background: var(--primary);
+    border-radius: 50%;
+    position: absolute;
+    top: -51px; /* Justo encima de la línea */
+    border: 3px solid var(--bg);
+}
+
+.timeline-year {
+    font-weight: bold;
+    color: var(--primary);
+    margin-bottom: 10px;
+    font-size: 1.2rem;
+}
+
+.timeline-item img {
+    width: 100px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 8px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+}
+
+.back-btn {
+    align-self: flex-start;
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
